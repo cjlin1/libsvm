@@ -86,8 +86,8 @@ Usage: grid.py [-log2c begin,end,step] [-log2g begin,end,step] [-v fold]
         i = i + 1
 
     pass_through_string = join(pass_through_options," ")
+    assert os.path.exists(svmtrain_exe),"svm-train executable not found"    
     assert os.path.exists(gnuplot_exe),"gnuplot executable not found"
-    assert os.path.exists(svmtrain_exe),"svm-train executable not found"
     gnuplot = os.popen(gnuplot_exe,'w')
 
 
