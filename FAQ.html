@@ -1,21 +1,33 @@
-<html><head><title>LIBSVM FAQ</title></head>
+<html>
+<head>
+<title>LIBSVM FAQ</title>
+</head>
 <body bgcolor="#ffffcc">
 
-<a name="_TOP"><b><h1><a href="http://www.csie.ntu.edu.tw/%7Ecjlin/libsvm">LIBSVM</a>  FAQ </h1></b></a>
+<a name="_TOP"><b><h1><a
+href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a>  FAQ </h1></b></a>
 <b>last modified : </b>
-Wed,  8 Sep 2004 12:16:09 GMT
-<class ="categories">
-<li><a href="#_TOP">All Questions</a>(48)</li>
-</class><ul><b>
-<li><a href="#/Q1:_Some_courses_which_have_used_libsvm_as_a_tool">Q1:_Some_courses_which_have_used_libsvm_as_a_tool</a>(1)</li>
-<li><a href="#/Q2:_Installation_and_running_the_program">Q2:_Installation_and_running_the_program</a>(8)</li>
-<li><a href="#/Q3:_Data_preparation">Q3:_Data_preparation</a>(3)</li>
-<li><a href="#/Q4:_Training_and_prediction">Q4:_Training_and_prediction</a>(25)</li>
-<li><a href="#/Q5:_Graphic_Interface">Q5:_Graphic_Interface</a>(3)</li>
-<li><a href="#/Q6:_Java_version_of_libsvm">Q6:_Java_version_of_libsvm</a>(4)</li>
-<li><a href="#/Q7:_Python_Interface">Q7:_Python_Interface</a>(4)</li>
+Sun, 24 Oct 2004 01:42:17 GMT
+<class="categories">
+<li><a
+href="#_TOP">All Questions</a>(48)</li>
+<ul><b>
+<li><a
+href="#/Q1:_Some_courses_which_have_used_libsvm_as_a_tool">Q1:_Some_courses_which_have_used_libsvm_as_a_tool</a>(1)</li>
+<li><a
+href="#/Q2:_Installation_and_running_the_program">Q2:_Installation_and_running_the_program</a>(8)</li>
+<li><a
+href="#/Q3:_Data_preparation">Q3:_Data_preparation</a>(3)</li>
+<li><a
+href="#/Q4:_Training_and_prediction">Q4:_Training_and_prediction</a>(25)</li>
+<li><a
+href="#/Q5:_Graphic_Interface">Q5:_Graphic_Interface</a>(3)</li>
+<li><a
+href="#/Q6:_Java_version_of_libsvm">Q6:_Java_version_of_libsvm</a>(4)</li>
+<li><a
+href="#/Q7:_Python_Interface">Q7:_Python_Interface</a>(4)</li>
 </b></ul>
-
+</li>
 
 <ul><ul class="headlines">
 <li class="headlines_item"><a href="#faq1">Some courses which have used libsvm as a tool</a></li>
@@ -42,15 +54,12 @@ Wed,  8 Sep 2004 12:16:09 GMT
 <li class="headlines_item"><a href="#f410">My data are unbalanced. Could libsvm handle such problems ?</a></li>
 <li class="headlines_item"><a href="#f411">What is the difference between nu-SVC and C-SVC ?</a></li>
 <li class="headlines_item"><a href="#f412">The program keeps running without showing any output. What should I do ?</a></li>
-<li class="headlines_item"><a href="#f413">The program keeps running (with output, i.e. many dots).What should I do ?</a></li>
+<li class="headlines_item"><a href="#f413">The program keeps running (with output, i.e. many dots). What should I do ?</a></li>
 <li class="headlines_item"><a href="#f414">The training time is too long. What should I do ?</a></li>
 <li class="headlines_item"><a href="#f415">How do I get the decision value(s) ?</a></li>
 <li class="headlines_item"><a href="#f416">For some problem sets if I use a large cache (i.e. large -m) on a linux machine, why sometimes I get "segmentation fault ?"</a></li>
 <li class="headlines_item"><a href="#f417">How do I disable screen output of svm-train and svm-predict ?</a></li>
-<li class="headlines_item"><a href="#f418">I would like to use my own
-kernel but find out that there are two subroutines for kernel
-evaluations: k_function() and kernel_function(). Which one should I
-modify ?</a></li>
+<li class="headlines_item"><a href="#f418">I would like to use my own kernel but find out that there are two subroutines for kernel evaluations: k_function() and kernel_function(). Which one should I modify ?</a></li>
 <li class="headlines_item"><a href="#f419">What method does libsvm use for multi-class SVM ? Why don't you use the "1-against-the rest" method ?</a></li>
 <li class="headlines_item"><a href="#f420">After doing cross validation, why there is no model file outputted ?</a></li>
 <li class="headlines_item"><a href="#f421">I would like to try different random partition for cross validation, how could I do it ?</a></li>
@@ -68,84 +77,85 @@ modify ?</a></li>
 <li class="headlines_item"><a href="#f702">Using python on MS windows, it fails to load the dll file.</a></li>
 <li class="headlines_item"><a href="#f703">How to modify the python interface on MS windows and rebuild the dll file ?</a></li>
 <li class="headlines_item"><a href="#f704">Except the python-C++ interface provided, could I use Jython to call libsvm ?</a></li>
-<li class="headlines_item"><a href="#f705">How could I instal the python interface on Mac OS? </a></li>
+<li class="headlines_item"><a href="#f705">How could I install the python interface on Mac OS? </a></li>
 </ul></ul>
 
 
-<hr size="5" noshade="noshade">
-<p>
+<hr size="5" noshade />
+<p/>
   
 <a name="/Q1:_Some_courses_which_have_used_libsvm_as_a_tool"></a>
 <a name="faq1"><b>Q: Some courses which have used libsvm as a tool</b></a>
-<br>                                                                                
-</p><ul>
-<li><a href="http://lmb.informatik.uni-freiburg.de/lectures/svm_seminar/">Institute for Computer Science,           
+<br/>                                                                                
+<ul>
+<li><a href=http://lmb.informatik.uni-freiburg.de/lectures/svm_seminar/>Institute for Computer Science,           
 Faculty of Applied Science, University of Freiburg, Germany 
 </a>
-</li><li> <a href="http://www.cs.vu.nl/%7Eelena/ml.html">
+<li> <a href=http://www.cs.vu.nl/~elena/ml.html>
 Division of Mathematics and Computer Science. 
 Faculteit der Exacte Wetenschappen 
 Vrije Universiteit, The Netherlands. </a>
-</li><li>
-<a href="http://www.cae.wisc.edu/%7Eece539/matlab/">
+<li>
+<a href=http://www.cae.wisc.edu/~ece539/matlab/>
 Electrical and Computer Engineering Department, 
 University of Wisconsin-Madison 
 </a>
-</li><li>
-<a href="http://www.hpl.hp.com/personal/Carl_Staelin/cs236601/project.html">
+<li>
+<a href=http://www.hpl.hp.com/personal/Carl_Staelin/cs236601/project.html>
 Technion (Israel Institute of Technology), Israel.
-</a></li><li>
-<a href="http://www.cise.ufl.edu/%7Efu/learn.html">
+<li>
+<a href=http://www.cise.ufl.edu/~fu/learn.html>
 Computer and Information Sciences Dept., University of Florida</a>
-</li><li>
-<a href="http://www.uonbi.ac.ke/acad_depts/ics/course_material/machine_learning/ML_and_DM_Resources.html">
+<li>
+<a href=http://www.uonbi.ac.ke/acad_depts/ics/course_material/machine_learning/ML_and_DM_Resources.html>
 The Institute of Computer Science,
 University of Nairobi, Kenya.</a>
-</li><li>
-<a href="http://cerium.raunvis.hi.is/%7Etpr/courseware/svm/hugbunadur.html">
+<li>
+<a href=http://cerium.raunvis.hi.is/~tpr/courseware/svm/hugbunadur.html>
 Applied Mathematics and Computer Science, University of Iceland.
 </a>
-</li></ul>
+</ul>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q2:_Installation_and_running_the_program"></a>
 <a name="f201"><b>Q: Where can I find documents of libsvm ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 In the package there is a README file which 
 details all options, data format, and library calls.
 The model selection tool and the python interface
 have a separate README under the directory python.
 The guide
-<a href="http://www.csie.ntu.edu.tw/%7Ecjlin/papers/guide/guide.pdf">
+<A HREF="http://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf">
 A practical guide to support vector classification
-</a> shows beginners how to train/test their data.
-The paper <a href="http://www.csie.ntu.edu.tw/%7Ecjlin/papers/libsvm.pdf">LIBSVM
+</A> shows beginners how to train/test their data.
+The paper <a href="http://www.csie.ntu.edu.tw/~cjlin/papers/libsvm.pdf">LIBSVM
 : a library for support vector machines</a> discusses the implementation of
 libsvm in detail.
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q2:_Installation_and_running_the_program"></a>
 <a name="f202"><b>Q: What are changes in previous versions?</b></a>
-<br>                                                                                
-<p>See <a href="http://www.csie.ntu.edu.tw/%7Ecjlin/libsvm/log">the change log</a>.
-</p><p align="right">
+<br/>                                                                                
+<p>See <a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm/log">the change log</a>.
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q2:_Installation_and_running_the_program"></a>
 <a name="f203"><b>Q: I would like to cite libsvm. Which paper should I cite ?   </b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 Please cite the following document:
-</p><p>
+<p>
 Chih-Chung Chang and Chih-Jen Lin, LIBSVM
 : a library for support vector machines, 2001.
 Software available at http://www.csie.ntu.edu.tw/~cjlin/libsvm
-</p><p>
+<p>
 The bibtex format is as follows
-</p><pre>@Manual{CC01a,
+<pre>
+@Manual{CC01a,
   author =	 {Chih-Chung Chang and Chih-Jen Lin},
   title =	 {{LIBSVM}: a library for support vector machines},
   year =	 {2001},
@@ -154,43 +164,43 @@ The bibtex format is as follows
 </pre>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q2:_Installation_and_running_the_program"></a>
 <a name="f204"><b>Q: I would like to use libsvm in my software. Is there any license problem?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 The libsvm license ("the modified BSD license")
 is compatible with many
 free software licenses such as GPL. Hence, it is very easy to
 use libsvm in your software.
 It can also be used in commercial products.
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q2:_Installation_and_running_the_program"></a>
 <a name="f205"><b>Q: Is there a repository of additional tools based on libsvm?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
-Yes, see <a href="http://www.csie.ntu.edu.tw/%7Ecjlin/libsvmtools">libsvm 
+Yes, see <a href="http://www.csie.ntu.edu.tw/~cjlin/libsvmtools">libsvm 
 tools</a>
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q2:_Installation_and_running_the_program"></a>
 <a name="f206"><b>Q: On unix machines, I got "error in loading shared libraries" or "cannot open shared object file." What happened ? </b></a>
-<br>                                                                                
+<br/>                                                                                
 
 <p>
 This usually happens if you compile the code
 on one machine and run it on another which has incompatible
 libraries.
 Try to recompile the program on that machine or use static linking.
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q2:_Installation_and_running_the_program"></a>
 <a name="f207"><b>Q: I have modified the source and would like to build the graphic interface "svm-toy" on MS windows. How should I do it ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 
 <p>
 Build it as a project by choosing "Win32 Application."
@@ -200,56 +210,59 @@ After libsvm 2.5, you can also use the file Makefile.win.
 See details in README.
 
 
-</p><p>
+<p>
 If you are not using Makefile.win and see the following 
 link error
-</p><pre>LIBCMTD.lib(wwincrt0.obj) : error LNK2001: unresolved external symbol
+<pre>
+LIBCMTD.lib(wwincrt0.obj) : error LNK2001: unresolved external symbol
 _wWinMain@16
 </pre>
 you may have selected a wrong project type.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q2:_Installation_and_running_the_program"></a>
 <a name="f208"><b>Q: I am an MS windows user but why only one (SVM_toy) of those precompiled .exe actually runs ?  </b></a>
-<br>                                                                                
+<br/>                                                                                
 
 <p>
 You need to open a command window 
 and type  svmtrain.exe to see all options.
 Some examples are in README file.
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q3:_Data_preparation"></a>
 <a name="f301"><b>Q: Why sometimes not all attributes of a data appear in the training/model files ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 libsvm uses the so called "sparse" format where zero
 values do not need to be stored. Hence a data with attributes
-</p><pre>1 0 2 0
+<pre>
+1 0 2 0
 </pre>
 is represented as
-<pre>1:1 3:2
+<pre>
+1:1 3:2
 </pre>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q3:_Data_preparation"></a>
 <a name="f302"><b>Q: What if my data are non-numerical ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 Currently libsvm supports only numerical data.
 You may have to change non-numerical data to 
 numerical. For example, you can use several
 binary attributes to represent a categorical
 attribute.
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q3:_Data_preparation"></a>
 <a name="f303"><b>Q: Why do you consider sparse format ? Will the training of dense data be much slower ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 This is a controversial issue. The kernel
 evaluation (i.e. inner product) of sparse vectors is slower 
@@ -259,12 +272,12 @@ However, we cannot support only dense format as then we CANNOT
 handle extremely sparse cases. Simplicity of the code is another
 concern. Right now we decide to support
 the sparse format only.
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q4:_Training_and_prediction"></a>
 <a name="f401"><b>Q: The output of training C-SVM is like the following. What do they mean ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <br>optimization finished, #iter = 219
 <br>nu = 0.431030
 <br>obj = -100.877286, rho = 0.424632
@@ -278,14 +291,14 @@ nSV and nBSV are number of support vectors and bounded support
 vectors (i.e., alpha_i = C). nu-svm is a somewhat equivalent
 form of C-SVM where C is replaced by nu. nu simply shows the
 corresponding parameter. More details are in
-<a href="http://www.csie.ntu.edu.tw/%7Ecjlin/papers/libsvm.pdf">
+<a href="http://www.csie.ntu.edu.tw/~cjlin/papers/libsvm.pdf">
 libsvm document</a>.
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q4:_Training_and_prediction"></a>
 <a name="f402"><b>Q: Can you explain more about the model file ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 
 <p>
 After the parameters, each line represents a support vector.
@@ -305,7 +318,8 @@ k-j coefficients.
 
 For example, if there are 4 classes, the file looks like:
 
-</p><pre>+-+-+-+--------------------+
+<pre>
++-+-+-+--------------------+
 |1|1|1|                    |
 |v|v|v|  SVs from class 1  |
 |2|3|4|                    |
@@ -325,10 +339,10 @@ For example, if there are 4 classes, the file looks like:
 </pre>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q4:_Training_and_prediction"></a>
 <a name="f403"><b>Q: Should I use float or double to store numbers in the cache ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 
 <p>
 We have float as the default as you can store more numbers
@@ -337,35 +351,35 @@ In general this is good enough but for few difficult
 cases (e.g. C very very large) where solutions are huge
 numbers, it might be possible that the numerical precision is not
 enough using only float.
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q4:_Training_and_prediction"></a>
 <a name="f404"><b>Q: How do I choose the kernel ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 
 <p>
 In general we suggest you to try the RBF kernel first.
 A recent result by Keerthi and Lin
-(<a href="http://www.csie.ntu.edu.tw/%7Ecjlin/papers/limit.ps.gz">
+(<a href=http://www.csie.ntu.edu.tw/~cjlin/papers/limit.ps.gz>
 download paper here</a>)
 shows that if RBF is used with model selection,
 then there is no need to consider the linear kernel.
 The kernel matrix using sigmoid may not be positive definite
 and in general it's accuracy is not better than RBF.
 (see the paper by Lin and Lin
-(<a href="http://www.csie.ntu.edu.tw/%7Ecjlin/papers/tanh.pdf">
+(<a href=http://www.csie.ntu.edu.tw/~cjlin/papers/tanh.pdf>
 download paper here</a>).
 Polynomial kernels are ok but if a high degree is used,
 numerical difficulties tend to happen
-(thinking about dth power of (&lt;1) goes to 0
-and (&gt;1) goes to infinity).
-</p><p align="right">
+(thinking about dth power of (<1) goes to 0
+and (>1) goes to infinity).
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q4:_Training_and_prediction"></a>
 <a name="f405"><b>Q: Does libsvm have special treatments for linear SVM ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 
 <p>
 
@@ -378,7 +392,7 @@ Hence libsvm is <b>NOT</b> particularly efficient for linear SVM,
 especially for problems whose number of data is much larger
 than number of attributes.
 If you plan to solve this type of problems, you may want 
-to check <a href="http://www.csie.ntu.edu.tw/%7Ecjlin/bsvm">bsvm</a>,
+to check <a href=http://www.csie.ntu.edu.tw/~cjlin/bsvm>bsvm</a>,
 which includes an efficient implementation for
 linear SVMs.
 More details can be found in the following study:
@@ -386,19 +400,19 @@ K.-M. Chung, W.-C. Kao,
 T. Sun, 
 and
 C.-J. Lin.
-<a href="http://www.csie.ntu.edu.tw/%7Ecjlin/papers/linear.pdf">
+<A HREF="http://www.csie.ntu.edu.tw/~cjlin/papers/linear.pdf">
 Decomposition Methods for Linear Support Vector Machines
 </a>
 
-</p><p> On the other hand, you do not really need to solve
+<p> On the other hand, you do not really need to solve
 linear SVMs. See the previous question about choosing
 kernels for details.
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q4:_Training_and_prediction"></a>
 <a name="f406"><b>Q: The number of free support vectors is large. What should I do ?</b></a>
-<br>                                                                                
+<br/>                                                                                
  <p>
 This usually happens when the data are overfitted.
 If attributes of your data are in large ranges,
@@ -406,22 +420,22 @@ try to scale them. Then the region
 of appropriate parameters may be larger.
 Note that there is a scale program
 in libsvm. 
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q4:_Training_and_prediction"></a>
 <a name="f407"><b>Q: Should I scale training and testing data in a similar way ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 Yes, you can do the following:
-<br> svm-scale -s scaling_parameters train_data &gt; scaled_train_data
-<br> svm-scale -r scaling_parameters test_data &gt; scaled_test_data
-</p><p align="right">
+<br> svm-scale -s scaling_parameters train_data > scaled_train_data
+<br> svm-scale -r scaling_parameters test_data > scaled_test_data
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q4:_Training_and_prediction"></a>
 <a name="f408"><b>Q: Does it make a big difference  if I scale each attribute to [0,1] instead of [-1,1] ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 
 <p>
 For the linear scaling method, if the RBF kernel is
@@ -429,13 +443,16 @@ used and parameter selection is conducted, there
 is no difference. Assume Mi and mi are 
 respectively the maximal and minimal values of the
 ith attribute. Scaling to [0,1] means
-</p><pre>                x'=(x-mi)/(Mi-mi)
+<pre>
+                x'=(x-mi)/(Mi-mi)
 </pre>
 For [-1,1],
-<pre>                x''=2(x-mi)/(Mi-mi)-1.
+<pre>
+                x''=2(x-mi)/(Mi-mi)-1.
 </pre>
 In the RBF kernel,
-<pre>                x'-y'=(x-y)/(Mi-mi), x''-y''=2(x-y)/(Mi-mi).
+<pre>
+                x'-y'=(x-y)/(Mi-mi), x''-y''=2(x-y)/(Mi-mi).
 </pre>
 Hence, using (C,g) on the [0,1]-scaled data is the
 same as (C,g/2) on the [-1,1]-scaled data.
@@ -444,41 +461,41 @@ same as (C,g/2) on the [-1,1]-scaled data.
 time may be different. For data with many zero entries,
 [0,1]-scaling keeps the sparsity of input data and hence
 may save the time.
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q4:_Training_and_prediction"></a>
 <a name="f409"><b>Q: The prediction rate is low. How could I improve it ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 Try to use the model selection tool grid.py in the python
 directory find
 out good parameters. To see the importance of model selection,
 please 
 see my  talk:
-<a href="http://www.csie.ntu.edu.tw/%7Ecjlin/talks/freiburg.pdf">
+<A HREF="http://www.csie.ntu.edu.tw/~cjlin/talks/freiburg.pdf">
 A practical guide to support vector 
 classification 
-</a>
-</p><p align="right">
+</A>
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q4:_Training_and_prediction"></a>
 <a name="f410"><b>Q: My data are unbalanced. Could libsvm handle such problems ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 Yes, there is a -wi options. For example, if you use
-</p><p>
+<p>
  svm-train -s 0 -c 10 -w1 1 -w-1 5 data_file
-</p><p>
+<p>
 the penalty for class "-1" is larger.
 Note that this -w option is for C-SVC only.
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q4:_Training_and_prediction"></a>
 <a name="f411"><b>Q: What is the difference between nu-SVC and C-SVC ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 Basically they are the same thing but with different
 parameters. The range of C is from zero to infinity
@@ -486,22 +503,22 @@ but nu is always between [0,1]. A nice property
 of nu is that it is related to the ratio of 
 support vectors and the ratio of the training
 error.
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q4:_Training_and_prediction"></a>
 <a name="f412"><b>Q: The program keeps running without showing any output. What should I do ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 You may want to check your data. Each training/testing
 data must be in one line. It cannot be separated.
 In addition, you have to remove empty lines.
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q4:_Training_and_prediction"></a>
-<a name="f413"><b>Q: The program keeps running (with output, i.e. many dots).What should I do ?</b></a>
-<br>                                                                                
+<a name="f413"><b>Q: The program keeps running (with output, i.e. many dots). What should I do ?</b></a>
+<br/>                                                                                
 <p>
 In theory libsvm guarantees to converge if the kernel
 matrix is positive semidefinite. 
@@ -511,23 +528,23 @@ Therefore, this means you are
 handling ill-conditioned situations
 (e.g. too large/small parameters) so numerical
 difficulties occur.
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q4:_Training_and_prediction"></a>
 <a name="f414"><b>Q: The training time is too long. What should I do ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 This may happen for some difficult cases (e.g. -c is large).
 You can try to use a looser stopping tolerance with -e.
 If that still doesn't work, you may want to contact us. We can show you some
 tricks on improving the training time.
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q4:_Training_and_prediction"></a>
 <a name="f415"><b>Q: How do I get the decision value(s) ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 We print out decision values for regression. For classification,
 we solve several binary SVMs for multi-class cases, so 
@@ -537,16 +554,18 @@ can be obtained from svm_get_labels.
 Details are in 
 README of libsvm package. 
 
-</p><p>
+<p>
 We do not recommend the following. But if you would
 like to get values for 
 TWO-class classification with labels +1 and -1
 (note: +1 and -1 but not things like 5 and 10)
 in the easiest way, simply add 
-</p><pre>		printf("%f\n", dec_values[0]*model-&gt;label[0]);
+<pre>
+		printf("%f\n", dec_values[0]*model->label[0]);
 </pre>
 after the line
-<pre>		svm_predict_values(model, x, dec_values);
+<pre>
+		svm_predict_values(model, x, dec_values);
 </pre>
 of the file svm.cpp.
 Positive (negative)
@@ -555,10 +574,10 @@ decision values correspond to data predicted as +1 (-1).
 
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q4:_Training_and_prediction"></a>
 <a name="f416"><b>Q: For some problem sets if I use a large cache (i.e. large -m) on a linux machine, why sometimes I get "segmentation fault ?"</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 
 On 32-bit machines, the maximum addressable
@@ -569,10 +588,10 @@ kernel space is 1G. Although there are
 memory is 2G. So, if you specify -m near 2G,
 the memory will be exhausted. And svm-train
 will fail when it asks more memory.
-For more detail, please read 
-<a href="http://groups.google.com/groups?hl=en&amp;lr=&amp;ie=UTF-8&amp;selm=3BA164F6.BAFA4FB%40daimi.au.dk">
+For more details, please read 
+<a href=http://groups.google.com/groups?hl=en&lr=&ie=UTF-8&selm=3BA164F6.BAFA4FB%40daimi.au.dk>
 this article</a>.
-</p><p>
+<p>
 There are two ways to solve this. If your
 machine supports Intel's PAE (Physical Address
 Extension), you can turn on the option HIGHMEM64G
@@ -581,7 +600,7 @@ kernel and user space. If you don't, you can
 try a software `tub' which can elimate the 2G
 boundary for dymanic allocated memory. The `tub'
 is available at 
-<a href="http://www.bitwagon.com/tub.html">http://www.bitwagon.com/tub.html</a>.
+<a href=http://www.bitwagon.com/tub.html>http://www.bitwagon.com/tub.html</a>.
 
 
 <!--
@@ -625,29 +644,29 @@ More information can be found by
 $ info libc "Malloc Tunable Parameters"
 </pre>
 -->
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q4:_Training_and_prediction"></a>
 <a name="f417"><b>Q: How do I disable screen output of svm-train and svm-predict ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 Simply update svm.cpp:
-</p><pre>#if 1
+<pre>
+#if 1
 void info(char *fmt,...)
 </pre>
 to
-<pre>#if 0
+<pre>
+#if 0
 void info(char *fmt,...)
 </pre>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q4:_Training_and_prediction"></a>
-<a name="f418"><b>Q: I would like to use my own kernel but find out
-that there are two subroutines for kernel evaluations: k_function() and
-kernel_function(). Which one should I modify ?</b></a>
-<br>                                                                                
+<a name="f418"><b>Q: I would like to use my own kernel but find out that there are two subroutines for kernel evaluations: k_function() and kernel_function(). Which one should I modify ?</b></a>
+<br/>                                                                                
 <p>
 The reason why we have two functions is as follows:
 For the RBF kernel exp(-g |xi - xj|^2), if we calculate
@@ -662,87 +681,99 @@ needed.
 The easiest way to have your own kernel is
 to  put the same code in these two
 subroutines by replacing any kernel.
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q4:_Training_and_prediction"></a>
 <a name="f419"><b>Q: What method does libsvm use for multi-class SVM ? Why don't you use the "1-against-the rest" method ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 It is one-against-one. We chose it after doing the following
 comparison:
 C.-W. Hsu and C.-J. Lin.
-<a href="http://www.csie.ntu.edu.tw/%7Ecjlin/papers/multisvm.ps.gz">
+<A HREF="http://www.csie.ntu.edu.tw/~cjlin/papers/multisvm.ps.gz">
 A comparison of methods 
 for multi-class support vector machines
-</a>, 
-<i>IEEE Transactions on Neural Networks</i>, 13(2002), 415-425.
+</A>, 
+<I>IEEE Transactions on Neural Networks</A></I>, 13(2002), 415-425.
 
-</p><p>
+<p>
 "1-against-the rest" is a good method whose performance
 is comparable to "1-against-1." We do the latter
 simply because its training time is shorter.
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q4:_Training_and_prediction"></a>
 <a name="f420"><b>Q: After doing cross validation, why there is no model file outputted ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 Cross validation is used for selecting good parameters.
 After finding them, you want to re-train the whole
 data without the -v option.
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q4:_Training_and_prediction"></a>
 <a name="f421"><b>Q: I would like to try different random partition for cross validation, how could I do it ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 Right now we use the default seed so each time when you
 run svm-train -v, folds of validation data are the same.
 To have different seeds, you can add the following code
 in svm-train.c:
-</p><pre>#include &lt;time.h&gt;
+<pre>
+#include &lt;time.h&gt;
 </pre>
 and in the beginning of the subroutine do_cross_validation(),
-<pre>srand(time(0));
+<pre>
+srand(time(0));
 </pre>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q4:_Training_and_prediction"></a>
 <a name="f422"><b>Q: I would like to solve L2-SVM (i.e., error term is quadratic). How should I modify the code ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 It is extremely easy. Taking c-svc for example, only two 
 places of svm.cpp have to be changed. 
 First, modify the following line of 
 solve_c_svc from 
-</p><pre>	s.Solve(l, SVC_Q(*prob,*param,y), minus_ones, y,
-		alpha, Cp, Cn, param-&gt;eps, si, param-&gt;shrinking, param-&gt;cal_partial, param-&gt;gamma);
+<pre>
+	s.Solve(l, SVC_Q(*prob,*param,y), minus_ones, y,
+		alpha, Cp, Cn, param->eps, si, param->shrinking, param->cal_partial, param->gamma);
 </pre>
 to
-<pre>	s.Solve(l, SVC_Q(*prob,*param,y), minus_ones, y,
-		alpha, INF, INF, param-&gt;eps, si, param-&gt;shrinking, param-&gt;cal_partial, param-&gt;gamma);
+<pre>
+	s.Solve(l, SVC_Q(*prob,*param,y), minus_ones, y,
+		alpha, INF, INF, param->eps, si, param->shrinking, param->cal_partial, param->gamma);
 </pre>
 Second, in  the class  of SVC_Q, declare C as 
 a private variable:
-<pre>	double C;
+<pre>
+	double C;
 </pre> 
 In the constructor we assign it to param.C:
-<pre>        this-&gt;C = param.C;		
+<pre>
+        this->C = param.C;		
 </pre>
 Than in the the subroutine get_Q, after the for loop, add
-<pre>        if(i &gt;= start &amp;&amp; i &lt; len) 
+<pre>
+        if(i >= start && i < len) 
 		data[i] += 1/C;
+</pre>
+
+For one-class svm, the modification is exactly the same. For SVR, you don't need an if statement like the above. Instead, you only need a simple assignment:
+<pre>
+	data[real_i] += 1/C;
 </pre>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q4:_Training_and_prediction"></a>
 <a name="f423"><b>Q: There seems to be a zero division ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 We intend
 to have this zero division. 
@@ -754,21 +785,21 @@ In general no warning messages happen. On some computers, you may
 need to add an option (e.g. -mieee on alpha).
 
 Reasons of doing so are described in libsvm document.
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q4:_Training_and_prediction"></a>
 <a name="f424"><b>Q: How do I choose parameters for one-class svm as training data are in only one class ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 You have pre-specified true positive rate in mind and then search for
 parameters which achieve similar cross-validation accuracy.
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q4:_Training_and_prediction"></a>
 <a name="f425"><b>Q: Why training a probability model (i.e., -b 1) takes longer time ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 To construct this probability model, we internaly conduct a 
 cross validation, which is more time consuming than
@@ -777,12 +808,12 @@ Hence, in general you do parameter selection first without
 -b 1. You only use -b 1 when good parameters have been
 selected. In other words, you avoid using -b 1 and -v
 together.
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q5:_Graphic_Interface"></a>
 <a name="f501"><b>Q: How can I save images drawn by svm-toy?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 For Microsoft windows, first press the "print screen" key on the keyboard.
 Open "Microsoft Paint" 
@@ -791,155 +822,159 @@ and press "ctrl-v." Then you can clip
 the part of picture which you want.
 For X windows, you can 
 use the program "xv" to grab the picture of the svm-toy window.
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q5:_Graphic_Interface"></a>
 <a name="f502"><b>Q: I press the "load" button to load data points but why svm-toy does not draw them ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 The program svm-toy assumes both attributes (i.e. x-axis and y-axis
 values) are in (0,1). Hence you want to scale your 
 data to between a small positive number and 
 a number less than but very close to 1.
-</p><p align="right">
+Moreover, class labels must be 1, 2, or 3
+(not 1.0, 2.0 or anything else).
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q5:_Graphic_Interface"></a>
 <a name="f503"><b>Q: I would like svm-toy to handle more than three classes of data, what should I do ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 Taking windows/svm-toy.cpp as an example, you need to
 modify it and  the difference
 from the original file is as the following: (for five classes of
 data)
-</p><pre>30,32c30
-&lt; 	RGB(200,0,200),
-&lt; 	RGB(0,160,0),
-&lt; 	RGB(160,0,0)
+<pre>
+30,32c30
+< 	RGB(200,0,200),
+< 	RGB(0,160,0),
+< 	RGB(160,0,0)
 ---
-&gt; 	RGB(200,0,200)
+> 	RGB(200,0,200)
 39c37
-&lt; HBRUSH brush1, brush2, brush3, brush4, brush5;
+< HBRUSH brush1, brush2, brush3, brush4, brush5;
 ---
-&gt; HBRUSH brush1, brush2, brush3;
+> HBRUSH brush1, brush2, brush3;
 113,114d110
-&lt; 	brush4 = CreateSolidBrush(colors[7]);
-&lt; 	brush5 = CreateSolidBrush(colors[8]);
+< 	brush4 = CreateSolidBrush(colors[7]);
+< 	brush5 = CreateSolidBrush(colors[8]);
 155,157c151
-&lt; 	else if(v==3) return brush3;
-&lt; 	else if(v==4) return brush4;
-&lt; 	else return brush5;
+< 	else if(v==3) return brush3;
+< 	else if(v==4) return brush4;
+< 	else return brush5;
 ---
-&gt; 	else return brush3;
+> 	else return brush3;
 325d318
-&lt; 	  int colornum = 5;
+< 	  int colornum = 5;
 327c320
-&lt; 		svm_node *x_space = new svm_node[colornum * prob.l];
+< 		svm_node *x_space = new svm_node[colornum * prob.l];
 ---
-&gt; 		svm_node *x_space = new svm_node[3 * prob.l];
+> 		svm_node *x_space = new svm_node[3 * prob.l];
 333,338c326,331
-&lt; 			x_space[colornum * i].index = 1;
-&lt; 			x_space[colornum * i].value = q-&gt;x;
-&lt; 			x_space[colornum * i + 1].index = 2;
-&lt; 			x_space[colornum * i + 1].value = q-&gt;y;
-&lt; 			x_space[colornum * i + 2].index = -1;
-&lt; 			prob.x[i] = &amp;x_space[colornum * i];
+< 			x_space[colornum * i].index = 1;
+< 			x_space[colornum * i].value = q->x;
+< 			x_space[colornum * i + 1].index = 2;
+< 			x_space[colornum * i + 1].value = q->y;
+< 			x_space[colornum * i + 2].index = -1;
+< 			prob.x[i] = &x_space[colornum * i];
 ---
-&gt; 			x_space[3 * i].index = 1;
-&gt; 			x_space[3 * i].value = q-&gt;x;
-&gt; 			x_space[3 * i + 1].index = 2;
-&gt; 			x_space[3 * i + 1].value = q-&gt;y;
-&gt; 			x_space[3 * i + 2].index = -1;
-&gt; 			prob.x[i] = &amp;x_space[3 * i];
+> 			x_space[3 * i].index = 1;
+> 			x_space[3 * i].value = q->x;
+> 			x_space[3 * i + 1].index = 2;
+> 			x_space[3 * i + 1].value = q->y;
+> 			x_space[3 * i + 2].index = -1;
+> 			prob.x[i] = &x_space[3 * i];
 397c390
-&lt; 				if(current_value &gt; 5) current_value = 1;
+< 				if(current_value > 5) current_value = 1;
 ---
-&gt; 				if(current_value &gt; 3) current_value = 1;
+> 				if(current_value > 3) current_value = 1;
 </pre>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q6:_Java_version_of_libsvm"></a>
 <a name="f601"><b>Q: What is the difference between Java version and C++ version of libsvm?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 They are the same thing. We just rewrote the C++ code
 in Java.
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q6:_Java_version_of_libsvm"></a>
 <a name="f602"><b>Q: Is the Java version significantly slower than the C++ version?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 This depends on the VM you used. We have seen good
 VM which leads the Java version to be quite competitive with
 the C++ code. (though still slower)
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q6:_Java_version_of_libsvm"></a>
 <a name="f603"><b>Q: While training I get the following error message: java.lang.OutOfMemoryError. What is wrong?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 You should try to increase the maximum Java heap size.
 For example,
-</p><pre>java -Xmx256m svm_train.java ...
+<pre>
+java -Xmx256m svm_train.java ...
 </pre>
 sets the maximum heap size to 256M.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q6:_Java_version_of_libsvm"></a>
 <a name="f604"><b>Q: Why you have the main source file svm.m4 and then transform it to svm.java?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 Unlike C, Java does not have a preprocessor built-in.
 However,  we need some macros (see first 3 lines of svm.m4).
 
-
-</p><p align="right">
+</ul>
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q7:_Python_Interface"></a>
 <a name="f702"><b>Q: Using python on MS windows, it fails to load the dll file.</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 It seems the dll file is version dependent. So far we haven't
 found out a good solution. Please email us if you have any
 good suggestions.
-</p><p align="right">
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q7:_Python_Interface"></a>
 <a name="f703"><b>Q: How to modify the python interface on MS windows and rebuild the dll file ?</b></a>
-<br>                                                                                
+<br/>                                                                                
 <p>
 
 To modify the interface, follow the instructions given in
-<a href="http://www.swig.org/Doc1.1/HTML/Python.html#n2">
+<a href=http://www.swig.org/Doc1.1/HTML/Python.html#n2>
 http://www.swig.org/Doc1.1/HTML/Python.html#n2</a>
 
-</p><p>
+<p>
 
 If you just want to build DLL for a different python version,
 after libsvm 2.5, you can easily use the file Makefile.win.
 See details in README.
 
 Alternatively, you can use Visual C++:
-</p><ol>
-<li> Create a Win32 DLL project and set (Build-&gt;Active Configuration) to "Release."
-</li><li> Add svm.cpp, svmc_wrap.c, python2x.lib to your project.
-</li><li> Add the directories containing Python.h and svm.h to
+<ol>
+<li> Create a Win32 DLL project and set (Build->Active Configuration) to "Release."
+<li> Add svm.cpp, svmc_wrap.c, python2x.lib to your project.
+<li> Add the directories containing Python.h and svm.h to
 the Additional include directories. (in Project
-Settings-&gt;C/C++-&gt;Preprocessor)
-</li><li> add __WIN32__ to Preprocessor definitions
-</li><li> Make sure that in the "General" category of
-Project-&gt;Settings-&gt;Settings For "Win32 Release", Output
+Settings->C/C++->Preprocessor)
+<li> add __WIN32__ to Preprocessor definitions
+<li> Make sure that in the "General" category of
+Project->Settings->Settings For "Win32 Release", Output
 directories should be "Release"
-</li><li> Build the DLL.
-</li></ol>
+<li> Build the DLL.
+</ol>
 
 
 <!--
@@ -954,26 +989,57 @@ presented a similar example.
 -->
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q7:_Python_Interface"></a>
 <a name="f704"><b>Q: Except the python-C++ interface provided, could I use Jython to call libsvm ?</b></a>
-<br>                                                                                
-<p> Yes, an example is <a href="http://www.csie.ntu.edu.tw/%7Ecjlin/libsvm/jython">here</a>
-</p><p align="right">
+<br/>                                                                                
+<p> Yes, here are some examples:
+
+<pre>
+$ export CLASSPATH=$CLASSPATH:~/libsvm-2.4/java/libsvm.jar
+$ ./jython
+Jython 2.1a3 on java1.3.0 (JIT: jitc)
+Type "copyright", "credits" or "license" for more information.
+>>> from libsvm import *
+>>> dir()
+['__doc__', '__name__', 'svm', 'svm_model', 'svm_node', 'svm_parameter',
+'svm_problem']
+>>> x1 = [svm_node(index=1,value=1)]
+>>> x2 = [svm_node(index=1,value=-1)]
+>>> param = svm_parameter(svm_type=0,kernel_type=2,gamma=1,cache_size=40,eps=0.001,C=1,nr_weight=0,shrinking=1)
+>>> prob = svm_problem(l=2,y=[1,-1],x=[x1,x2])
+>>> model = svm.svm_train(prob,param)
+*
+optimization finished, #iter = 1
+nu = 1.0
+obj = -1.018315639346838, rho = 0.0
+nSV = 2, nBSV = 2
+Total nSV = 2
+>>> svm.svm_predict(model,x1)
+1.0
+>>> svm.svm_predict(model,x2)
+-1.0
+>>> svm.svm_save_model("test.model",model)
+
+</pre>
+
+<p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
+<hr/>
   <a name="/Q7:_Python_Interface"></a>
-<a name="f705"><b>Q: How could I instal the python interface on Mac OS? </b></a>
-<br>                                                                                
+<a name="f705"><b>Q: How could I install the python interface on Mac OS? </b></a>
+<br/>                                                                                
 <p> According to S V N Vishwanathan in Australian National University, instead of 
 LDFLAGS = -shared
 in the Makefile, you need
-</p><pre>LDFLAGS = -bundle -flat_namespace -undefined suppress
+<pre>
+LDFLAGS = -bundle -flat_namespace -undefined suppress
 </pre>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
-</p><hr>
-  <p align="center">
-<a href="http://www.csie.ntu.edu.tw/%7Ecjlin/libsvm">LIBSVM home page</a>
+<hr/>
+  <p align="middle">
+<a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm">LIBSVM home page</a>
 </p>
-</body></html>
+</body>
+</html>

@@ -1680,7 +1680,6 @@ void multiclass_probability(int k, double **r, double *p)
 		p[t]=1.0/k;  // Valid if k = 1
 		Q[t]=Malloc(double,k);
 		Q[t][t]=0;
-		int j;
 		for (j=0;j<t;j++)
 		{
 			Q[t][t]+=r[j][t]*r[j][t];
