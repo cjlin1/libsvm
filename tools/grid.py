@@ -227,7 +227,7 @@ class SSHWorker(Worker):
         self.host = host
         self.cwd = os.getcwd()
     def run_one(self,c,g):
-        cmdline = 'ssh %s "cd %s; %s -c %s -g %s -v %s %s %s"' % \
+        cmdline = 'ssh -x %s "cd %s; %s -c %s -g %s -v %s %s %s"' % \
           (self.host,self.cwd,
            svmtrain_exe,c,g,fold,pass_through_string,dataset_pathname)
         result = os.popen(cmdline,'r')
