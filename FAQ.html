@@ -9,7 +9,7 @@
     <h1><a href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a> FAQ</h1>
 <!-- Created: Wed Apr 18 19:26:54 CST 2001 -->
 <!-- hhmts start -->
-Last modified: Tue Mar 30 15:00:16 CST 2004
+Last modified: Wed Mar 31 10:49:17 CST 2004
 <!-- hhmts end -->
 
 <hr>
@@ -648,7 +648,7 @@ data)
 <h3>Java version of libsvm</h3>
 <ul>
 <p><li>What is the difference between Java version and C++
-version of libsvm ?
+version of libsvm?
 <p>
 They are the same thing. We just rewrote the C++ code
 in Java.
@@ -659,7 +659,7 @@ This depends on the VM you used. We have seen good
 VM which leads the Java version to be quite competitive with
 the C++ code. (though still slower)
 <p><li> While training I get the following error 
-message: java.lang.OutOfMemoryError. What is wrong ?
+message: java.lang.OutOfMemoryError. What is wrong?
 <p>
 You should try to increase the maximum Java heap size.
 For example,
@@ -667,6 +667,12 @@ For example,
 java -Xmx256m svm_train.java ...
 </pre>
 sets the maximum heap size to 256M.
+<p><li> Why you have the main source file svm.m4 
+and then transform it to svm.java?
+<p>
+Unlike C, Java does not have a preprocessor built-in.
+However,  we need some macros (see first 3 lines of svm.m4).
+
 </ul>
 <hr>
 <h3>Python Interface</h3>
