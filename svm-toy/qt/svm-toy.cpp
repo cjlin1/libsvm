@@ -10,6 +10,8 @@
 #include <ctype.h>
 #include <list>
 #include "../../svm.h"
+using namespace std;
+
 #define DEFAULT_PARAM "-t 2 -c 100"
 #define XLEN 500
 #define YLEN 500
