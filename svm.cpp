@@ -2157,8 +2157,10 @@ void svm_cross_validation(const svm_problem *prob, const svm_parameter *param, i
 	int *perm = Malloc(int,l);
 	int nr_class;
 
-	if(param->svm_type == C_SVC ||
-	   param->svm_type == NU_SVC)
+	// stratified cv may not give leave-one-out rate
+	// Each class to l folds -> some folds may have zero elements
+	if((param->svm_type == C_SVC ||
+	    param->svm_type == NU_SVC) && nr_fold < l)
 	{
 		int *start = NULL;
 		int *label = NULL;
