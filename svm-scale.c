@@ -63,7 +63,8 @@ int main(int argc,char **argv)
 	
 	if(argc != i+1) 
 	{
-		fprintf(stderr,"usage: %s [-l lower] [-u upper] [-y y_lower y_upper] filename\n",argv[0]);
+		fprintf(stderr,"usage: %s [-l lower] [-u upper] [-y y_lower y_upper]\n",argv[0]);
+		fprintf(stderr,"      [-s save_filename] [-r restore_filename] filename\n");
 		fprintf(stderr,"(default: lower = -1, upper = 1, no y scaling)\n");
 		exit(1);
 	}
@@ -172,6 +173,7 @@ int main(int argc,char **argv)
 			fprintf(stderr,"can't open file %s\n", restore_filename);
 			exit(1);
 		}
+		fscanf(fp, "%lf %lf\n", &lower, &upper);
 		while(fscanf(fp,"%d %lf %lf\n",&idx,&fmin,&fmax)==3)
 		{
 			if(idx<=max_index)
@@ -191,6 +193,7 @@ int main(int argc,char **argv)
 			fprintf(stderr,"can't open file %s\n", save_filename);
 			exit(1);
 		}
+		fprintf(fp, "%g %g\n", lower, upper);
 		for(i=1;i<=max_index;i++)
 		{
 			if(feature_min[i]!=feature_max[i])
