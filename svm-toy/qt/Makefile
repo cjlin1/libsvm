@@ -14,4 +14,4 @@ svm-toy.moc: svm-toy.cpp
 ../../svm.o:
 	cd ../..; make svm.o
 clean:
-	rm -f *~ svm-toy svm-toy.moc
+	rm -f *~ svm-toy svm-toy.moc ../../svm.o

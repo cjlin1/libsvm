@@ -19,4 +19,4 @@ callbacks.o: callbacks.cpp callbacks.h
 	cd ../..; make svm.o
 
 clean:
-	rm -f *~ callbacks.o svm-toy main.o interface.o callbacks.o
+	rm -f *~ callbacks.o svm-toy main.o interface.o callbacks.o ../../svm.o
