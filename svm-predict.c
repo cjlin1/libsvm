@@ -10,6 +10,7 @@ struct svm_node *x;
 int max_nr_attr = 64;
 
 struct svm_model* model;
+int predict_prob=0;
 
 void predict(FILE *input, FILE *output)
 {
@@ -17,12 +18,35 @@ void predict(FILE *input, FILE *output)
 	int total = 0;
 	double error = 0;
 	double sumv = 0, sumy = 0, sumvv = 0, sumyy = 0, sumvy = 0;
-	
+
+	int svm_type=svm_get_svm_type(model);
+	int nr_class=svm_get_nr_class(model);
+	int *labels=(int *) malloc(nr_class*sizeof(int));
+	double *prob_estimates=NULL;
+
+	if(predict_prob)
+	{
+		if (svm_type==NU_SVR || svm_type==EPSILON_SVR)
+		{
+			prob_estimates = (double *) malloc(sizeof(double));
+			printf("Prob. model for test data: target value = predicted value + z,\nz: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma=%g\n",svm_get_svr_probability(model));
+		}
+		else
+		{
+			svm_get_labels(model,labels);
+			prob_estimates = (double *) malloc(nr_class*sizeof(double));
+			fprintf(output,"labels");		
+			for(int i=0;i<nr_class;i++)
+				fprintf(output," %d",labels[i]);
+			fprintf(output,"\n");
+		}
+	}
 	while(1)
 	{
 		int i = 0;
 		int c;
 		double target,v;
+
 
 		if (fscanf(input,"%lf",&target)==EOF)
 			break;
@@ -47,7 +71,20 @@ void predict(FILE *input, FILE *output)
 out2:
 		x[i++].index = -1;
 
-		v = svm_predict(model,x);
+		if (predict_prob && (svm_type==C_SVC || svm_type==NU_SVC))
+		{
+			v = svm_predict_probability(model,x,prob_estimates);
+			fprintf(output,"%g ",v);
+			for(int j=0;j<nr_class;j++)
+				fprintf(output,"%g ",prob_estimates[j]);
+			fprintf(output,"\n");
+		}
+		else
+		{
+			v = svm_predict(model,x);
+			fprintf(output,"%g\n",v);
+		}
+
 		if(v == target)
 			++correct;
 		error += (v-target)*(v-target);
@@ -57,8 +94,6 @@ out2:
 		sumyy += target*target;
 		sumvy += v*target;
 		++total;
-
-		fprintf(output,"%g\n",v);
 	}
 	printf("Accuracy = %g%% (%d/%d) (classification)\n",
 		(double)correct/total*100,correct,total);
@@ -67,40 +102,72 @@ out2:
 		((total*sumvy-sumv*sumy)*(total*sumvy-sumv*sumy))/
 		((total*sumvv-sumv*sumv)*(total*sumyy-sumy*sumy))
 		);
+	if(predict_prob)
+	{
+		free(prob_estimates);
+		free(labels);
+	}
+}
+
+void exit_with_help()
+{
+	printf(
+	"Usage: svm-predict [options] test_file model_file output_file\n"
+	"options:\n"
+	"-b probability_estimates: whether to predict probability estimates, 0 or 1 (default 0); one-class SVM not supported yet\n"
+	);
+	exit(1);
 }
 
 int main(int argc, char **argv)
 {
 	FILE *input, *output;
-	
-	if(argc!=4)
-	{
-		fprintf(stderr,"usage: svm-predict test_file model_file output_file\n");
-		exit(1);
-	}
+	int i=0;
 
-	input = fopen(argv[1],"r");
+	// parse options
+	for(i=1;i<argc;i++)
+	{
+		if(argv[i][0] != '-') break;
+		++i;
+		switch(argv[i-1][1])
+		{
+			case 'b':
+				predict_prob = atoi(argv[i]);
+				break;
+			default:
+				fprintf(stderr,"unknown option\n");
+				exit_with_help();
+		}
+	}
+	
+	input = fopen(argv[i],"r");
 	if(input == NULL)
 	{
-		fprintf(stderr,"can't open input file %s\n",argv[1]);
+		fprintf(stderr,"can't open input file %s\n",argv[i]);
 		exit(1);
 	}
 
-	output = fopen(argv[3],"w");
+	output = fopen(argv[i+2],"w");
 	if(output == NULL)
 	{
-		fprintf(stderr,"can't open output file %s\n",argv[3]);
+		fprintf(stderr,"can't open output file %s\n",argv[i+2]);
 		exit(1);
 	}
 
-	if((model=svm_load_model(argv[2]))==0)
+	if((model=svm_load_model(argv[i+1]))==0)
 	{
-		fprintf(stderr,"can't open model file %s\n",argv[2]);
+		fprintf(stderr,"can't open model file %s\n",argv[i+1]);
 		exit(1);
 	}
 	
 	line = (char *) malloc(max_line_len*sizeof(char));
 	x = (struct svm_node *) malloc(max_nr_attr*sizeof(struct svm_node));
+	if(predict_prob)
+		if(svm_check_probability_model(model)==0)
+		{
+			fprintf(stderr,"model does not support probabiliy estimates\n");
+			predict_prob=0;
+		}
 	predict(input,output);
 	svm_destroy_model(model);
 	free(line);

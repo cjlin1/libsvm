@@ -1523,6 +1523,8 @@ struct svm_model
 	svm_node **SV;		// SVs (SV[l])
 	double **sv_coef;	// coefficients for SVs in decision functions (sv_coef[n-1][l])
 	double *rho;		// constants in decision functions (rho[n*(n-1)/2])
+	double *probA;
+	double *probB;
 
 	// for classification only
 
@@ -1533,6 +1535,311 @@ struct svm_model
 	int free_sv;		// 1 if svm_model is created by svm_load_model
 				// 0 if svm_model is created by svm_train
 };
+
+// Platt's binary SVM Probablistic Output: an improvement from Lin et al.
+void sigmoid_train(
+	int l, const double *dec_values, const double *labels, 
+	double& A, double& B)
+{
+	double prior1=0, prior0 = 0;
+	int i;
+
+	for (i=0;i<l;i++)
+		if (labels[i] > 0) prior1+=1;
+		else prior0+=1;
+	
+	int max_iter=100; 	// Maximal number of iterations
+	double min_step=1e-10;	// Minimal step taken in line search
+	double sigma=1e-3;	// For numerically strict PD of Hessian
+	double eps=1e-5;
+	double hiTarget=(prior1+1.0)/(prior1+2.0);
+	double loTarget=1/(prior0+2.0);
+	double *t=Malloc(double,l);
+	double fApB,p,q,h11,h22,h21,g1,g2,det,dA,dB,gd,stepsize;
+	double newA,newB,newf,d1,d2;
+	int iter; 
+	
+	// Initial Point and Initial Fun Value
+	A=0.0; B=log((prior0+1.0)/(prior1+1.0));
+	double fval = 0.0;
+
+	for (i=0;i<l;i++)
+	{
+		if (labels[i]>0) t[i]=hiTarget;
+		else t[i]=loTarget;
+		fApB = dec_values[i]*A+B;
+		if (fApB>=0)
+			fval += t[i]*fApB + log(1+exp(-fApB));
+		else
+			fval += (t[i] - 1)*fApB +log(1+exp(fApB));
+	}
+	for (iter=0;iter<max_iter;iter++)
+	{
+		// Update Gradient and Hessian (use H' = H + sigma I)
+		h11=sigma; // numerically ensures strict PD
+		h22=sigma;
+		h21=0.0;g1=0.0;g2=0.0;
+		for (i=0;i<l;i++)
+		{
+			fApB = dec_values[i]*A+B;
+			if (fApB >= 0)
+			{
+				p=exp(-fApB)/(1.0+exp(-fApB));
+				q=1.0/(1.0+exp(-fApB));
+			}
+			else
+			{
+				p=1.0/(1.0+exp(fApB));
+				q=exp(fApB)/(1.0+exp(fApB));
+			}
+			d2=p*q;
+			h11+=dec_values[i]*dec_values[i]*d2;
+			h22+=d2;
+			h21+=dec_values[i]*d2;
+			d1=t[i]-p;
+			g1+=dec_values[i]*d1;
+			g2+=d1;
+		}
+
+		// Stopping Criteria
+		if (fabs(g1)<eps && fabs(g2)<eps)
+			break;
+
+		// Finding Newton direction: -inv(H') * g
+		det=h11*h22-h21*h21;
+		dA=-(h22*g1 - h21 * g2) / det;
+		dB=-(-h21*g1+ h11 * g2) / det;
+		gd=g1*dA+g2*dB;
+
+
+		stepsize = 1; 		// Line Search
+		while (stepsize >= min_step)
+		{
+			newA = A + stepsize * dA;
+			newB = B + stepsize * dB;
+
+			// New function value
+			newf = 0.0;
+			for (i=0;i<l;i++)
+			{
+				fApB = dec_values[i]*newA+newB;
+				if (fApB >= 0)
+					newf += t[i]*fApB + log(1+exp(-fApB));
+				else
+					newf += (t[i] - 1)*fApB +log(1+exp(fApB));
+			}
+			// Check sufficient decrease
+			if (newf<fval+0.0001*stepsize*gd)
+			{
+				A=newA;B=newB;fval=newf;
+				break;
+			}
+			else
+				stepsize = stepsize / 2.0;
+		}
+
+		if (stepsize < min_step)
+		{
+			info("Line search fails in two-class probability estimates\n");
+			break;
+		}
+	}
+
+	if (iter>=max_iter)
+		info("Reaching maximal iterations in two-class probability estimates\n");
+	free(t);
+}
+
+double sigmoid_predict(double decision_value, double A, double B)
+{
+	double fApB = decision_value*A+B;
+	if (fApB >= 0)
+		return exp(-fApB)/(1.0+exp(-fApB));
+	else
+		return 1.0/(1+exp(fApB)) ;
+}
+
+// Method 2 from the multiclass_prob paper by Wu, Lin, and Weng
+void multiclass_probability(int k, double **r, double *p)
+{
+	int t;
+	int iter = 0, max_iter=100;
+	double **Q=Malloc(double *,k);
+	double *Qp=Malloc(double,k);
+	double pQp, eps=0.001;
+	
+	for (t=0;t<k;t++)
+	{
+		p[t]=1.0/k;  // Valid if k = 1
+		Q[t]=Malloc(double,k);
+		Q[t][t]=0;
+		for (int j=0;j<t;j++)
+		{
+			Q[t][t]+=r[j][t]*r[j][t];
+			Q[t][j]=Q[j][t];
+		}
+		for (int j=t+1;j<k;j++)
+		{
+			Q[t][t]+=r[j][t]*r[j][t];
+			Q[t][j]=-r[j][t]*r[t][j];
+		}
+	}
+	for (iter=0;iter<max_iter;iter++)
+	{
+		// stopping condition, recalculate QP,pQP for numerical accuracy
+		pQp=0;
+		for (t=0;t<k;t++)
+		{
+			Qp[t]=0;
+			for (int j=0;j<k;j++)
+				Qp[t]+=Q[t][j]*p[j];
+			pQp+=p[t]*Qp[t];
+		}
+		double max_error=0;
+		for (t=0;t<k;t++)
+		{
+			double error=fabs(Qp[t]-pQp);
+			if (error>max_error)
+				max_error=error;
+		}
+		if (max_error<eps) break;
+		
+		for (t=0;t<k;t++)
+		{
+			double diff=(-Qp[t]+pQp)/Q[t][t];
+			p[t]+=diff;
+			pQp=(pQp+diff*(diff*Q[t][t]+2*Qp[t]))/(1+diff)/(1+diff);
+			for (int j=0;j<k;j++)
+			{
+				Qp[j]=(Qp[j]+diff*Q[t][j])/(1+diff);
+				p[j]/=(1+diff);
+			}
+		}
+	}
+	if (iter>=max_iter)
+		info("Exceeds max_iter in multiclass_prob\n");
+	for(t=0;t<k;t++) free(Q[t]);
+	free(Q);
+	free(Qp);
+}
+
+// Cross-validation decision values for probability estimates
+void svm_binary_svc_probability(
+	const svm_problem *prob, const svm_parameter *param,
+	double Cp, double Cn, double& probA, double& probB)
+{
+	int i;
+	int nr_fold = 5;
+	int *perm = Malloc(int,prob->l);
+	double *dec_values = Malloc(double,prob->l);
+
+	// random shuffle
+	for(i=0;i<prob->l;i++) perm[i]=i;
+	for(i=0;i<prob->l;i++)
+	{
+		int j = i+rand()%(prob->l-i);
+		swap(perm[i],perm[j]);
+	}
+	for(i=0;i<nr_fold;i++)
+	{
+		int begin = i*prob->l/nr_fold;
+		int end = (i+1)*prob->l/nr_fold;
+		int j,k;
+		struct svm_problem subprob;
+
+		subprob.l = prob->l-(end-begin);
+		subprob.x = Malloc(struct svm_node*,subprob.l);
+		subprob.y = Malloc(double,subprob.l);
+			
+		k=0;
+		for(j=0;j<begin;j++)
+		{
+			subprob.x[k] = prob->x[perm[j]];
+			subprob.y[k] = prob->y[perm[j]];
+			++k;
+		}
+		for(j=end;j<prob->l;j++)
+		{
+			subprob.x[k] = prob->x[perm[j]];
+			subprob.y[k] = prob->y[perm[j]];
+			++k;
+		}
+		int p_count=0,n_count=0;
+		for(j=0;j<k;j++)
+			if(subprob.y[j]>0)
+				p_count++;
+			else
+				n_count++;
+
+		svm_parameter subparam = *param;
+		subparam.probability=0;
+		subparam.C=1.0;
+		if(p_count==0 && n_count==0)
+			subparam.nr_weight=0;
+		else if(p_count==0 || n_count==0)
+		{
+			subparam.nr_weight=1;
+			subparam.weight_label = Malloc(int,1);
+			subparam.weight = Malloc(double,1);
+			subparam.weight_label[0]=(int)subprob.y[0];
+			subparam.weight[0]=((int)subprob.y[0]==1)?Cp:Cn;;
+		}
+		else
+		{
+			subparam.nr_weight=2;
+			subparam.weight_label = Malloc(int,2);
+			subparam.weight = Malloc(double,2);
+			subparam.weight_label[0]=+1;
+			subparam.weight_label[1]=-1;
+			subparam.weight[0]=Cp;
+			subparam.weight[1]=Cn;
+		}
+		struct svm_model *submodel = svm_train(&subprob,&subparam);
+		for(j=begin;j<end;j++)
+		{
+			svm_predict_values(submodel,prob->x[perm[j]],&(dec_values[perm[j]]));
+			// ensure +1 -1 order; reason not using CV subroutine
+			dec_values[perm[j]] *= submodel->label[0];
+		}		
+		svm_destroy_model(submodel);
+		svm_destroy_param(&subparam);
+		free(subprob.x);
+		free(subprob.y);
+	}		
+	sigmoid_train(prob->l,dec_values,prob->y,probA,probB);
+	free(dec_values);
+	free(perm);
+}
+
+void svm_svr_probability(
+	const svm_problem *prob, const svm_parameter *param, double& mae)
+{
+	int i;
+	int nr_fold = 5;
+	double *ymv = Malloc(double,prob->l);
+
+	mae = 0;
+	svm_parameter newparam = *param;
+	newparam.probability = 0;
+	svm_cross_validation(prob,&newparam,nr_fold,ymv);
+	for(i=0;i<prob->l;i++)
+	{
+		ymv[i]=prob->y[i]-ymv[i];
+		mae += fabs(ymv[i]);
+	}		
+	mae /= prob->l;
+	double std=sqrt(2*mae*mae);
+	int count=0;
+	mae=0;
+	for(i=0;i<prob->l;i++)
+	        if (fabs(ymv[i]) > 5*std) 
+                        count=count+1;
+		else 
+		        mae+=fabs(ymv[i]);
+	mae /= (prob->l-count);
+	info("Prob. model for test data: target value = predicted value + z,\nz: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma= %g\n",mae);
+	free(ymv);
+}
 
 //
 // Interface functions
@@ -1551,7 +1858,17 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 		model->nr_class = 2;
 		model->label = NULL;
 		model->nSV = NULL;
+		model->probA = NULL; model->probB = NULL;
 		model->sv_coef = Malloc(double *,1);
+
+		if(param->probability && 
+		   (param->svm_type == EPSILON_SVR ||
+		    param->svm_type == NU_SVR))
+		{
+			model->probA = Malloc(double,1);
+			svm_svr_probability(prob,param,model->probA[0]);
+		}
+
 		decision_function f = svm_train_one(prob,param,0,0);
 		model->rho = Malloc(double,1);
 		model->rho[0] = f.rho;
@@ -1647,12 +1964,19 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 				weighted_C[j] *= param->weight[i];
 		}
 
-		// train n*(n-1)/2 models
+		// train k*(k-1)/2 models
 		
 		bool *nonzero = Malloc(bool,l);
 		for(i=0;i<l;i++)
 			nonzero[i] = false;
 		decision_function *f = Malloc(decision_function,nr_class*(nr_class-1)/2);
+
+		double *probA=NULL,*probB=NULL;
+		if (param->probability)
+		{
+			probA=Malloc(double,nr_class*(nr_class-1)/2);
+			probB=Malloc(double,nr_class*(nr_class-1)/2);
+		}
 
 		int p = 0;
 		for(i=0;i<nr_class;i++)
@@ -1675,7 +1999,10 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 					sub_prob.x[ci+k] = x[sj+k];
 					sub_prob.y[ci+k] = -1;
 				}
-				
+
+				if(param->probability)
+					svm_binary_svc_probability(&sub_prob,param,weighted_C[i],weighted_C[j],probA[p],probB[p]);
+
 				f[p] = svm_train_one(&sub_prob,param,weighted_C[i],weighted_C[j]);
 				for(k=0;k<ci;k++)
 					if(!nonzero[si+k] && fabs(f[p].alpha[k]) > 0)
@@ -1699,6 +2026,17 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 		model->rho = Malloc(double,nr_class*(nr_class-1)/2);
 		for(i=0;i<nr_class*(nr_class-1)/2;i++)
 			model->rho[i] = f[i].rho;
+
+		if(param->probability)
+		{
+			model->probA=probA;
+			model->probB=probB;
+		}
+		else
+		{
+			model->probA=NULL;
+			model->probB=NULL;
+		}
 
 		int total_sv = 0;
 		int *nz_count = Malloc(int,nr_class);
@@ -1774,6 +2112,66 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 	return model;
 }
 
+void svm_cross_validation(const svm_problem *prob, const svm_parameter *param, int nr_fold, double *target)
+{
+	int i;
+	int *perm = Malloc(int,prob->l);
+
+	// random shuffle
+	for(i=0;i<prob->l;i++) perm[i]=i;
+	for(i=0;i<prob->l;i++)
+	{
+		int j = i+rand()%(prob->l-i);
+		swap(perm[i],perm[j]);
+	}
+	for(i=0;i<nr_fold;i++)
+	{
+		int begin = i*prob->l/nr_fold;
+		int end = (i+1)*prob->l/nr_fold;
+		int j,k;
+		struct svm_problem subprob;
+
+		subprob.l = prob->l-(end-begin);
+		subprob.x = Malloc(struct svm_node*,subprob.l);
+		subprob.y = Malloc(double,subprob.l);
+			
+		k=0;
+		for(j=0;j<begin;j++)
+		{
+			subprob.x[k] = prob->x[perm[j]];
+			subprob.y[k] = prob->y[perm[j]];
+			++k;
+		}
+		for(j=end;j<prob->l;j++)
+		{
+			subprob.x[k] = prob->x[perm[j]];
+			subprob.y[k] = prob->y[perm[j]];
+			++k;
+		}
+		struct svm_model *submodel = svm_train(&subprob,param);
+		if(param->probability && 
+		   (param->svm_type == C_SVC || param->svm_type == NU_SVC))
+		{
+			double *prob_estimates=Malloc(double,svm_get_nr_class(submodel));
+			for(j=begin;j<end;j++)
+				target[perm[j]] = svm_predict_probability(submodel,prob->x[perm[j]],prob_estimates);
+			free(prob_estimates);			
+		}
+		else
+			for(j=begin;j<end;j++)
+				target[perm[j]] = svm_predict(submodel,prob->x[perm[j]]);
+		svm_destroy_model(submodel);
+		free(subprob.x);
+		free(subprob.y);
+	}		
+	free(perm);	
+}
+
+int svm_get_svm_type(const svm_model *model)
+{
+	return model->param.svm_type;
+}
+
 int svm_get_nr_class(const svm_model *model)
 {
 	return model->nr_class;
@@ -1781,8 +2179,21 @@ int svm_get_nr_class(const svm_model *model)
 
 void svm_get_labels(const svm_model *model, int* label)
 {
-	for(int i=0;i<model->nr_class;i++)
-		label[i] = model->label[i];
+	if (model->label != NULL)
+		for(int i=0;i<model->nr_class;i++)
+			label[i] = model->label[i];
+}
+
+double svm_get_svr_probability(const svm_model *model)
+{
+	if ((model->param.svm_type == EPSILON_SVR || model->param.svm_type == NU_SVR) &&
+	    model->probA!=NULL)
+		return model->probA[0];
+	else
+	{
+		info("Model doesn't contain information for SVR probability inference\n");
+		return 0;
+	}
 }
 
 void svm_predict_values(const svm_model *model, const svm_node *x, double* dec_values)
@@ -1884,6 +2295,45 @@ double svm_predict(const svm_model *model, const svm_node *x)
 	}
 }
 
+double svm_predict_probability(
+	const svm_model *model, const svm_node *x, double *prob_estimates)
+{
+	if ((model->param.svm_type == C_SVC || model->param.svm_type == NU_SVC) &&
+	    model->probA!=NULL && model->probB!=NULL)
+	{
+		int i;
+		int nr_class = model->nr_class;
+		double *dec_values = Malloc(double, nr_class*(nr_class-1)/2);
+		svm_predict_values(model, x, dec_values);
+
+		double min_prob=1e-7;
+		double **pairwise_prob=Malloc(double *,nr_class);
+		for(i=0;i<nr_class;i++)
+			pairwise_prob[i]=Malloc(double,nr_class);
+		int k=0;
+		for(i=0;i<nr_class;i++)
+			for(int j=i+1;j<nr_class;j++)
+			{
+				pairwise_prob[i][j]=min(max(sigmoid_predict(dec_values[k],model->probA[k],model->probB[k]),min_prob),1-min_prob);
+				pairwise_prob[j][i]=1-pairwise_prob[i][j];
+				k++;
+			}
+		multiclass_probability(nr_class,pairwise_prob,prob_estimates);
+
+		int prob_max_idx = 0;
+		for(i=1;i<nr_class;i++)
+			if(prob_estimates[i] > prob_estimates[prob_max_idx])
+				prob_max_idx = i;
+		for(i=0;i<nr_class;i++)
+			free(pairwise_prob[i]);
+		free(dec_values);
+                free(pairwise_prob);	     
+		return model->label[prob_max_idx];
+	}
+	else 
+		return svm_predict(model, x);
+}
+
 
 const char *svm_type_table[] =
 {
@@ -1934,6 +2384,21 @@ int svm_save_model(const char *model_file_name, const svm_model *model)
 		fprintf(fp, "\n");
 	}
 
+	if(model->probA) // regression has probA only
+	{
+		fprintf(fp, "probA");
+		for(int i=0;i<nr_class*(nr_class-1)/2;i++)
+			fprintf(fp," %g",model->probA[i]);
+		fprintf(fp, "\n");
+	}
+	if(model->probB)
+	{
+		fprintf(fp, "probB");
+		for(int i=0;i<nr_class*(nr_class-1)/2;i++)
+			fprintf(fp," %g",model->probB[i]);
+		fprintf(fp, "\n");
+	}
+
 	if(model->nSV)
 	{
 		fprintf(fp, "nr_sv");
@@ -1974,6 +2439,8 @@ svm_model *svm_load_model(const char *model_file_name)
 	svm_model *model = Malloc(svm_model,1);
 	svm_parameter& param = model->param;
 	model->rho = NULL;
+	model->probA = NULL;
+	model->probB = NULL;
 	model->label = NULL;
 	model->nSV = NULL;
 
@@ -2049,6 +2516,20 @@ svm_model *svm_load_model(const char *model_file_name)
 			model->label = Malloc(int,n);
 			for(int i=0;i<n;i++)
 				fscanf(fp,"%d",&model->label[i]);
+		}
+		else if(strcmp(cmd,"probA")==0)
+		{
+			int n = model->nr_class * (model->nr_class-1)/2;
+			model->probA = Malloc(double,n);
+			for(int i=0;i<n;i++)
+				fscanf(fp,"%lf",&model->probA[i]);
+		}
+		else if(strcmp(cmd,"probB")==0)
+		{
+			int n = model->nr_class * (model->nr_class-1)/2;
+			model->probB = Malloc(double,n);
+			for(int i=0;i<n;i++)
+				fscanf(fp,"%lf",&model->probB[i]);
 		}
 		else if(strcmp(cmd,"nr_sv")==0)
 		{
@@ -2147,8 +2628,16 @@ void svm_destroy_model(svm_model* model)
 	free(model->sv_coef);
 	free(model->rho);
 	free(model->label);
+	free(model->probA);
+	free(model->probB);
 	free(model->nSV);
 	free(model);
+}
+
+void svm_destroy_param(svm_parameter* param)
+{
+	free(param->weight_label);
+	free(param->weight);
 }
 
 const char *svm_check_parameter(const svm_problem *prob, const svm_parameter *param)
@@ -2198,6 +2687,10 @@ const char *svm_check_parameter(const svm_problem *prob, const svm_parameter *pa
 
 	if(param->shrinking != 0 &&
 	   param->shrinking != 1)
+		return "shrinking != 0 and shrinking != 1";
+
+	if(param->probability != 0 &&
+	   param->probability != 1)
 		return "shrinking != 0 and shrinking != 1";
 
 
@@ -2253,4 +2746,12 @@ const char *svm_check_parameter(const svm_problem *prob, const svm_parameter *pa
 	}
 
 	return NULL;
+}
+
+int svm_check_probability_model(const svm_model *model)
+{
+	return ((model->param.svm_type == C_SVC || model->param.svm_type == NU_SVC) &&
+		model->probA!=NULL && model->probB!=NULL) ||
+		((model->param.svm_type == EPSILON_SVR || model->param.svm_type == NU_SVR) &&
+		 model->probA!=NULL);
 }

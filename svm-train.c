@@ -30,6 +30,7 @@ void exit_with_help()
 	"-m cachesize : set cache memory size in MB (default 40)\n"
 	"-e epsilon : set tolerance of termination criterion (default 0.001)\n"
 	"-h shrinking: whether to use the shrinking heuristics, 0 or 1 (default 1)\n"
+	"-b probability_estimates: whether to train a SVC or SVR model for probability estimates, 0 or 1 (default 0)\n"
 	"-wi weight: set the parameter C of class i to weight*C, for C-SVC (default 1)\n"
 	"-v n: n-fold cross validation mode\n"
 	);
@@ -73,7 +74,7 @@ int main(int argc, char **argv)
 		svm_save_model(model_file_name,model);
 		svm_destroy_model(model);
 	}
-
+	svm_destroy_param(&param);
 	free(prob.y);
 	free(prob.x);
 	free(x_space);
@@ -87,88 +88,23 @@ void do_cross_validation()
 	int total_correct = 0;
 	double total_error = 0;
 	double sumv = 0, sumy = 0, sumvv = 0, sumyy = 0, sumvy = 0;
+	double *target = Malloc(double,prob.l);
 
-	// random shuffle
-	for(i=0;i<prob.l;i++)
+	svm_cross_validation(&prob,&param,nr_fold,target);
+	if(param.svm_type == EPSILON_SVR ||
+	   param.svm_type == NU_SVR)
 	{
-		int j = i+rand()%(prob.l-i);
-		struct svm_node *tx;
-		double ty;
-			
-		tx = prob.x[i];
-		prob.x[i] = prob.x[j];
-		prob.x[j] = tx;
-
-		ty = prob.y[i];
-		prob.y[i] = prob.y[j];
-		prob.y[j] = ty;
-	}
-
-	for(i=0;i<nr_fold;i++)
-	{
-		int begin = i*prob.l/nr_fold;
-		int end = (i+1)*prob.l/nr_fold;
-		int j,k;
-		struct svm_problem subprob;
-
-		subprob.l = prob.l-(end-begin);
-		subprob.x = Malloc(struct svm_node*,subprob.l);
-		subprob.y = Malloc(double,subprob.l);
-			
-		k=0;
-		for(j=0;j<begin;j++)
+		for(i=0;i<prob.l;i++)
 		{
-			subprob.x[k] = prob.x[j];
-			subprob.y[k] = prob.y[j];
-			++k;
+			double y = prob.y[i];
+			double v = target[i];
+			total_error += (v-y)*(v-y);
+			sumv += v;
+			sumy += y;
+			sumvv += v*v;
+			sumyy += y*y;
+			sumvy += v*y;
 		}
-		for(j=end;j<prob.l;j++)
-		{
-			subprob.x[k] = prob.x[j];
-			subprob.y[k] = prob.y[j];
-			++k;
-		}
-
-		if(param.svm_type == EPSILON_SVR ||
-		   param.svm_type == NU_SVR)
-		{
-			struct svm_model *submodel = svm_train(&subprob,&param);
-			double error = 0;
-			for(j=begin;j<end;j++)
-			{
-				double v = svm_predict(submodel,prob.x[j]);
-				double y = prob.y[j];
-				error += (v-y)*(v-y);
-				sumv += v;
-				sumy += y;
-				sumvv += v*v;
-				sumyy += y*y;
-				sumvy += v*y;
-			}
-			svm_destroy_model(submodel);
-			printf("Mean squared error = %g\n", error/(end-begin));
-			total_error += error;			
-		}
-		else
-		{
-			struct svm_model *submodel = svm_train(&subprob,&param);
-			int correct = 0;
-			for(j=begin;j<end;j++)
-			{
-				double v = svm_predict(submodel,prob.x[j]);
-				if(v == prob.y[j])
-					++correct;
-			}
-			svm_destroy_model(submodel);
-			printf("Accuracy = %g%% (%d/%d)\n", 100.0*correct/(end-begin),correct,(end-begin));
-			total_correct += correct;
-		}
-
-		free(subprob.x);
-		free(subprob.y);
-	}		
-	if(param.svm_type == EPSILON_SVR || param.svm_type == NU_SVR)
-	{
 		printf("Cross Validation Mean squared error = %g\n",total_error/prob.l);
 		printf("Cross Validation Squared correlation coefficient = %g\n",
 			((prob.l*sumvy-sumv*sumy)*(prob.l*sumvy-sumv*sumy))/
@@ -176,7 +112,13 @@ void do_cross_validation()
 			);
 	}
 	else
+	{
+		for(i=0;i<prob.l;i++)
+			if(target[i] == prob.y[i])
+				++total_correct;
 		printf("Cross Validation Accuracy = %g%%\n",100.0*total_correct/prob.l);
+	}
+	free(target);
 }
 
 void parse_command_line(int argc, char **argv, char *input_file_name, char *model_file_name)
@@ -195,6 +137,7 @@ void parse_command_line(int argc, char **argv, char *input_file_name, char *mode
 	param.eps = 1e-3;
 	param.p = 0.1;
 	param.shrinking = 1;
+	param.probability = 0;
 	param.nr_weight = 0;
 	param.weight_label = NULL;
 	param.weight = NULL;
@@ -238,6 +181,9 @@ void parse_command_line(int argc, char **argv, char *input_file_name, char *mode
 				break;
 			case 'h':
 				param.shrinking = atoi(argv[i]);
+				break;
+			case 'b':
+				param.probability = atoi(argv[i]);
 				break;
 			case 'v':
 				cross_validation = 1;
