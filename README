@@ -24,7 +24,8 @@ Installation
 On Unix systems, type `make' to build the `svm-train' and `svm-predict'
 programs. Run them without arguments to show the usages of them.
 
-On other systems, consult `Makefile' to build them or use the pre-built
+On other systems, consult `Makefile' to build them (e.g., see
+'Building Windows binaries' in this file) or use the pre-built
 binaries (Windows binaries are in the directory `windows').
 
 The format of training and testing data file is:
@@ -352,6 +353,35 @@ public class svm {
 
 The library is in the "libsvm" package.
 Note that in Java version, svm_node[] is not ended with a node whose index = -1.
+
+
+Building Windows Binaries
+=========================
+
+Windows binaries are in the directory `windows'. To build them via
+Visual C++, use the following steps:
+
+1. Open a dos command box and change to libsvm directory.  If
+evironment variables of VC++ have not been set, type
+
+"C:\Program Files\Microsoft Visual Studio\VC98\Bin\VCVARS32.Bat"
+
+You may have to modify the above according where VC++ is installed.
+
+2. Type
+
+nmake -f Makefile.win clean all
+
+3. (optional) To build python interface, download and install Python.
+Edit Makefile.win and change PYTHON_INC and PYTHON_LIB to your python
+installtion. Type
+
+nmake -f Makefile.win python 
+
+and then copy windows\python\svmc.dll to the python directory.
+
+Another way is to build them from Visual C++ environment. See details
+in libsvm faq.
 
 Model Selection
 ===============
