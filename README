@@ -144,6 +144,13 @@ Tips on practical use
 Examples
 ========
 
+> svm-scale -l -1 -u 1 -s range train > train.scale
+> svm-scale -r range test > test.scale
+
+Scale each feature of the training data to be in [-1,1]. Scaling
+factors are stored in the file range and then used for scaling the
+test data.
+
 > svm-train -s 0 -c 1000 -t 2 -g 0.5 -e 0.00001 data_file 
 
 Train a classifier with RBF kernel exp(-0.5|u-v|^2) and stopping
