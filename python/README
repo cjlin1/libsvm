@@ -19,7 +19,7 @@ Installation
 The build process for the various Unix systems is as follows:
 
 Before you build the module, you need to find out the python include
-directory, which is typically located at /usr/local/include/python2.3 or
+directory, which is typically located at /usr/local/include/python2.4 or
 /usr/include/python. You can set the variable PYTHON_INCLUDEDIR in
 Makefile manually or use something like the following:
 

@@ -139,7 +139,7 @@ Tips on practical use
 =====================
 
 * Scale your data. For example, scale each attribute to [0,1] or [-1,+1].
-* For C-SVC, consider using the model selection tool in the python directory.
+* For C-SVC, consider using the model selection tool in the tools directory.
 * nu in nu-SVC/one-class-SVM/nu-SVR approximates the fraction of training
   errors and support vectors.
 * If data for classification are unbalanced (e.g. many positive and
