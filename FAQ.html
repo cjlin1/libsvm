@@ -9,7 +9,7 @@
     <h1><a href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a> FAQ</h1>
 <!-- Created: Wed Apr 18 19:26:54 CST 2001 -->
 <!-- hhmts start -->
-Last modified: Mon Nov  3 12:22:26 CST 2003
+Last modified: Sat Nov 15 10:42:38 CST 2003
 <!-- hhmts end -->
 
 <hr>
@@ -380,23 +380,28 @@ You can try to use a looser stopping tolerance with -e.
 If that still doesn't work, you may want to contact us. We can show you some
 tricks on improving the training time.
 
-<p><li>I want to know the value of the decision function. How do I get it ?
+<p><li> How do I get the decision value(s) ?
 <p>
 We print out decision values for regression. For classification,
-as we have to solve several binary SVMs for multi-class cases,
-we do not print out them. 
-However, you can easily modify the program for 
-printing them. Just add 
+we solve several binary SVMs for multi-class cases, so 
+you obtain values by easily calling the subroutine
+svm_predict_values. Details are in 
+README of libsvm package. 
+
+<p>
+We do not recommend the following, but if you would
+like to get the value for 
+TWO-class classification in the easiest way, simply add 
 <pre>
-       printf("%f ", sum);
+		printf("%f\n", dec_values[0]);
 </pre>
 after the line
 <pre>
-       sum -= model->rho[p++];
+		svm_predict_values(model, x, dec_values);
 </pre>
 of the file svm.cpp.
 Note that
-for binary SVC, in the implementation,
+for two-class SVC, in the implementation,
 the class of the first training point is treated as y = +1 in the decision
 function.
 
@@ -706,13 +711,14 @@ http://www.swig.org/Doc1.1/HTML/Python.html#n2</a>
 
 <p>
 
-
 If you just want to build DLL for a different python version,
-you need only
-Visual C++ and but not SWIG:
+after libsvm 2.5, you can easily use the file Makefile.win.
+See details in README.
+
+Alternatively, you can use Visual C++:
 <ol>
 <li> Create a Win32 DLL project and set (Build->Active Configuration) to "Release."
-<li> Add svm.cpp, svmc_wrap.c, python21.lib to your project.
+<li> Add svm.cpp, svmc_wrap.c, python2x.lib to your project.
 <li> Add the directories containing Python.h and svm.h to
 the Additional include directories. (in Project
 Settings->C/C++->Preprocessor)
@@ -723,8 +729,6 @@ directories should be "Release"
 <li> Build the DLL.
 </ol>
 
-After libsvm 2.5, you can easily use the file Makefile.win.
-See details in README.
 
 <!--
 There do exist work arounds, however. In
