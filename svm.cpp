@@ -2701,6 +2701,10 @@ const char *svm_check_parameter(const svm_problem *prob, const svm_parameter *pa
 	   param->probability != 1)
 		return "probability != 0 and probability != 1";
 
+	if(param->probability == 1 &&
+	   svm_type == ONE_CLASS)
+		return "one-class SVM probability output not supported yet";
+
 
 	// check whether nu-svc is feasible
 	
