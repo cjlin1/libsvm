@@ -2685,7 +2685,8 @@ out:
 	for(i=0;i<m;i++)
 		model->sv_coef[i] = Malloc(double,l);
 	model->SV = Malloc(svm_node*,l);
-	svm_node *x_space = Malloc(svm_node,elements);
+	svm_node *x_space;
+	if(l>0) x_space = Malloc(svm_node,elements);
 
 	int j=0;
 	for(i=0;i<l;i++)
@@ -2716,7 +2717,7 @@ out2:
 
 void svm_destroy_model(svm_model* model)
 {
-	if(model->free_sv)
+	if(model->free_sv && model->l > 0)
 		free((void *)(model->SV[0]));
 	for(int i=0;i<model->nr_class-1;i++)
 		free(model->sv_coef[i]);
