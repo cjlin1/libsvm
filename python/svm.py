@@ -22,11 +22,11 @@ def _double_array(seq):
 	return array
 
 def _free_int_array(x):
-	if x != 'NULL':
+	if x != 'NULL' and x != None:
 		svmc.int_destroy(x)
 
 def _free_double_array(x):
-	if x != 'NULL':
+	if x != 'NULL' and x != None:
 		svmc.double_destroy(x)
 
 def _int_array_to_list(x,n):
@@ -166,12 +166,47 @@ class svm_model:
 			msg = svmc.svm_check_parameter(prob.prob,param.param)
 			if msg: raise ValueError, msg
 			self.model = svmc.svm_train(prob.prob,param.param)
+		self.nr_class = svmc.svm_get_nr_class(self.model)
 
 	def predict(self,x):
 		data = _convert_to_svm_node_array(x)
 		ret = svmc.svm_predict(self.model,data)
 		svmc.svm_node_array_destroy(data)
 		return ret
+
+	def get_nr_class(self):
+		return self.nr_class
+
+	def get_labels(self):
+		intarr = svmc.int_array(self.nr_class)
+		svmc.svm_get_labels(self.model,intarr)
+		ret = _int_array_to_list(intarr, self.nr_class)
+		svmc.int_destroy(intarr)
+		return ret
+		
+	def predict_values_raw(self,x):
+		n = self.nr_class*(self.nr_class-1)/2
+		data = _convert_to_svm_node_array(x)
+		dblarr = svmc.double_array(n)
+		svmc.svm_predict_values(self.model, data, dblarr)
+		ret = _double_array_to_list(dblarr, n)
+		svmc.double_destroy(dblarr)
+		svmc.svm_node_array_destroy(data)
+		return ret
+
+
+	def predict_values(self,x):
+		v=self.predict_values_raw(x)
+		labels = self.get_labels()
+		count = 0
+		d = {}
+		for i in range(len(labels)):
+			for j in range(i+1, len(labels)):
+				d[labels[i],labels[j]] = v[count]
+				d[labels[j],labels[i]] = -v[count]
+				count += 1
+		return  d
+
 
 	def save(self,filename):
 		svmc.svm_save_model(filename,self.model)

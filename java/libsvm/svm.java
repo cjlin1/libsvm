@@ -1602,7 +1602,18 @@ public class svm {
 		return model;
 	}
 
-	public static double svm_predict(svm_model model, svm_node[] x)
+	public static int svm_get_nr_class(svm_model model)
+	{
+		return model.nr_class;
+	}
+
+	public static void svm_get_labels(svm_model model, int[] label)
+	{
+		for(int i=0;i<model.nr_class;i++)
+			label[i] = model.label[i];
+	}
+
+	public static void svm_predict_values(svm_model model, svm_node[] x, double[] dec_values)
 	{
 		if(model.param.svm_type == svm_parameter.ONE_CLASS ||
 		   model.param.svm_type == svm_parameter.EPSILON_SVR ||
@@ -1613,10 +1624,7 @@ public class svm {
 			for(int i=0;i<model.l;i++)
 				sum += sv_coef[i] * Kernel.k_function(x,model.SV[i],model.param);
 			sum -= model.rho[0];
-			if(model.param.svm_type == svm_parameter.ONE_CLASS)
-				return (sum>0)?1:-1;
-			else
-				return sum;
+			dec_values[0] = sum;
 		}
 		else
 		{
@@ -1633,10 +1641,8 @@ public class svm {
 			for(i=1;i<nr_class;i++)
 				start[i] = start[i-1]+model.nSV[i-1];
 
-			int[] vote = new int[nr_class];
-			for(i=0;i<nr_class;i++)
-				vote[i] = 0;
 			int p=0;
+			int pos=0;
 			for(i=0;i<nr_class;i++)
 				for(int j=i+1;j<nr_class;j++)
 				{
@@ -1654,7 +1660,40 @@ public class svm {
 					for(k=0;k<cj;k++)
 						sum += coef2[sj+k] * kvalue[sj+k];
 					sum -= model.rho[p++];
-					if(sum > 0)
+					dec_values[pos++] = sum;					
+				}
+		}
+	}
+
+	public static double svm_predict(svm_model model, svm_node[] x)
+	{
+		if(model.param.svm_type == svm_parameter.ONE_CLASS ||
+		   model.param.svm_type == svm_parameter.EPSILON_SVR ||
+		   model.param.svm_type == svm_parameter.NU_SVR)
+		{
+			double[] res = new double[1];
+			svm_predict_values(model, x, res);
+
+			if(model.param.svm_type == svm_parameter.ONE_CLASS)
+				return (res[0]>0)?1:-1;
+			else
+				return res[0];
+		}
+		else
+		{
+			int i;
+			int nr_class = model.nr_class;
+			double[] dec_values = new double[nr_class*(nr_class-1)/2];
+			svm_predict_values(model, x, dec_values);
+
+			int[] vote = new int[nr_class];
+			for(i=0;i<nr_class;i++)
+				vote[i] = 0;
+			int pos=0;
+			for(i=0;i<nr_class;i++)
+				for(int j=i+1;j<nr_class;j++)
+				{
+					if(dec_values[pos++] > 0)
 						++vote[i];
 					else
 						++vote[j];
@@ -1667,6 +1706,7 @@ public class svm {
 			return model.label[vote_max_idx];
 		}
 	}
+
 	static final String svm_type_table[] =
 	{
 		"c_svc","nu_svc","one_class","epsilon_svr","nu_svr",
