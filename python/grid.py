@@ -327,8 +327,9 @@ def main():
                 result_file.write('%s %s %s\n' %(c1,g1,rate))
                 result_file.flush()
                 print "[%s] %s %s %s" % (worker,c1,g1,rate),
-                if rate > best_rate:
+                if (rate > best_rate) or (rate==best_rate and g1==best_g1 and c1<best_c1):
                     best_rate = rate
+                    best_c1,best_g1=c1,g1
                     best_c = 2.0**c1
                     best_g = 2.0**g1
                 print " (best c=%s, g=%s, rate=%s)" % \
