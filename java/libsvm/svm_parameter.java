@@ -1,5 +1,5 @@
 package libsvm;
-public class svm_parameter
+public class svm_parameter implements java.io.Serializable
 {
 	/* svm_type */
 	public static final int C_SVC = 0;

@@ -2,7 +2,7 @@
 // svm_model
 //
 package libsvm;
-public class svm_model
+public class svm_model implements java.io.Serializable
 {
 	svm_parameter param;	// parameter
 	int nr_class;		// number of classes, = 2 in regression/one class svm
