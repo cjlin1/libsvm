@@ -1699,7 +1699,7 @@ void multiclass_probability(int k, double **r, double *p)
 		for (t=0;t<k;t++)
 		{
 			Qp[t]=0;
-			for (int j=0;j<k;j++)
+			for (j=0;j<k;j++)
 				Qp[t]+=Q[t][j]*p[j];
 			pQp+=p[t]*Qp[t];
 		}
@@ -1964,7 +1964,7 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 	{
 		// classification
 		int l = prob->l;
-		int nr_class = 0;
+		int nr_class;
 		int *label = NULL;
 		int *start = NULL;
 		int *count = NULL;
@@ -2156,7 +2156,7 @@ void svm_cross_validation(const svm_problem *prob, const svm_parameter *param, i
 	int *fold_start = Malloc(int,nr_fold+1);
 	int l = prob->l;
 	int *perm = Malloc(int,l);
-	int nr_class = 0;
+	int nr_class;
 
 	if(param->svm_type == C_SVC ||
 	   param->svm_type == NU_SVC)
@@ -2685,7 +2685,7 @@ out:
 	for(i=0;i<m;i++)
 		model->sv_coef[i] = Malloc(double,l);
 	model->SV = Malloc(svm_node*,l);
-	svm_node *x_space;
+	svm_node *x_space=NULL;
 	if(l>0) x_space = Malloc(svm_node,elements);
 
 	int j=0;

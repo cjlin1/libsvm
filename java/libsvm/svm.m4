@@ -629,7 +629,7 @@ class Solver {
 			{
 				if(!is_upper_bound(i))	// d = +1
 				{
-					if(-G[i] > Gmax1)
+					if(-G[i] >= Gmax1)
 					{
 						Gmax1 = -G[i];
 						Gmax1_idx = i;
@@ -637,7 +637,7 @@ class Solver {
 				}
 				if(!is_lower_bound(i))	// d = -1
 				{
-					if(G[i] > Gmax2)
+					if(G[i] >= Gmax2)
 					{
 						Gmax2 = G[i];
 						Gmax2_idx = i;
@@ -648,7 +648,7 @@ class Solver {
 			{
 				if(!is_upper_bound(i))	// d = +1
 				{
-					if(-G[i] > Gmax2)
+					if(-G[i] >= Gmax2)
 					{
 						Gmax2 = -G[i];
 						Gmax2_idx = i;
@@ -656,7 +656,7 @@ class Solver {
 				}
 				if(!is_lower_bound(i))	// d = -1
 				{
-					if(G[i] > Gmax1)
+					if(G[i] >= Gmax1)
 					{
 						Gmax1 = G[i];
 						Gmax1_idx = i;
@@ -824,7 +824,7 @@ final class Solver_NU extends Solver
 			{
 				if(!is_upper_bound(i))	// d = +1
 				{
-					if(-G[i] > Gmax1)
+					if(-G[i] >= Gmax1)
 					{
 						Gmax1 = -G[i];
 						Gmax1_idx = i;
@@ -832,7 +832,7 @@ final class Solver_NU extends Solver
 				}
 				if(!is_lower_bound(i))	// d = -1
 				{
-					if(G[i] > Gmax2)
+					if(G[i] >= Gmax2)
 					{
 						Gmax2 = G[i];
 						Gmax2_idx = i;
@@ -843,7 +843,7 @@ final class Solver_NU extends Solver
 			{
 				if(!is_upper_bound(i))	// d = +1
 				{
-					if(-G[i] > Gmax3)
+					if(-G[i] >= Gmax3)
 					{
 						Gmax3 = -G[i];
 						Gmax3_idx = i;
@@ -851,7 +851,7 @@ final class Solver_NU extends Solver
 				}
 				if(!is_lower_bound(i))	// d = -1
 				{
-					if(G[i] > Gmax4)
+					if(G[i] >= Gmax4)
 					{
 						Gmax4 = G[i];
 						Gmax4_idx = i;
@@ -1507,22 +1507,22 @@ public class svm {
 	// Method 2 from the multiclass_prob paper by Wu, Lin, and Weng
 	private static void multiclass_probability(int k, double[][] r, double[] p)
 	{
-		int t;
+		int t,j;
 		int iter = 0, max_iter=100;
 		double[][] Q=new double[k][k];
 		double[] Qp= new double[k];
-		double pQp, eps=0.001;
+		double pQp, eps=0.005/k;
 	
 		for (t=0;t<k;t++)
 		{
 			p[t]=1.0/k;  // Valid if k = 1
 			Q[t][t]=0;
-			for (int j=0;j<t;j++)
+			for (j=0;j<t;j++)
 			{
 				Q[t][t]+=r[j][t]*r[j][t];
 				Q[t][j]=Q[j][t];
 			}
-			for (int j=t+1;j<k;j++)
+			for (j=t+1;j<k;j++)
 			{
 				Q[t][t]+=r[j][t]*r[j][t];
 				Q[t][j]=-r[j][t]*r[t][j];
@@ -1535,7 +1535,7 @@ public class svm {
 			for (t=0;t<k;t++)
 			{
 				Qp[t]=0;
-				for (int j=0;j<k;j++)
+				for (j=0;j<k;j++)
 					Qp[t]+=Q[t][j]*p[j];
 				pQp+=p[t]*Qp[t];
 			}
@@ -1553,7 +1553,7 @@ public class svm {
 				double diff=(-Qp[t]+pQp)/Q[t][t];
 				p[t]+=diff;
 				pQp=(pQp+diff*(diff*Q[t][t]+2*Qp[t]))/(1+diff)/(1+diff);
-				for (int j=0;j<k;j++)
+				for (j=0;j<k;j++)
 				{
 					Qp[j]=(Qp[j]+diff*Q[t][j])/(1+diff);
 					p[j]/=(1+diff);
