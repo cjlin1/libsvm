@@ -101,22 +101,29 @@ class svm_parameter:
 
 def _convert_to_svm_node_array(x):
 	""" convert a sequence or mapping to an svm_node array """
-	data = svmc.svm_node_array(len(x)+1)
-	svmc.svm_node_array_set(data,len(x),-1,0)
 	import operator
+
+	# Find non zero elements
+	iter_range = []
 	if type(x) == dict:
-		keys = x.keys()
-		keys.sort()
-		j = 0
-		for k in keys:
-			svmc.svm_node_array_set(data,j,k,x[k])
-			j = j + 1
+		for k, v in x.iteritems():
+			if( v != 0 ):
+				iter_range.append( k )
 	elif operator.isSequenceType(x):
 		for j in range(len(x)):
-			svmc.svm_node_array_set(data,j,j+1,x[j])
+			if( x[ j ] != 0 ):
+				iter_range.append( j )
 	else:
 		raise TypeError,"data must be a mapping or a sequence"
-	
+
+	iter_range.sort()
+	data = svmc.svm_node_array(len(iter_range)+1)
+	svmc.svm_node_array_set(data,len(iter_range),-1,0)
+
+	j = 0
+	for k in iter_range:
+		svmc.svm_node_array_set(data,j,k,x[k])
+		j = j + 1
 	return data
 
 class svm_problem:
@@ -137,7 +144,8 @@ class svm_problem:
 			self.data.append(data);
 			svmc.svm_node_matrix_set(x_matrix,i,data)
 			if type(x[i]) == dict:
-				self.maxlen = max(self.maxlen,max(x[i].keys()))
+				if (len(x[i]) > 0):
+					self.maxlen = max(self.maxlen,max(x[i].keys()))
 			else:
 				self.maxlen = max(self.maxlen,len(x[i]))
 
