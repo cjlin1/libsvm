@@ -13,10 +13,12 @@ Quick Start
 ===========
 
 If you are new to SVM and if the data is not large, please go to 
-python directory and use easy.py after installation. It does 
+tools directory and use easy.py after installation. It does 
 everything automatic -- from data scaling to parameter selection.
 
 Usage: easy.py training_file [testing_file]
+
+More information can be found in tools/README.
 
 Installation
 ============
@@ -489,7 +491,7 @@ in libsvm faq.
 Model Selection
 ===============
 
-See the README file in python directory.
+See the README file in tools directory.
 
 Python Interface
 ================

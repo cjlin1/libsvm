@@ -1,7 +1,7 @@
-		Part I: Model Selection Tools
+Model Selection Tools
 
 Introduction
-===============
+============
 
 grid.py is a model selection tool for C-SVM classification using RBF
 (radial basis function) kernel. It uses cross validation (CV) technique
