@@ -67,7 +67,7 @@ private:
 		int len;		// data[0,len) is cached in this entry
 	};
 
-	head_t* head;
+	head_t *head;
 	head_t lru_head;
 	void lru_delete(head_t *h);
 	void lru_insert(head_t *h);
@@ -723,7 +723,7 @@ int Solver::select_working_set(int &out_i, int &out_j)
 {
 	// return i,j such that
 	// i: maximizes -y_i * grad(f)_i, i in I_up(\alpha)
-	// j: mimimizes the decrease of obj value
+	// j: minimizes the decrease of obj value
 	//    (if quadratic coefficeint <= 0, replace it with tau)
 	//    -y_j*grad(f)_j < -y_i*grad(f)_i, j in I_low(\alpha)
 	
@@ -1264,7 +1264,7 @@ public:
 	{
 		clone(y,y_,prob.l);
 		cache = new Cache(prob.l,(int)(param.cache_size*(1<<20)));
-		QD = Malloc(Qfloat,prob.l);
+		QD = new Qfloat[prob.l];
 		for(int i=0;i<prob.l;i++)
 			QD[i]= (Qfloat)(this->*kernel_function)(i,i);
 	}
@@ -1280,6 +1280,7 @@ public:
 		}
 		return data;
 	}
+
 	Qfloat *get_QD() const
 	{
 		return QD;
@@ -1297,7 +1298,7 @@ public:
 	{
 		delete[] y;
 		delete cache;
-		free(QD);
+		delete[] QD;
 	}
 private:
 	schar *y;
@@ -1312,7 +1313,7 @@ public:
 	:Kernel(prob.l, prob.x, param)
 	{
 		cache = new Cache(prob.l,(int)(param.cache_size*(1<<20)));
-		QD = Malloc(Qfloat,prob.l);
+		QD = new Qfloat[prob.l];
 		for(int i=0;i<prob.l;i++)
 			QD[i]= (Qfloat)(this->*kernel_function)(i,i);
 	}
@@ -1328,6 +1329,7 @@ public:
 		}
 		return data;
 	}
+
 	Qfloat *get_QD() const
 	{
 		return QD;
@@ -1343,7 +1345,7 @@ public:
 	~ONE_CLASS_Q()
 	{
 		delete cache;
-		free(QD);
+		delete[] QD;
 	}
 private:
 	Cache *cache;
@@ -1358,7 +1360,7 @@ public:
 	{
 		l = prob.l;
 		cache = new Cache(l,(int)(param.cache_size*(1<<20)));
-		QD = Malloc(Qfloat,2*l);
+		QD = new Qfloat[2*l];
 		sign = new schar[2*l];
 		index = new int[2*l];
 		for(int k=0;k<l;k++)
@@ -1413,7 +1415,7 @@ public:
 		delete[] index;
 		delete[] buffer[0];
 		delete[] buffer[1];
-		free(QD);
+		delete[] QD;
 	}
 private:
 	int l;
@@ -1421,7 +1423,7 @@ private:
 	schar *sign;
 	int *index;
 	mutable int next_buffer;
-	Qfloat* buffer[2];
+	Qfloat *buffer[2];
 	Qfloat *QD;
 };
 
