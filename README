@@ -64,16 +64,18 @@ svm-toy:
 	This is a simple graphical interface which shows how SVM
 	separate data in a plane. You can click in the window to 
 	draw data points. Use "change" button to choose class 
-	1 or 2, "load" button to load data from a file, "save" button
-	to save data to a file, "run" button to obtain an SVM model,
-	and "clear" button to clear the window.
+	1, 2 or 3 (i.e., up to three classes are supported), "load"
+	button to load data from a file, "save" button to save data to
+	a file, "run" button to obtain an SVM model, and "clear"
+	button to clear the window.
 
 	You can enter options in the bottom of the window, the syntax of
 	options is the same as `svm-train'.
 
-	Note that "load" and "save" consider data in the classification but
-	not the regression case. Each data point has one label (the color)
-	and two attributes (x-axis and y-axis values).
+	Note that "load" and "save" consider data in the
+	classification but not the regression case. Each data point
+	has one label (the color) which must be 1, 2, or 3 and two
+	attributes (x-axis and y-axis values) in [0,1].
 
 	Type `make' in respective directories to build them.
 
