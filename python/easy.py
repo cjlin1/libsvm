@@ -21,7 +21,7 @@ else:
 	svmscale_exe = r"..\windows\svmscale.exe"
 	svmtrain_exe = r"..\windows\svmtrain.exe"
 	svmpredict_exe = r"..\windows\svmpredict.exe"
-	gnuplot_exe = r"c:\tmp\gp373w32\pgnuplot.exe"
+	gnuplot_exe = r"c:\tmp\gnuplot\bin\pgnuplot.exe"
 	grid_py = r".\grid.py"
 
 assert os.path.exists(svmscale_exe),"svm-scale executable not found"

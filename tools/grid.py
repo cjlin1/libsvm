@@ -13,8 +13,8 @@ is_win32 = (sys.platform == 'win32')
 svmtrain_exe = "../svm-train"
 gnuplot_exe = "/usr/bin/gnuplot"
 # example for windows
-# svmtrain_exe = r"c:\tmp\libsvm-2.6\windows\svmtrain.exe"
-# gnuplot_exe = r"c:\tmp\gp373w32\pgnuplot.exe"
+# svmtrain_exe = r"c:\tmp\libsvm-2.7\windows\svmtrain.exe"
+# gnuplot_exe = r"c:\tmp\gnuplot\bin\pgnuplot.exe"
 
 # global parameters and their default values
 
