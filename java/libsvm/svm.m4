@@ -1709,7 +1709,7 @@ public class svm {
 					System.arraycopy(label,0,new_data,0,label.length);
 					label = new_data;
 					new_data = new int[max_nr_class];
-					System.arraycopy(count,0,new_data,0,label.length);
+					System.arraycopy(count,0,new_data,0,count.length);
 					count = new_data;					
 				}
 				label[nr_class] = this_label;
