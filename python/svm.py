@@ -199,7 +199,7 @@ class svm_model:
 		
 	def predict_values_raw(self,x):
 		#convert x into svm_node, allocate a double array for return
-		n = self.nr_class*(self.nr_class-1)/2
+		n = self.nr_class*(self.nr_class-1)//2
 		data = _convert_to_svm_node_array(x)
 		dblarr = svmc.new_double(n)
 		svmc.svm_predict_values(self.model, data, dblarr)
