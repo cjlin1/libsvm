@@ -43,14 +43,14 @@ it's not used so can be any number. <index> is an integer starting from 1,
 calculate accuracy or error. If they are unknown, just fill this column with a
 number.
 
-There is a sample training data for classification in this package:
+There is a sample data for classification in this package:
 heart_scale.
 
 Type `svm-train heart_scale', and the program will read the training
-data and output the model file `heart_scale.model'. Then you can
-type `svm-predict heart_scale heart_scale.model output' to see the
-rate of classification on training data. The `output' file contains
-the prediction value of the model.
+data and output the model file `heart_scale.model'. If you have a test
+set called heart_scale.t, then you type `svm-predict heart_scale.t
+heart_scale.model output' to see the prediction accuracy on the test
+data. The `output' file contains the predicted class label.
 
 There are some other useful programs in this package.
 
@@ -428,13 +428,18 @@ Library usages are similar to the C version. These functions are available:
 
 public class svm {
 	public static svm_model svm_train(svm_problem prob, svm_parameter param);
-	public static double svm_predict(svm_model model, svm_node[] x);
+	public static void svm_cross_validation(svm_problem prob, svm_parameter param, int nr_fold, double[] target);
+	public static int svm_get_svm_type(svm_model model);
 	public static int svm_get_nr_class(svm_model model);
 	public static void svm_get_labels(svm_model model, int[] label);
+	public static double svm_get_svr_probability(svm_model model);
 	public static void svm_predict_values(svm_model model, svm_node[] x, double[] dec_values);
+	public static double svm_predict(svm_model model, svm_node[] x);
+	public static double svm_predict_probability(svm_model model, svm_node[] x, double[] prob_estimates);
 	public static void svm_save_model(String model_file_name, svm_model model) throws IOException
 	public static svm_model svm_load_model(String model_file_name) throws IOException
 	public static String svm_check_parameter(svm_problem prob, svm_parameter param);
+	public static int svm_check_probability_model(svm_model model);
 }
 
 The library is in the "libsvm" package.
