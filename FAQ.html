@@ -9,7 +9,7 @@
     <h1><a href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a> FAQ</h1>
 <!-- Created: Wed Apr 18 19:26:54 CST 2001 -->
 <!-- hhmts start -->
-Last modified: Sun Mar 28 10:45:02 CST 2004
+Last modified: Tue Mar 30 15:00:16 CST 2004
 <!-- hhmts end -->
 
 <hr>
@@ -35,7 +35,7 @@ Technion (Israel Institute of Technology), Israel.
 Computer and Information Sciences Dept., University of Florida</a>
 <li>
 <a href=http://www.uonbi.ac.ke/acad_depts/ics/course_material/machine_learning/ML_and_DM_Resources.html>
-The Institue of Computer Science,
+The Institute of Computer Science,
 University of Nairobi, Kenya.</a>
 <li>
 <a href=http://cerium.raunvis.hi.is/~tpr/courseware/svm/hugbunadur.html>
@@ -88,7 +88,7 @@ free software licenses such as GPL. Hence, it is very easy to
 use libsvm in your software.
 It can also be used in commercial products.
 
-<p><li> Is there a respository of additional tools
+<p><li> Is there a repository of additional tools
 based on libsvm ?
 
 <p>
@@ -111,7 +111,7 @@ build the graphic interface "svm-toy"
 on MS windows. How should I do it ?
 
 <p>
-Build it as a project by chooising "Win32 Application."
+Build it as a project by choosing "Win32 Application."
 On the other hand, for "svm-train" and "svm-predict"
 you want to choose "Win32 Console Application."
 After libsvm 2.5, you can also use the file Makefile.win.
@@ -178,7 +178,7 @@ obj is the optimal objective value of the dual SVM problem.
 rho is the bias term in the decision function
 sgn(w^Tx - rho).
 nSV and nBSV are number of support vectors and bounded support
-vectors (i.e., alpha_i = C). nu-svm is a somewhat eqivalent
+vectors (i.e., alpha_i = C). nu-svm is a somewhat equivalent
 form of C-SVM where C is replaced by nu. nu simply shows the
 corresponding parameter. More details are in
 <a href="http://www.csie.ntu.edu.tw/~cjlin/papers/libsvm.pdf">
@@ -292,7 +292,7 @@ in libsvm.
 training and testing data in a similar way ?
 <p>
 Yes, you can do the following:
-<br> svm-scale -s scaling_parameters traing_data > scaled_traing_data
+<br> svm-scale -s scaling_parameters train_data > scaled_train_data
 <br> svm-scale -r scaling_parameters test_data > scaled_test_data
 
 <p><li>
@@ -321,12 +321,12 @@ same as (C,g/2) on the [-1,1]-scaled data.
 
 <p> Though the performance is the same, the computational
 time may be different. For data with many zero entries,
-[0,1]-scaling keeps the sparsity of input data and hance
+[0,1]-scaling keeps the sparsity of input data and hence
 may save the time.
 <p><li>The prediction rate is low. How could I improve it ?<p>
 Try to use the model selection tool grid.py in the python
 directory find
-out good parameters. To see the importance of model selction,
+out good parameters. To see the importance of model selection,
 please 
 see my  talk:
 <A HREF="http://www.csie.ntu.edu.tw/~cjlin/talks/tuebingen.ps.gz">
@@ -443,7 +443,7 @@ and then in main():
       mallopt(M_MMAP_MAX,1000000);
 </pre>
 You can also set the environment variables instead
-of writing thems in the program:
+of writing them in the program:
 <pre>
 $ M_MMAP_MAX=1000000 M_MMAP_THRESHOLD=32768 ./svm-train .....
 </pre>
@@ -467,7 +467,7 @@ void info(char *fmt,...)
 </pre>
 
 <p><li>I would like to use my own kernel but find out that
-there are two subtourines for kernel 
+there are two subroutines for kernel 
 evaluations: k_function() and kernel_function(). Which one
 should I modify ?
 <p>
@@ -478,14 +478,14 @@ Thus we consider exp(-g (|xi|^2 - 2dot(xi,xj) +|xj|^2))
 and by calculating all |xi|^2 in the beginning, 
 the number of operations is reduced to 2n.
 This is for the training.  For prediction we cannot
-do this so a regular subrouting using that 3n operations is
+do this so a regular subroutine using that 3n operations is
 needed.
 
 The easiest way to have your own kernel is
 to  put the same code in these two
-subourines by replacing any kernel.
+subroutines by replacing any kernel.
 
-<p><li>What method does libsvm use for mulsit-class SVM ?
+<p><li>What method does libsvm use for multi-class SVM ?
 <p>
 It is one-against-one. We chose it after doing the following
 comparison:
@@ -498,7 +498,7 @@ for multi-class support vector machines
 
 
 <p><li> After doing cross validation, why there is no
-model file outputed ?
+model file outputted ?
 <p>
 Cross validation is used for selecting good parameters.
 After finding them, you want to re-train the whole
@@ -535,7 +535,7 @@ to
 	s.Solve(l, SVC_Q(*prob,*param,y), minus_ones, y,
 		alpha, INF, INF, param->eps, si, param->shrinking, param->cal_partial, param->gamma);
 </pre>
-Second, in  the class  of SVC_Q, declair C as 
+Second, in  the class  of SVC_Q, declare C as 
 a private variable:
 <pre>
 	double C;
@@ -559,7 +559,7 @@ Under the IEEE floating point standard, zero
 division will returns infinity. Then with the 
 operations later to bound it, things go back to normal numbers without any problem.
 
-In general no warning messages happen. On some computaers, you may
+In general no warning messages happen. On some computers, you may
 need to add an option (e.g. -mieee on alpha).
 
 Reasons of doing so are described in libsvm document.
