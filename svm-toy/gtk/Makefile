@@ -1,0 +1,22 @@
+CC = gcc
+CXXC = g++
+CFLAGS = -Wall -O3 -g `gtk-config --cflags`
+LIBS = `gtk-config --libs`
+
+svm-toy: main.o interface.o callbacks.o ../../svm.o
+	$(CXXC) $(CFLAGS) main.o interface.o callbacks.o ../../svm.o -o svm-toy $(LIBS)
+
+main.o: main.c
+	$(CC) $(CFLAGS) -c main.c
+
+interface.o: interface.c interface.h
+	$(CC) $(CFLAGS) -c interface.c
+
+callbacks.o: callbacks.cpp callbacks.h
+	$(CXXC) $(CFLAGS) -c callbacks.cpp
+
+../../svm.o:
+	cd ../..; make svm.o
+
+clean:
+	rm -f *~ callbacks.o svm-toy main.o interface.o callbacks.o
