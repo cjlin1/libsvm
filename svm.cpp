@@ -2755,6 +2755,8 @@ const char *svm_check_parameter(const svm_problem *prob, const svm_parameter *pa
 				}
 			}
 		}
+		free(label);
+		free(count);
 	}
 
 	return NULL;
