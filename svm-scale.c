@@ -11,7 +11,7 @@
 
 char *line;
 int max_line_len = 1024;
-double lower=-1.0,upper=1.0,y_lower,y_upper;
+double lower=0.0,upper=1.0,y_lower,y_upper;
 int y_scaling = 0;
 double *feature_max;
 double *feature_min;
@@ -65,7 +65,7 @@ int main(int argc,char **argv)
 	{
 		fprintf(stderr,"usage: %s [-l lower] [-u upper] [-y y_lower y_upper]\n",argv[0]);
 		fprintf(stderr,"      [-s save_filename] [-r restore_filename] filename\n");
-		fprintf(stderr,"(default: lower = -1, upper = 1, no y scaling)\n");
+		fprintf(stderr,"(default: lower = 0, upper = 1, no y scaling)\n");
 		exit(1);
 	}
 
