@@ -8,17 +8,21 @@ if len(sys.argv) <= 1:
 	raise SystemExit
 
 # svm, grid, and gnuplot executable
-svmscale_exe = "../svm-scale"
-svmtrain_exe = "../svm-train"
-svmpredict_exe = "../svm-predict"
-grid_py = "./grid.py"
-gnuplot_exe = "/usr/bin/gnuplot"
-# example for windows
-#svmscale_exe = r"c:\tmp\libsvm-2.7\windows\svmscale.exe"
-#svmtrain_exe = r"c:\tmp\libsvm-2.7\windows\svmtrain.exe"
-#svmpredict_exe = r"c:\tmp\libsvm-2.7\windows\svmpredict.exe"
-#gnuplot_exe = r"c:\tmp\gp373w32\pgnuplot.exe"
-#grid_py = r".\grid.py"
+
+is_win32 = (sys.platform == 'win32')
+if not is_win32:
+	svmscale_exe = "../svm-scale"
+	svmtrain_exe = "../svm-train"
+	svmpredict_exe = "../svm-predict"
+	grid_py = "./grid.py"
+	gnuplot_exe = "/usr/bin/gnuplot"
+else:
+        # example for windows
+	svmscale_exe = r"..\windows\svmscale.exe"
+	svmtrain_exe = r"..\windows\svmtrain.exe"
+	svmpredict_exe = r"..\windows\svmpredict.exe"
+	gnuplot_exe = r"c:\tmp\gp373w32\pgnuplot.exe"
+	grid_py = r".\grid.py"
 
 assert os.path.exists(svmscale_exe),"svm-scale executable not found"
 assert os.path.exists(svmtrain_exe),"svm-train executable not found"
