@@ -37,8 +37,8 @@ class svm_predict {
 				svm.svm_get_labels(model,labels);
 				prob_estimates = new double[nr_class];
 				output.writeBytes("labels");
-				for(int i=0;i<nr_class;i++)
-					output.writeBytes(" "+labels[i]);
+				for(int j=0;j<nr_class;j++)
+					output.writeBytes(" "+labels[j]);
 				output.writeBytes("\n");
 			}
 		}

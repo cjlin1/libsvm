@@ -23,6 +23,7 @@ void predict(FILE *input, FILE *output)
 	int nr_class=svm_get_nr_class(model);
 	int *labels=(int *) malloc(nr_class*sizeof(int));
 	double *prob_estimates=NULL;
+	int j;
 
 	if(predict_probability)
 	{
@@ -33,8 +34,8 @@ void predict(FILE *input, FILE *output)
 			svm_get_labels(model,labels);
 			prob_estimates = (double *) malloc(nr_class*sizeof(double));
 			fprintf(output,"labels");		
-			for(int i=0;i<nr_class;i++)
-				fprintf(output," %d",labels[i]);
+			for(j=0;j<nr_class;j++)
+				fprintf(output," %d",labels[j]);
 			fprintf(output,"\n");
 		}
 	}
@@ -43,7 +44,6 @@ void predict(FILE *input, FILE *output)
 		int i = 0;
 		int c;
 		double target,v;
-
 
 		if (fscanf(input,"%lf",&target)==EOF)
 			break;
@@ -72,7 +72,7 @@ out2:
 		{
 			v = svm_predict_probability(model,x,prob_estimates);
 			fprintf(output,"%g ",v);
-			for(int j=0;j<nr_class;j++)
+			for(j=0;j<nr_class;j++)
 				fprintf(output,"%g ",prob_estimates[j]);
 			fprintf(output,"\n");
 		}
