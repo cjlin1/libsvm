@@ -294,15 +294,45 @@ to classify new data.
     svm_model produced by svm_train().
 
 - Function: double svm_predict(const struct svm_model *model,
-                             const struct svm_node *x);
+                               const struct svm_node *x);
 
     This function does classification or regression on a test vector x
     given a model.
 
     For a classification model, the predicted class for x is returned.
     For a regression model, the function value of x calculated using
-    the model is returned. For one-class model, +1 or -1 is returned.
+    the model is returned. For an one-class model, +1 or -1 is
+    returned.
 
+- Function: int svm_get_nr_class(const svm_model *model)
+
+    For a classification model, this function gives the number of
+    classes. For a regression or an one-class model, 2 is returned.
+
+- Function: void svm_get_labels(const svm_model *model, int* label)
+    
+    For a classification model, this function outputs the name of
+    labels into an array called label. It returns NULL for regression
+    and one-class models.
+
+- Function: void svm_predict_values(const svm_model *model, 
+				    const svm_node *x, double* dec_values)
+
+    This function gives decision values on a test vector x given a
+    model.
+
+    For a classification model with nr_class classes, this function
+    gives nr_class*(nr_class-1)/2 decision values in the array
+    dec_values, where nr_class can be obtained from the function
+    svm_get_nr_class. The order is label[0] vs. label[1], ...,
+    label[0] vs. label[nr_class-1], label[1] vs. label[2], ...,
+    label[nr_class-2] vs. label[nr_class-1], where label can be
+    obtained from the function svm_get_labels.
+
+    For a regression model, label[0] is the function value of x
+    calculated using the model. For one-class model, label[0] is +1 or
+    -1.
+     
 - Function: const char *svm_check_parameter(const struct svm_problem *prob,
                                             const struct svm_parameter *param);
 
@@ -330,7 +360,7 @@ to classify new data.
 Java version
 ============
 
-The precompiled java class archive `libsvm.jar' and its source files are
+The pre-compiled java class archive `libsvm.jar' and its source files are
 in the java directory. To run the programs, use
 
 java -classpath libsvm.jar svm_train <arguments>
@@ -346,6 +376,9 @@ Library usages are similar to the C version. These functions are available:
 public class svm {
 	public static svm_model svm_train(svm_problem prob, svm_parameter param);
 	public static double svm_predict(svm_model model, svm_node[] x);
+	public static int svm_get_nr_class(svm_model model);
+	public static void svm_get_labels(svm_model model, int[] label);
+	public static void svm_predict_values(svm_model model, svm_node[] x, double[] dec_values);
 	public static void svm_save_model(String model_file_name, svm_model model) throws IOException
 	public static svm_model svm_load_model(String model_file_name) throws IOException
 	public static String svm_check_parameter(svm_problem prob, svm_parameter param);
@@ -362,7 +395,7 @@ Windows binaries are in the directory `windows'. To build them via
 Visual C++, use the following steps:
 
 1. Open a dos command box and change to libsvm directory.  If
-evironment variables of VC++ have not been set, type
+environment variables of VC++ have not been set, type
 
 "C:\Program Files\Microsoft Visual Studio\VC98\Bin\VCVARS32.Bat"
 
@@ -374,7 +407,7 @@ nmake -f Makefile.win clean all
 
 3. (optional) To build python interface, download and install Python.
 Edit Makefile.win and change PYTHON_INC and PYTHON_LIB to your python
-installtion. Type
+installation. Type
 
 nmake -f Makefile.win python 
 
@@ -403,5 +436,7 @@ http://www.csie.ntu.edu.tw/~cjlin/papers/libsvm.ps.gz
 Acknowledgments:
 This work was supported in part by the National Science 
 Council of Taiwan via the grant NSC 89-2213-E-002-013.
-The authors thank Chih-Wei Hsu and Jen-Hao Lee
-for many helpful discussions and comments.
+The authors thank their group members and users
+for many helpful discussions and comments. They are listed in
+http://www.csie.ntu.edu.tw/~cjlin/libsvm/acknowledgements
+
