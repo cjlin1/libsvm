@@ -1772,21 +1772,20 @@ void svm_binary_svc_probability(
 			else
 				n_count++;
 
-		svm_parameter subparam = *param;
-		subparam.probability=0;
-		subparam.C=1.0;
 		if(p_count==0 && n_count==0)
-			subparam.nr_weight=0;
-		else if(p_count==0 || n_count==0)
-		{
-			subparam.nr_weight=1;
-			subparam.weight_label = Malloc(int,1);
-			subparam.weight = Malloc(double,1);
-			subparam.weight_label[0]=(int)subprob.y[0];
-			subparam.weight[0]=((int)subprob.y[0]==1)?Cp:Cn;;
-		}
+			for(j=begin;j<end;j++)
+				dec_values[perm[j]] = 0;
+		else if(p_count > 0 && n_count == 0)
+			for(j=begin;j<end;j++)
+				dec_values[perm[j]] = 1;
+		else if(p_count == 0 && n_count > 0)
+			for(j=begin;j<end;j++)
+				dec_values[perm[j]] = -1;
 		else
 		{
+			svm_parameter subparam = *param;
+			subparam.probability=0;
+			subparam.C=1.0;
 			subparam.nr_weight=2;
 			subparam.weight_label = Malloc(int,2);
 			subparam.weight = Malloc(double,2);
@@ -1794,18 +1793,18 @@ void svm_binary_svc_probability(
 			subparam.weight_label[1]=-1;
 			subparam.weight[0]=Cp;
 			subparam.weight[1]=Cn;
+			struct svm_model *submodel = svm_train(&subprob,&subparam);
+			for(j=begin;j<end;j++)
+			{
+				svm_predict_values(submodel,prob->x[perm[j]],&(dec_values[perm[j]])); 
+				// ensure +1 -1 order; reason not using CV subroutine
+				dec_values[perm[j]] *= submodel->label[0];
+			}		
+			svm_destroy_model(submodel);
+			svm_destroy_param(&subparam);
+			free(subprob.x);
+			free(subprob.y);
 		}
-		struct svm_model *submodel = svm_train(&subprob,&subparam);
-		for(j=begin;j<end;j++)
-		{
-			svm_predict_values(submodel,prob->x[perm[j]],&(dec_values[perm[j]]));
-			// ensure +1 -1 order; reason not using CV subroutine
-			dec_values[perm[j]] *= submodel->label[0];
-		}		
-		svm_destroy_model(submodel);
-		svm_destroy_param(&subparam);
-		free(subprob.x);
-		free(subprob.y);
 	}		
 	sigmoid_train(prob->l,dec_values,prob->y,probA,probB);
 	free(dec_values);

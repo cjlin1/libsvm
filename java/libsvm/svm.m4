@@ -1605,21 +1605,20 @@ public class svm {
 				else
 					n_count++;
 			
-			svm_parameter subparam = (svm_parameter)param.clone();
-			subparam.probability=0;
-			subparam.C=1.0;
 			if(p_count==0 && n_count==0)
-				subparam.nr_weight=0;
-			else if(p_count==0 || n_count==0)
-			{
-				subparam.nr_weight=1;
-				subparam.weight_label = new int[1];
-				subparam.weight = new double[1];
-				subparam.weight_label[0]=(int)subprob.y[0];
-				subparam.weight[0]=((int)subprob.y[0]==1)?Cp:Cn;;
-			}
+				for(j=begin;j<end;j++)
+					dec_values[perm[j]] = 0;
+			else if(p_count > 0 && n_count == 0)
+				for(j=begin;j<end;j++)
+					dec_values[perm[j]] = 1;
+			else if(p_count == 0 && n_count > 0)
+				for(j=begin;j<end;j++)
+					dec_values[perm[j]] = -1;
 			else
 			{
+				svm_parameter subparam = (svm_parameter)param.clone();
+				subparam.probability=0;
+				subparam.C=1.0;
 				subparam.nr_weight=2;
 				subparam.weight_label = new int[2];
 				subparam.weight = new double[2];
@@ -1627,16 +1626,16 @@ public class svm {
 				subparam.weight_label[1]=-1;
 				subparam.weight[0]=Cp;
 				subparam.weight[1]=Cn;
+				svm_model submodel = svm_train(subprob,subparam);
+				for(j=begin;j<end;j++)
+				{
+					double[] dec_value=new double[1];
+					svm_predict_values(submodel,prob.x[perm[j]],dec_value);
+					dec_values[perm[j]]=dec_value[0];
+					// ensure +1 -1 order; reason not using CV subroutine
+					dec_values[perm[j]] *= submodel.label[0];
+				}		
 			}
-			svm_model submodel = svm_train(subprob,subparam);
-			for(j=begin;j<end;j++)
-			{
-				double[] dec_value=new double[1];
-				svm_predict_values(submodel,prob.x[perm[j]],dec_value);
-				dec_values[perm[j]]=dec_value[0];
-				// ensure +1 -1 order; reason not using CV subroutine
-				dec_values[perm[j]] *= submodel.label[0];
-			}		
 		}		
 		sigmoid_train(prob.l,dec_values,prob.y,probAB);
 	}
