@@ -36,7 +36,7 @@ while 1:
     if not line: break
 c,g,rate = map(float,last_line.split())
 
-print 'Best c=%s, g=%s' % (c,g)
+print 'Best c=%s, g=%s CV rate=%s' % (c,g,rate)
 
 cmd = "../svm-train -c %s -g %s %s %s" % (c,g,scaled_file,model_file)
 print 'Training...'
