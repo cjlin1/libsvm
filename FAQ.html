@@ -6,10 +6,10 @@
 <body text="#000000" bgcolor="#FFEFD5" link="#FF0000" vlink="#0000FF">
 
   <body>
-    <h1><a href=index.html>LIBSVM</a> FAQ</h1>
+    <h1><a href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a> FAQ</h1>
 <!-- Created: Wed Apr 18 19:26:54 CST 2001 -->
 <!-- hhmts start -->
-Last modified: Mon Mar  3 19:25:00 CST 2003
+Last modified: Wed Oct 29 13:03:12 CST 2003
 <!-- hhmts end -->
 
 <hr>
@@ -22,11 +22,6 @@ Faculty of Applied Science, University of Freiburg, Germany
 Division of Mathematics and Computer Science. 
 Faculteit der Exacte Wetenschappen 
 Vrije Universiteit, The Netherlands. </a>
-<li>
-<a href=
-http://progwww.vub.ac.be/poolteaching/proj1lic/svm.htm>
-Department of (Applied) Computer Science (Faculty of Sciences), Vrije Universiteit Brussel,  Belgium
-</a>
 <li>
 <a href=http://www.cae.wisc.edu/~ece539/matlab/>
 Electrical and Computer Engineering Department, 
@@ -41,7 +36,10 @@ Computer and Information Sciences Dept., University of Florida</a>
 <li>
 <a href=http://www.uonbi.ac.ke/acad_depts/ics/course_material/machine_learning/ML_and_DM_Resources.html>
 The Institue of Computer Science,
-University of Nairobi, Kenya.
+University of Nairobi, Kenya.</a>
+<li>
+<a href=http://cerium.raunvis.hi.is/~tpr/courseware/svm/hugbunadur.html>
+Applied Mathematics and Computer Science, University of Iceland.
 </a>
 </ul>
 
@@ -54,17 +52,15 @@ In the package there is a README file which
 details all options, data format, and library calls.
 The model selection tool and the python interface
 have a separate README under the directory python.
+The guide
+<A HREF="http://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf">
+A practical guide to support vector classification
+</A> shows beginners how to train/test their data.
 The paper <a href="http://www.csie.ntu.edu.tw/~cjlin/papers/libsvm.pdf">LIBSVM
 : a library for support vector machines</a> discusses the implementation of
 libsvm in detail.
 <p><li> What are changes in previous versions? <p>
 See <a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm/log">the change log</a>.
-<p><li> I have modified the source and would like to 
-build the graphic interface "svm-toy"
-on MS windows. How should I do it ?<p>
-Build it as a project by chooising "Win32 Application."
-On the other hand, for "svm-train" and "svm-predict"
-you want to choose "Win32 Console Application."
 
 <p><li> I would like to cite libsvm. Which paper should
 I cite ?<p>
@@ -92,6 +88,46 @@ free software licenses such as GPL. Hence, it is very easy to
 use libsvm in your software.
 It can also be used in commercial products.
 
+<p><li> Is there a respository of additional tools
+based on libsvm ?
+
+<p>
+Yes, see <a href="http://www.csie.ntu.edu.tw/~cjlin/libsvmtools">libsvm 
+tools</a>
+
+<p><li> 
+On unix machines, I got "error in loading shared libraries"
+or "cannot open shared object file." What happened ?
+
+<p>
+This usually happens if you compile the code
+on one machine and run it on another which has incompatible
+libraries.
+Try to recompile the program on that machine or use static linking.
+
+
+<p><li> I have modified the source and would like to 
+build the graphic interface "svm-toy"
+on MS windows. How should I do it ?
+
+<p>
+Build it as a project by chooising "Win32 Application."
+On the other hand, for "svm-train" and "svm-predict"
+you want to choose "Win32 Console Application."
+After libsvm 2.5, you can also use the file Makefile.win.
+See details in README.
+
+<p><li>
+I am an MS windows user but why
+only one (SVM_toy) 
+of those precompiled .exe 
+actually runs ? 
+
+<p>
+You need to open a command window 
+and type  svmtrain.exe to see all options.
+Some examples are in README file.
+
 </ul>
 <hr>
 <h3>Data preparation</h3>
@@ -115,10 +151,79 @@ You may have to change non-numerical data to
 numerical. For example, you can use several
 binary attributes to represent a categorical
 attribute.
+<p><li>Why do you consider sparse format ? Will the training of 
+dense data be much slower ?
+<p>
+This is a controversial issue. The kernel
+evaluation (i.e. inner product) of sparse vectors is slower 
+so the total training time can be at least twice or three times
+of that using the dense format.
+However, we cannot support only dense format as then we CANNOT
+handle extremely sparse cases. Simplicity of the code is another
+concern. Right now we decide to support
+the sparse format only.
 </ul>
 <hr>
 <h3>Training and prediction</h3>
 <ul>
+
+<p><li> The output of training C-SVM is like the following. What do they mean ?
+<br>optimization finished, #iter = 219
+<br>nu = 0.431030
+<br>obj = -100.877286, rho = 0.424632
+<br>nSV = 132, nBSV = 107
+<br>Total nSV = 132
+<p>
+obj is the optimal objective value of the dual SVM problem.
+rho is the bias term in the decision function
+sgn(w^Tx - rho).
+nSV and nBSV are number of support vectors and bounded support
+vectors (i.e., alpha_i = C). nu-svm is an somehwat eqivalent
+form of C-SVM where C is replaced by nu. nu simply shows the
+corresponding parameter. More details are in
+<a href="http://www.csie.ntu.edu.tw/~cjlin/papers/libsvm.pdf">
+libsvm document</a>.
+
+<p><li> Can you explain more about the model file ?
+
+<p>
+After the parameters, each line represents a support vector.
+Support vectors are listed in the order of "labels" listed earlier.
+(i.e., those from the first class in the "labels" list are
+grouped first, and so on.) 
+If k is the total number of classes,
+in front of each support vector, there are
+k-1 coefficients 
+y*alpha where alpha are dual solution of the
+following two class problems:
+<br>
+1 vs j, 2 vs j, ..., j-1 vs j, j vs j+1, j vs j+2, ..., j vs k
+<br>
+and y=1 in first j-1 coefficients, y=-1 in the remaining
+k-j coefficients.
+
+For example, if there are 4 classes, the file looks like:
+
+<pre>
++-+-+-+--------------------+
+|1|1|1|                    |
+|v|v|v|  SVs from class 1  |
+|2|3|4|                    |
++-+-+-+--------------------+
+|1|2|2|                    |
+|v|v|v|  SVs from class 2  |
+|2|3|4|                    |
++-+-+-+--------------------+
+|1|2|3|                    |
+|v|v|v|  SVs from class 3  |
+|3|3|4|                    |
++-+-+-+--------------------+
+|1|2|3|                    |
+|v|v|v|  SVs from class 4  |
+|4|4|4|                    |
++-+-+-+--------------------+
+</pre>
+
 
 <p><li> Should I use float or double to store numbers in the cache ?<p>
 We have float as the default as you can store more numbers
@@ -136,7 +241,15 @@ A recent result by Keerthi and Lin
 download paper here</a>)
 shows that if RBF is used with model selection,
 then there is no need to consider the linear kernel.
-
+The kernel matrix using sigmoid may not be positive definite
+and in general it's accuracy is not better than RBF.
+(see the paper by Lin and Lin
+(<a href=http://www.csie.ntu.edu.tw/~cjlin/papers/tanh.pdf>
+download paper here</a>).
+Polynomial kernels are ok but if a high degree is used,
+numerical difficulties tend to happen
+(thinking about dth power of (<1) goes to 0
+and (>1) goes to infinity). 
 
 <p><li> Does libsvm have special treatments
 for linear SVM ?<p>
@@ -146,18 +259,19 @@ same way.
 Note that there are some possible
 tricks to save training/testing time if the
 linear kernel is used.
-Hence libsvm is NOT particularly efficient for linear SVM,
+Hence libsvm is <b>NOT</b> particularly efficient for linear SVM,
 especially for problems whose number of data is much larger
 than number of attributes.
 If you plan to solve this type of problems, you may want 
-to check some software which are specially suitable for 
+to check <a href=http://www.csie.ntu.edu.tw/~cjlin/bsvm>bsvm</a>,
+which includes an efficient implementation for
 linear SVMs.
 More details can be found in the following study:
 K.-M. Chung, W.-C. Kao, 
 T. Sun, 
 and
 C.-J. Lin.
-<A HREF="../papers/linear.pdf">
+<A HREF="http://www.csie.ntu.edu.tw/~cjlin/papers/linear.pdf">
 Decomposition Methods for Linear Support Vector Machines
 </a>
 
@@ -177,17 +291,45 @@ in libsvm.
 <p><li>Should I scale 
 training and testing data in a similar way ?
 <p>
-Yes, usually we merge the two files as one and 
-scale it.
-We then split them again for training and testing.
+Yes, you can do the following:
+<br> svm-scale -s scaling_parameters traing_data > scaled_traing_data
+<br> svm-scale -r scaling_parameters test_data > scaled_test_data
 
+<p><li>
+Does it make big difference  if I scale each attribute
+to [0,1] instead of [-1,1] ?
+
+<p>
+For the linear scaling method, if the RBF kernel is
+used and parameter selection is conducted, there
+is no difference. Assume Mi and mi are 
+respectively the maximal and minimal values of the
+ith attribute. Scaling to [0,1] means
+<pre>
+                x'=(x-mi)/(Mi-mi)
+</pre>
+For [-1,1],
+<pre>
+                x''=2(x-mi)/(Mi-mi)-1.
+</pre>
+In the RBF kernel,
+<pre>
+                x'-y'=(x-y)/(Mi-mi), x''-y''=2(x-y)/(Mi-mi).
+</pre>
+Hence, using (C,g) on the [0,1]-scaled data is the
+same as (C,g/2) on the [-1,1]-scaled data.
+
+<p> Though the performance is the same, the computational
+time may be different. For data with many zero entries,
+[0,1]-scaling keeps the sparsity of input data and hance
+may save the time.
 <p><li>The prediction rate is low. How could I improve it ?<p>
 Try to use the model selection tool grid.py in the python
 directory find
 out good parameters. To see the importance of model selction,
 please 
 see my  talk:
-<A HREF="../talks/tuebingen.ps.gz">
+<A HREF="http://www.csie.ntu.edu.tw/~cjlin/talks/tuebingen.ps.gz">
 Can support vector machines become 
 a major classification method ? 
 </A>
@@ -199,6 +341,7 @@ Yes, there is a -wi options. For example, if you use
  svm-train -s 0 -c 10 -w1 1 -w-1 5 data_file
 <p>
 the penalty for class "-1" is larger.
+Note that this -w option is for C-SVC only.
 
 <p><li>What is the difference between nu-SVC and C-SVC ?
 <p>
@@ -223,9 +366,12 @@ What should I do ?
 <p>
 In theory libsvm guarantees to converge if the kernel
 matrix is positive semidefinite. 
-Hence, this may mean
-that you are using the signomidal kernel where
-for some parameters the kernel matrix is not Positive Semi Definite.
+After version 2.4 it can also handle non-PSD
+kernels such as the sigmoid (tanh).
+Therefore, this means you are
+handling ill-conditioned situations
+(e.g. too large/small parameters) so numerical
+difficulties occur.
 
 <p><li>The training time is too long. What should I do ?
 <p>
@@ -297,11 +443,7 @@ More information can be found by
 <pre>
 $ info libc "Malloc Tunable Parameters"
 </pre>
-<p><li>Now for different classes I can assign weights. 
-What if I want to give weights to different data ?
-<p>
-Please contact us so we can give you our preliminary
-code.
+
 <p><li>How do I disable screen output of svm-train and svm-predict ?
 <p>
 Simply update svm.cpp:
@@ -345,14 +487,6 @@ for multi-class support vector machines
 </A>, 
 <I>IEEE Transactions on Neural Networks</A></I>, 13(2002), 415-425.
 
-<p><li>I would like to calculate the radius of the smallest
-sphere containing all data. How should I do it ?
-<p>
-It is very easy to modify the code for doing this.
-However, to keep the code simple, we do not include
-this in the package. Please email me about the details.
-
-
 
 <p><li> After doing cross validation, why there is no
 model file outputed ?
@@ -360,6 +494,21 @@ model file outputed ?
 Cross validation is used for selecting good parameters.
 After finding them, you want to re-train the whole
 data without the -v option.
+
+<p><li> I would like to try different random partition
+for cross validation, how could I do it ?
+<p>
+Right now we use the default seed so each time when you
+run svm-train -v, folds of validation data are the same.
+To have different seeds, you can add the following code
+in svm-train.c:
+<pre>
+#include &lt;time.h&gt;
+</pre>
+and in the beginning of the subroutine do_cross_validation(),
+<pre>
+srand(time(0));
+</pre>
 
 <p><li> I would like to solve L2-SVM (i.e., error term is 
 quadratic). How should I modify the code ?
@@ -389,8 +538,28 @@ In the constructor we assign it to param.C:
 Than in the the subroutine get_Q, after the for loop, add
 <pre>
         if(i >= start && i < len) 
-		data[i] += 1/param.C;
+		data[i] += 1/C;
 </pre>
+
+<p><li> 
+There seems to be a zero division ?
+<p>
+We intend
+to have this zero division. 
+Under the IEEE floating point standard, zero
+division will returns infinity. Then with the 
+operations later to bound it, things go back to normal numbers without any problem.
+
+In general no warning messages happen. On some computaers, you may
+need to add an option (e.g. -mieee on alpha).
+
+Reasons of doing so are described in libsvm document.
+
+<p><li> 
+How do I choose parameters for one-class svm as training data are in only one class ?
+<p>
+You have pre-specified true positive rate in mind and then search for
+parameters which achieve similar cross-validation accuracy.
 
 </ul>
 <hr>
@@ -536,6 +705,8 @@ To modify the interface, follow the instructions given in
 http://www.swig.org/Doc1.1/HTML/Python.html#n2</a>
 
 <p>
+
+
 If you just want to build DLL for a different python version,
 you need only
 Visual C++ and but not SWIG:
@@ -551,6 +722,10 @@ Project->Settings->Settings For "Win32 Release", Output
 directories should be "Release"
 <li> Build the DLL.
 </ol>
+
+After libsvm 2.5, you can easily use the file Makefile.win.
+See details in README.
+
 <!--
 There do exist work arounds, however. In
 http://aspn.activestate.com/ASPN/Mail/Message/python-list/983252
