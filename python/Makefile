@@ -19,7 +19,7 @@ svmc_wrap.c: svmc.i
 	cd ..; make svm.o
 
 clean:
-	rm -f *~ *.o *.so *.pyc *.pyo svmc_wrap.doc
+	rm -f *~ *.o *.so *.pyc *.pyo svmc_wrap.doc ../svm.o
 
 moreclean:	clean
 	rm -f svmc_wrap.c
