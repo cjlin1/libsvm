@@ -3,16 +3,16 @@
 #Under dosbox prompt
 #nmake -f Makefile.win
 
-PYTHON_INC= c:\python23\include
-PYTHON_LIB= c:\python23\libs\python23.lib
+PYTHON_INC = c:\python23\include
+PYTHON_LIB = c:\python23\libs\python23.lib
 ##########################################
-CXXC=cl.exe
-CFLAGS= -nologo -O2 -GX -I. -D __WIN32__
-TARGET= windows
+CXXC = cl.exe
+CFLAGS = -nologo -O2 -GX -I. -D __WIN32__
+TARGET = windows
 
-all : $(TARGET)\svmtrain.exe $(TARGET)\svmpredict.exe $(TARGET)\svmscale.exe $(TARGET)\svmtoy.exe
+all: $(TARGET)\svmtrain.exe $(TARGET)\svmpredict.exe $(TARGET)\svmscale.exe $(TARGET)\svmtoy.exe
 
-python : $(TARGET)\python\svmc.dll
+python: $(TARGET)\python\svmc.dll
 
 $(TARGET)\svmpredict.exe: svm.h svm-predict.c svm.obj
     $(CXXC) $(CFLAGS) svm-predict.c svm.obj -o $(TARGET)\svmpredict.exe
@@ -23,13 +23,13 @@ $(TARGET)\svmtrain.exe: svm.h svm-train.c svm.obj
 $(TARGET)\svmscale.exe: svm.h svm-scale.c
     $(CXXC) $(CFLAGS) svm-scale.c -o $(TARGET)\svmscale.exe
 
-$(TARGET)\svmtoy.exe : svm.h svm.obj svm-toy\windows\svm-toy.cpp
+$(TARGET)\svmtoy.exe: svm.h svm.obj svm-toy\windows\svm-toy.cpp
 	$(CXXC) $(CFLAGS) svm-toy\windows\svm-toy.cpp svm.obj user32.lib gdi32.lib comdlg32.lib  -o $(TARGET)\svmtoy.exe
 
 svm.obj: svm.cpp svm.h
     $(CXXC) $(CFLAGS) -c svm.cpp
 
-$(TARGET)\python\svmc.dll : python\svmc_wrap.c svm.obj $(PYTHON_LIB)
+$(TARGET)\python\svmc.dll: python\svmc_wrap.c svm.obj $(PYTHON_LIB)
     $(CXXC) $(CFLAGS) -I$(PYTHON_INC) -ML -LD $** -o $(TARGET)\python\svmc.dll
 # $** means all dependencies
 
