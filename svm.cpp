@@ -1275,7 +1275,8 @@ static void solve_c_svc(
 	for(i=0;i<l;i++)
 		sum_alpha += alpha[i];
 
-	info("nu = %f\n", sum_alpha/(param->C*prob->l));
+	if (Cp==Cn)
+		info("nu = %f\n", sum_alpha/(Cp*prob->l));
 
 	for(i=0;i<l;i++)
 		alpha[i] *= y[i];

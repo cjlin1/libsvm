@@ -1159,7 +1159,8 @@ public class svm {
 		for(i=0;i<l;i++)
 			sum_alpha += alpha[i];
 
-		System.out.print("nu = "+sum_alpha/(param.C*prob.l)+"\n");
+		if (Cp==Cn)
+			System.out.print("nu = "+sum_alpha/(Cp*prob.l)+"\n");
 
 		for(i=0;i<l;i++)
 			alpha[i] *= y[i];
