@@ -8,6 +8,7 @@ if len(sys.argv) <= 1:
 	raise SystemExit
 
 train_pathname = sys.argv[1]
+assert os.path.exists(train_pathname),"training file not found"
 file_name = os.path.split(train_pathname)[1]
 scaled_file = file_name + ".scale"
 model_file = file_name + ".model"
@@ -16,6 +17,7 @@ range_file = file_name + ".range"
 if len(sys.argv) > 2:
 	test_pathname = sys.argv[2]
 	file_name = os.path.split(test_pathname)[1]
+    assert os.path.exists(test_pathname),"testing file not found"
 	scaled_test_file = file_name + ".scale"
 	predict_test_file = file_name + ".predict"
 
