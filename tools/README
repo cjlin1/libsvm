@@ -128,12 +128,13 @@ python:
 There are three classes in svm.py, namely svm_parameter, svm_problem, and
 svm_model.
 
-svm_parameter is used to set the parameters of the training process. The
-attributes in svm_parameter include svm_type, kernel_type, degree, gamma,
-coef0, nu, cache_size, C, eps, p, shrinking, and nr_weight. Available svm
-types include C_SVC, NU_SVC, ONE_CLASS, EPSILON_SVR, and NU_SVR. Available
-kernel types include LINEAR, POLY, RBF, and SIGMOID. The user can setup the
-parameters with the constructor and keyword arguments:
+svm_parameter is used to set the parameters of the training
+process. The attributes in svm_parameter include svm_type,
+kernel_type, degree, gamma, coef0, nu, cache_size, C, eps, p,
+shrinking, nr_weight, weight_label, and weight. Available svm types
+include C_SVC, NU_SVC, ONE_CLASS, EPSILON_SVR, and NU_SVR. Available
+kernel types include LINEAR, POLY, RBF, and SIGMOID. The user can
+setup the parameters with the constructor and keyword arguments:
 
 	param = svm_parameter(kernel_type = LINEAR, C = 10)
 
