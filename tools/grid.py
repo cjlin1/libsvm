@@ -287,9 +287,13 @@ def main():
     # use FIFO, the job will be put
     # into the end of the queue, and the graph
     # will only be updated in the end
-    
+
     def _put(self,item):
-        self.queue.insert(0,item)
+        if sys.hexversion >= 0x020400F0:
+            self.queue.appendleft(item)
+        else:
+            self.queue.insert(0,item)
+
     import new
     job_queue._put = new.instancemethod(_put,job_queue,job_queue.__class__)
 
