@@ -1,39 +1,39 @@
 import svmc
-
 from svmc import C_SVC, NU_SVC, ONE_CLASS, EPSILON_SVR, NU_SVR
 from svmc import LINEAR, POLY, RBF, SIGMOID
+from math import exp, fabs
 
 def _int_array(seq):
 	size = len(seq)
-	array = svmc.int_array(size)
+	array = svmc.new_int(size)
 	i = 0
 	for item in seq:
-		svmc.int_set(array,i,item)
+		svmc.int_setitem(array,i,item)
 		i = i + 1
 	return array
 
 def _double_array(seq):
 	size = len(seq)
-	array = svmc.double_array(size)
+	array = svmc.new_double(size)
 	i = 0
 	for item in seq:
-		svmc.double_set(array,i,item)
+		svmc.double_setitem(array,i,item)
 		i = i + 1
 	return array
 
 def _free_int_array(x):
 	if x != 'NULL' and x != None:
-		svmc.int_destroy(x)
+		svmc.delete_int(x)
 
 def _free_double_array(x):
 	if x != 'NULL' and x != None:
-		svmc.double_destroy(x)
+		svmc.delete_double(x)
 
 def _int_array_to_list(x,n):
-	return map(svmc.int_get,[x]*n,range(n))
+	return map(svmc.int_getitem,[x]*n,range(n))
 
 def _double_array_to_list(x,n):
-	return map(svmc.double_get,[x]*n,range(n))
+	return map(svmc.double_getitem,[x]*n,range(n))
 
 class svm_parameter:
 	
@@ -53,6 +53,7 @@ class svm_parameter:
 	'nr_weight' : 0,
 	'weight_label' : [],
 	'weight' : [],
+	'probability' : 0
 	}
 
 	def __init__(self,**kw):
@@ -103,7 +104,7 @@ def _convert_to_svm_node_array(x):
 	data = svmc.svm_node_array(len(x)+1)
 	svmc.svm_node_array_set(data,len(x),-1,0)
 	import operator
-	if type(x) == type({}):
+	if type(x) == dict:
 		keys = x.keys()
 		keys.sort()
 		j = 0
@@ -124,9 +125,9 @@ class svm_problem:
 		self.prob = prob = svmc.new_svm_problem()
 		self.size = size = len(y)
 
-		self.y_array = y_array = svmc.double_array(size)
+		self.y_array = y_array = svmc.new_double(size)
 		for i in range(size):
-			svmc.double_set(y_array,i,y[i])
+			svmc.double_setitem(y_array,i,y[i])
 
 		self.x_matrix = x_matrix = svmc.svm_node_matrix(size)
 		self.data = []
@@ -135,7 +136,10 @@ class svm_problem:
 			data = _convert_to_svm_node_array(x[i])
 			self.data.append(data);
 			svmc.svm_node_matrix_set(x_matrix,i,data)
-			self.maxlen = max(self.maxlen,len(x[i]))
+			if type(x[i]) == dict:
+				self.maxlen = max(self.maxlen,max(x[i].keys()))
+			else:
+				self.maxlen = max(self.maxlen,len(x[i]))
 
 		svmc.svm_problem_l_set(prob,size)
 		svmc.svm_problem_y_set(prob,y_array)
@@ -146,7 +150,7 @@ class svm_problem:
 
 	def __del__(self):
 		svmc.delete_svm_problem(self.prob)
-		svmc.double_destroy(self.y_array)
+		svmc.delete_double(self.y_array)
 		for i in range(self.size):
 			svmc.svm_node_array_destroy(self.data[i])
 		svmc.svm_node_matrix_destroy(self.x_matrix)
@@ -166,7 +170,17 @@ class svm_model:
 			msg = svmc.svm_check_parameter(prob.prob,param.param)
 			if msg: raise ValueError, msg
 			self.model = svmc.svm_train(prob.prob,param.param)
+
+		#setup some classwide variables
 		self.nr_class = svmc.svm_get_nr_class(self.model)
+		self.svm_type = svmc.svm_get_svm_type(self.model)
+		#create labels(classes)
+		intarr = svmc.new_int(self.nr_class)
+		svmc.svm_get_labels(self.model,intarr)
+		self.labels = _int_array_to_list(intarr, self.nr_class)
+		svmc.delete_int(intarr)
+		#check if valid probability model
+		self.probability = svmc.svm_check_probability_model(self.model)
 
 	def predict(self,x):
 		data = _convert_to_svm_node_array(x)
@@ -174,38 +188,73 @@ class svm_model:
 		svmc.svm_node_array_destroy(data)
 		return ret
 
+
 	def get_nr_class(self):
 		return self.nr_class
 
 	def get_labels(self):
-		intarr = svmc.int_array(self.nr_class)
-		svmc.svm_get_labels(self.model,intarr)
-		ret = _int_array_to_list(intarr, self.nr_class)
-		svmc.int_destroy(intarr)
-		return ret
+		if self.svm_type == NU_SVR or self.svm_type == EPSILON_SVR or self.svm_type == ONE_CLASS:
+			raise TypeError, "Unable to get label from a SVR/ONE_CLASS model"
+		return self.labels
 		
 	def predict_values_raw(self,x):
+		#convert x into svm_node, allocate a double array for return
 		n = self.nr_class*(self.nr_class-1)/2
 		data = _convert_to_svm_node_array(x)
-		dblarr = svmc.double_array(n)
+		dblarr = svmc.new_double(n)
 		svmc.svm_predict_values(self.model, data, dblarr)
 		ret = _double_array_to_list(dblarr, n)
-		svmc.double_destroy(dblarr)
+		svmc.delete_double(dblarr)
 		svmc.svm_node_array_destroy(data)
 		return ret
 
-
 	def predict_values(self,x):
 		v=self.predict_values_raw(x)
-		labels = self.get_labels()
-		count = 0
-		d = {}
-		for i in range(len(labels)):
-			for j in range(i+1, len(labels)):
-				d[labels[i],labels[j]] = v[count]
-				d[labels[j],labels[i]] = -v[count]
-				count += 1
-		return  d
+		if self.svm_type == NU_SVR or self.svm_type == EPSILON_SVR or self.svm_type == ONE_CLASS:
+			return v[0]
+		else: #self.svm_type == C_SVC or self.svm_type == NU_SVC
+			count = 0
+			d = {}
+			for i in range(len(self.labels)):
+				for j in range(i+1, len(self.labels)):
+					d[self.labels[i],self.labels[j]] = v[count]
+					d[self.labels[j],self.labels[i]] = -v[count]
+					count += 1
+			return  d
+
+	def predict_probability(self,x):
+		#c code will do nothing on wrong type, so we have to check ourself
+		if self.svm_type == NU_SVR or self.svm_type == EPSILON_SVR:
+			raise TypeError, "call get_svr_probability or get_svr_pdf for probability output of regression"
+		elif self.svm_type == ONE_CLASS:
+			raise TypeError, "probability not supported yet for one-class problem"
+		#only C_SVC,NU_SVC goes in
+		if not self.probability:
+			raise TypeError, "model does not support probabiliy estimates"
+
+		#convert x into svm_node, alloc a double array to receive probabilities
+		data = _convert_to_svm_node_array(x)
+		dblarr = svmc.new_double(self.nr_class)
+		pred = svmc.svm_predict_probability(self.model, data, dblarr)
+		pv = _double_array_to_list(dblarr, self.nr_class)
+		svmc.delete_double(dblarr)
+		svmc.svm_node_array_destroy(data)
+		p = {}
+		for i in range(len(self.labels)):
+			p[self.labels[i]] = pv[i]
+		return pred, p
+	
+	def get_svr_probability(self):
+		#leave the Error checking to svm.cpp code
+		ret = svmc.svm_get_svr_probability(self.model)
+		if ret == 0:
+			raise TypeError, "not a regression model or probability information not available"
+		return ret
+
+	def get_svr_pdf(self):
+		#get_svr_probability will handle error checking
+		sigma = self.get_svr_probability()
+		return lambda z: exp(-fabs(z)/sigma)/(2*sigma)
 
 
 	def save(self,filename):
@@ -213,3 +262,13 @@ class svm_model:
 
 	def __del__(self):
 		svmc.svm_destroy_model(self.model)
+
+
+def cross_validation(prob, param, fold):
+	if param.gamma == 0:
+		param.gamma = 1.0/prob.maxlen
+	dblarr = svmc.new_double(prob.size)
+	svmc.svm_cross_validation(prob.prob, param.param, fold, dblarr)
+	ret = _double_array_to_list(dblarr, prob.size)
+	svmc.delete_double(dblarr)
+	return ret

@@ -18,6 +18,7 @@ for k in kernels:
 	errors = 0
 	for i in range(size):
 		prediction = model.predict(samples[i])
+		probability = model.predict_probability
 		if (labels[i] != prediction):
 			errors = errors + 1
 	print "##########################################"
@@ -37,3 +38,12 @@ for i in model.get_labels():
 		if j>i:
 			print "{%d, %d} = %9.5f" % (i, j, d[i,j])
 
+param = svm_parameter(kernel_type = RBF, C=10, probability = 1)
+model = svm_model(problem, param)
+pred_label, pred_probability = model.predict_probability(samples[1])
+print "##########################################"
+print " Probability estimate of predicting %s" % (samples[1])
+print "##########################################"
+print "predicted class: %d" % (pred_label)
+for i in model.get_labels():
+	print "prob(label=%d) = %f" % (i, pred_probability[i])

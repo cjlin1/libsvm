@@ -1,6 +1,9 @@
 CC = g++
 SWIG ?= swig
-PYTHON_INCLUDEDIR ?= /usr/include/python2.2
+
+#Windows: see ../README ../Makefile.win
+PYTHON_INCLUDEDIR ?= /usr/include/python2.3
+
 CFLAGS = -O3 -I$(PYTHON_INCLUDEDIR) -I..
 LDFLAGS = -shared
 
@@ -13,13 +16,13 @@ svmc_wrap.o: svmc_wrap.c ../svm.h
 	$(CC) $(CFLAGS) -c svmc_wrap.c
 
 svmc_wrap.c: svmc.i
-	$(SWIG) -python -dnone svmc.i
+	$(SWIG) -python -noproxy svmc.i
 
-../svm.o:	
+../svm.o: ../svm.cpp ../svm.h	
 	cd ..; make svm.o
 
 clean:
-	rm -f *~ *.o *.so *.pyc *.pyo svmc_wrap.doc ../svm.o
+	rm -f *~ *.o *.so *.pyc *.pyo ../svm.o
 
 moreclean:	clean
 	rm -f svmc_wrap.c
