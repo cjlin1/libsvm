@@ -124,7 +124,12 @@ class Cache {
 // the constructor of Kernel prepares to calculate the l*l kernel matrix
 // the member function get_Q is for getting one column from the Q Matrix
 //
-abstract class Kernel {
+abstract class QMatrix {
+	abstract Qfloat[] get_Q(int column, int len);
+	abstract void swap_index(int i, int j);
+};
+
+abstract class Kernel extends QMatrix {
 	private svm_node[][] x;
 	private final double[] x_square;
 
@@ -289,7 +294,7 @@ class Solver {
 	static final byte FREE = 2;
 	byte[] alpha_status;	// LOWER_BOUND, UPPER_BOUND, FREE
 	double[] alpha;
-	Kernel Q;
+	QMatrix Q;
 	double eps;
 	double Cp,Cn;
 	double[] b;
@@ -358,7 +363,7 @@ class Solver {
 			}
 	}
 
-	void Solve(int l, Kernel Q, double[] b_, byte[] y_,
+	void Solve(int l, QMatrix Q, double[] b_, byte[] y_,
 		   double[] alpha_, double Cp, double Cn, double eps, SolutionInfo si, int shrinking)
 	{
 		this.l = l;
@@ -787,7 +792,7 @@ final class Solver_NU extends Solver
 {
 	private SolutionInfo si;
 
-	void Solve(int l, Kernel Q, double[] b, byte[] y,
+	void Solve(int l, QMatrix Q, double[] b, byte[] y,
 		   double[] alpha, double Cp, double Cn, double eps,
 		   SolutionInfo si, int shrinking)
 	{
