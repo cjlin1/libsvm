@@ -2031,9 +2031,9 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 
 		if(param->probability)
 		{
-			model->probA = Malloc(double,nr_class);
-			model->probB = Malloc(double,nr_class);
-			for(i=0;i<nr_class;i++)
+			model->probA = Malloc(double,nr_class*(nr_class-1)/2);
+			model->probB = Malloc(double,nr_class*(nr_class-1)/2);
+			for(i=0;i<nr_class*(nr_class-1)/2;i++)
 			{
 				model->probA[i] = probA[i];
 				model->probB[i] = probB[i];

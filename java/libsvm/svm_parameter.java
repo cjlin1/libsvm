@@ -1,5 +1,5 @@
 package libsvm;
-public class svm_parameter implements java.io.Serializable
+public class svm_parameter implements Cloneable,java.io.Serializable
 {
 	/* svm_type */
 	public static final int C_SVC = 0;
@@ -30,4 +30,17 @@ public class svm_parameter implements java.io.Serializable
 	public double nu;	// for NU_SVC, ONE_CLASS, and NU_SVR
 	public double p;	// for EPSILON_SVR
 	public int shrinking;	// use the shrinking heuristics
+	public int probability; // do probability estimates
+
+	public Object clone() 
+	{
+		try 
+		{
+			return super.clone();
+		} catch (CloneNotSupportedException e) 
+		{
+			return null;
+		}
+	}
+
 }

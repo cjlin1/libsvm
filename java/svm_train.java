@@ -15,7 +15,7 @@ class svm_train {
 	private static void exit_with_help()
 	{
 		System.out.print(
-		 "Usage: svm-train [options] training_set_file [model_file]\n"
+		 "Usage: svm_train [options] training_set_file [model_file]\n"
 		+"options:\n"
 		+"-s svm_type : set type of SVM (default 0)\n"
 		+"	0 -- C-SVC\n"
@@ -37,6 +37,7 @@ class svm_train {
 		+"-m cachesize : set cache memory size in MB (default 40)\n"
 		+"-e epsilon : set tolerance of termination criterion (default 0.001)\n"
 		+"-h shrinking: whether to use the shrinking heuristics, 0 or 1 (default 1)\n"
+		+"-b probability_estimates: whether to train a SVC or SVR model for probability estimates, 0 or 1 (default 0)\n"
 		+"-wi weight: set the parameter C of class i to weight*C, for C-SVC (default 1)\n"
 		+"-v n: n-fold cross validation mode\n"
 		);
@@ -49,83 +50,23 @@ class svm_train {
 		int total_correct = 0;
 		double total_error = 0;
 		double sumv = 0, sumy = 0, sumvv = 0, sumyy = 0, sumvy = 0;
+		double[] target = new double[prob.l];
 
-		// random shuffle
-		for(i=0;i<prob.l;i++)
+		svm.svm_cross_validation(prob,param,nr_fold,target);
+		if(param.svm_type == svm_parameter.EPSILON_SVR ||
+		   param.svm_type == svm_parameter.NU_SVR)
 		{
-			int j = i+(int)(Math.random()*(prob.l-i));
-			svm_node[] tx;
-			double ty;
-
-			tx = prob.x[i];
-			prob.x[i] = prob.x[j];
-			prob.x[j] = tx;
-
-			ty = prob.y[i];
-			prob.y[i] = prob.y[j];
-			prob.y[j] = ty;
-		}
-
-		for(i=0;i<nr_fold;i++)
-		{
-			int begin = i*prob.l/nr_fold;
-			int end = (i+1)*prob.l/nr_fold;
-			int j,k;
-			svm_problem subprob = new svm_problem();
-
-			subprob.l = prob.l-(end-begin);
-			subprob.x = new svm_node[subprob.l][];
-			subprob.y = new double[subprob.l];
-
-			k=0;
-			for(j=0;j<begin;j++)
+			for(i=0;i<prob.l;i++)
 			{
-				subprob.x[k] = prob.x[j];
-				subprob.y[k] = prob.y[j];
-				++k;
+				double y = prob.y[i];
+				double v = target[i];
+				total_error += (v-y)*(v-y);
+				sumv += v;
+				sumy += y;
+				sumvv += v*v;
+				sumyy += y*y;
+				sumvy += v*y;
 			}
-			for(j=end;j<prob.l;j++)
-			{
-				subprob.x[k] = prob.x[j];
-				subprob.y[k] = prob.y[j];
-				++k;
-			}
-
-			if(param.svm_type == svm_parameter.EPSILON_SVR ||
-			   param.svm_type == svm_parameter.NU_SVR)
-			{
-				svm_model submodel = svm.svm_train(subprob,param);
-				double error = 0;
-				for(j=begin;j<end;j++)
-				{
-					double v = svm.svm_predict(submodel,prob.x[j]);
-					double y = prob.y[j];
-					error += (v-y)*(v-y);
-					sumv += v;
-					sumy += y;
-					sumvv += v*v;
-					sumyy += y*y;
-					sumvy += v*y;
-				}
-				System.out.print("Mean squared error = "+error/(end-begin)+"\n");
-				total_error += error;			
-			}
-			else
-			{
-				svm_model submodel = svm.svm_train(subprob,param);
-				int correct = 0;
-				for(j=begin;j<end;j++)
-				{
-					double v = svm.svm_predict(submodel,prob.x[j]);
-					if(v == prob.y[j])
-						++correct;
-				}
-				System.out.print("Accuracy = "+100.0*correct/(end-begin)+"% ("+correct+"/"+(end-begin)+")\n");
-				total_correct += correct;
-			}
-		}		
-		if(param.svm_type == svm_parameter.EPSILON_SVR || param.svm_type == svm_parameter.NU_SVR)
-		{
 			System.out.print("Cross Validation Mean squared error = "+total_error/prob.l+"\n");
 			System.out.print("Cross Validation Squared correlation coefficient = "+
 				((prob.l*sumvy-sumv*sumy)*(prob.l*sumvy-sumv*sumy))/
@@ -133,6 +74,9 @@ class svm_train {
 				);
 		}
 		else
+			for(i=0;i<prob.l;i++)
+				if(target[i] == prob.y[i])
+					++total_correct;
 			System.out.print("Cross Validation Accuracy = "+100.0*total_correct/prob.l+"%\n");
 	}
 	
@@ -192,6 +136,7 @@ class svm_train {
 		param.eps = 1e-3;
 		param.p = 0.1;
 		param.shrinking = 1;
+		param.probability = 0;
 		param.nr_weight = 0;
 		param.weight_label = new int[0];
 		param.weight = new double[0];
@@ -236,6 +181,18 @@ class svm_train {
 				case 'h':
 					param.shrinking = atoi(argv[i]);
 					break;
+			        case 'b':
+					param.probability = atoi(argv[i]);
+					break;
+				case 'v':
+					cross_validation = 1;
+					nr_fold = atoi(argv[i]);
+					if(nr_fold < 2)
+					{
+						System.err.print("n-fold cross validation: n must >= 2\n");
+						exit_with_help();
+					}
+					break;
 				case 'w':
 					++param.nr_weight;
 					{
@@ -252,15 +209,6 @@ class svm_train {
 
 					param.weight_label[param.nr_weight-1] = atoi(argv[i-1].substring(2));
 					param.weight[param.nr_weight-1] = atof(argv[i]);
-					break;
-				case 'v':
-					cross_validation = 1;
-					nr_fold = atoi(argv[i]);
-					if(nr_fold < 2)
-					{
-						System.err.print("n-fold cross validation: n must >= 2\n");
-						exit_with_help();
-					}
 					break;
 				default:
 					System.err.print("unknown option\n");

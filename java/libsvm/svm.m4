@@ -1375,6 +1375,301 @@ public class svm {
 		return f;
 	}
 
+	// Platt's binary SVM Probablistic Output: an improvement from Lin et al.
+	private static void sigmoid_train(int l, double[] dec_values, double[] labels, 
+				  double[] probAB)
+	{
+		double A, B;
+		double prior1=0, prior0 = 0;
+		int i;
+
+		for (i=0;i<l;i++)
+			if (labels[i] > 0) prior1+=1;
+			else prior0+=1;
+	
+		int max_iter=100; 	// Maximal number of iterations
+		double min_step=1e-10;	// Minimal step taken in line search
+		double sigma=1e-3;	// For numerically strict PD of Hessian
+		double eps=1e-5;
+		double hiTarget=(prior1+1.0)/(prior1+2.0);
+		double loTarget=1/(prior0+2.0);
+		double[] t= new double[l];
+		double fApB,p,q,h11,h22,h21,g1,g2,det,dA,dB,gd,stepsize;
+		double newA,newB,newf,d1,d2;
+		int iter; 
+	
+		// Initial Point and Initial Fun Value
+		A=0.0; B=Math.log((prior0+1.0)/(prior1+1.0));
+		double fval = 0.0;
+
+		for (i=0;i<l;i++)
+		{
+			if (labels[i]>0) t[i]=hiTarget;
+			else t[i]=loTarget;
+			fApB = dec_values[i]*A+B;
+			if (fApB>=0)
+				fval += t[i]*fApB + Math.log(1+Math.exp(-fApB));
+			else
+				fval += (t[i] - 1)*fApB +Math.log(1+Math.exp(fApB));
+		}
+		for (iter=0;iter<max_iter;iter++)
+		{
+			// Update Gradient and Hessian (use H' = H + sigma I)
+			h11=sigma; // numerically ensures strict PD
+			h22=sigma;
+			h21=0.0;g1=0.0;g2=0.0;
+			for (i=0;i<l;i++)
+			{
+				fApB = dec_values[i]*A+B;
+				if (fApB >= 0)
+				{
+					p=Math.exp(-fApB)/(1.0+Math.exp(-fApB));
+					q=1.0/(1.0+Math.exp(-fApB));
+				}
+				else
+				{
+					p=1.0/(1.0+Math.exp(fApB));
+					q=Math.exp(fApB)/(1.0+Math.exp(fApB));
+				}
+				d2=p*q;
+				h11+=dec_values[i]*dec_values[i]*d2;
+				h22+=d2;
+				h21+=dec_values[i]*d2;
+				d1=t[i]-p;
+				g1+=dec_values[i]*d1;
+				g2+=d1;
+			}
+
+			// Stopping Criteria
+			if (Math.abs(g1)<eps && Math.abs(g2)<eps)
+				break;
+			
+			// Finding Newton direction: -inv(H') * g
+			det=h11*h22-h21*h21;
+			dA=-(h22*g1 - h21 * g2) / det;
+			dB=-(-h21*g1+ h11 * g2) / det;
+			gd=g1*dA+g2*dB;
+
+
+			stepsize = 1; 		// Line Search
+			while (stepsize >= min_step)
+			{
+				newA = A + stepsize * dA;
+				newB = B + stepsize * dB;
+
+				// New function value
+				newf = 0.0;
+				for (i=0;i<l;i++)
+				{
+					fApB = dec_values[i]*newA+newB;
+					if (fApB >= 0)
+						newf += t[i]*fApB + Math.log(1+Math.exp(-fApB));
+					else
+						newf += (t[i] - 1)*fApB +Math.log(1+Math.exp(fApB));
+				}
+				// Check sufficient decrease
+				if (newf<fval+0.0001*stepsize*gd)
+				{
+					A=newA;B=newB;fval=newf;
+					break;
+				}
+				else
+					stepsize = stepsize / 2.0;
+			}
+			
+			if (stepsize < min_step)
+			{
+				System.err.print("Line search fails in two-class probability estimates\n");
+				break;
+			}
+		}
+		
+		if (iter>=max_iter)
+			System.err.print("Reaching maximal iterations in two-class probability estimates\n");
+		probAB[0]=A;probAB[1]=B;
+	}
+
+	private static double sigmoid_predict(double decision_value, double A, double B)
+	{
+		double fApB = decision_value*A+B;
+		if (fApB >= 0)
+			return Math.exp(-fApB)/(1.0+Math.exp(-fApB));
+		else
+			return 1.0/(1+Math.exp(fApB)) ;
+	}
+
+	// Method 2 from the multiclass_prob paper by Wu, Lin, and Weng
+	private static void multiclass_probability(int k, double[][] r, double[] p)
+	{
+		int t;
+		int iter = 0, max_iter=100;
+		double[][] Q=new double[k][k];
+		double[] Qp= new double[k];
+		double pQp, eps=0.001;
+	
+		for (t=0;t<k;t++)
+		{
+			p[t]=1.0/k;  // Valid if k = 1
+			Q[t][t]=0;
+			for (int j=0;j<t;j++)
+			{
+				Q[t][t]+=r[j][t]*r[j][t];
+				Q[t][j]=Q[j][t];
+			}
+			for (int j=t+1;j<k;j++)
+			{
+				Q[t][t]+=r[j][t]*r[j][t];
+				Q[t][j]=-r[j][t]*r[t][j];
+			}
+		}
+		for (iter=0;iter<max_iter;iter++)
+		{
+			// stopping condition, recalculate QP,pQP for numerical accuracy
+			pQp=0;
+			for (t=0;t<k;t++)
+			{
+				Qp[t]=0;
+				for (int j=0;j<k;j++)
+					Qp[t]+=Q[t][j]*p[j];
+				pQp+=p[t]*Qp[t];
+			}
+			double max_error=0;
+			for (t=0;t<k;t++)
+			{
+				double error=Math.abs(Qp[t]-pQp);
+				if (error>max_error)
+					max_error=error;
+			}
+			if (max_error<eps) break;
+		
+			for (t=0;t<k;t++)
+			{
+				double diff=(-Qp[t]+pQp)/Q[t][t];
+				p[t]+=diff;
+				pQp=(pQp+diff*(diff*Q[t][t]+2*Qp[t]))/(1+diff)/(1+diff);
+				for (int j=0;j<k;j++)
+				{
+					Qp[j]=(Qp[j]+diff*Q[t][j])/(1+diff);
+					p[j]/=(1+diff);
+				}
+			}
+		}
+		if (iter>=max_iter)
+			System.err.print("Exceeds max_iter in multiclass_prob\n");
+	}
+
+	// Cross-validation decision values for probability estimates
+	private static void svm_binary_svc_probability(svm_problem prob, svm_parameter param, double Cp, double Cn, double[] probAB)
+	{
+		int i;
+		int nr_fold = 5;
+		int[] perm = new int[prob.l];
+		double[] dec_values = new double[prob.l];
+
+		// random shuffle
+		for(i=0;i<prob.l;i++) perm[i]=i;
+		for(i=0;i<prob.l;i++)
+		{
+			int j = i+(int)(Math.random()*(prob.l-i));
+			swap(int,perm[i],perm[j]);
+		}
+		for(i=0;i<nr_fold;i++)
+		{
+			int begin = i*prob.l/nr_fold;
+			int end = (i+1)*prob.l/nr_fold;
+			int j,k;
+			svm_problem subprob = new svm_problem();
+
+			subprob.l = prob.l-(end-begin);
+			subprob.x = new svm_node[subprob.l][];
+			subprob.y = new double[subprob.l];
+			
+			k=0;
+			for(j=0;j<begin;j++)
+			{
+				subprob.x[k] = prob.x[perm[j]];
+				subprob.y[k] = prob.y[perm[j]];
+				++k;
+			}
+			for(j=end;j<prob.l;j++)
+			{
+				subprob.x[k] = prob.x[perm[j]];
+				subprob.y[k] = prob.y[perm[j]];
+				++k;
+			}
+			int p_count=0,n_count=0;
+			for(j=0;j<k;j++)
+				if(subprob.y[j]>0)
+					p_count++;
+				else
+					n_count++;
+			
+			svm_parameter subparam = (svm_parameter)param.clone();
+			subparam.probability=0;
+			subparam.C=1.0;
+			if(p_count==0 && n_count==0)
+				subparam.nr_weight=0;
+			else if(p_count==0 || n_count==0)
+			{
+				subparam.nr_weight=1;
+				subparam.weight_label = new int[1];
+				subparam.weight = new double[1];
+				subparam.weight_label[0]=(int)subprob.y[0];
+				subparam.weight[0]=((int)subprob.y[0]==1)?Cp:Cn;;
+			}
+			else
+			{
+				subparam.nr_weight=2;
+				subparam.weight_label = new int[2];
+				subparam.weight = new double[2];
+				subparam.weight_label[0]=+1;
+				subparam.weight_label[1]=-1;
+				subparam.weight[0]=Cp;
+				subparam.weight[1]=Cn;
+			}
+			svm_model submodel = svm_train(subprob,subparam);
+			for(j=begin;j<end;j++)
+			{
+				double[] dec_value=new double[1];
+				svm_predict_values(submodel,prob.x[perm[j]],dec_value);
+				dec_values[perm[j]]=dec_value[0];
+				// ensure +1 -1 order; reason not using CV subroutine
+				dec_values[perm[j]] *= submodel.label[0];
+			}		
+		}		
+		sigmoid_train(prob.l,dec_values,prob.y,probAB);
+	}
+
+	// Return parameter of a Laplace distribution 
+	private static double svm_svr_probability(svm_problem prob, svm_parameter param)
+	{
+		int i;
+		int nr_fold = 5;
+		double[] ymv = new double[prob.l];
+		double mae = 0;
+
+		svm_parameter newparam = (svm_parameter)param.clone();
+		newparam.probability = 0;
+		svm_cross_validation(prob,newparam,nr_fold,ymv);
+		for(i=0;i<prob.l;i++)
+		{
+			ymv[i]=prob.y[i]-ymv[i];
+			mae += Math.abs(ymv[i]);
+		}		
+		mae /= prob.l;
+		double std=Math.sqrt(2*mae*mae);
+		int count=0;
+		mae=0;
+		for(i=0;i<prob.l;i++)
+			if (Math.abs(ymv[i]) > 5*std) 
+				count=count+1;
+			else 
+				mae+=Math.abs(ymv[i]);
+		mae /= (prob.l-count);
+		System.err.print("Prob. model for test data: target value = predicted value + z,\nz: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma="+mae+"\n");
+		return mae;
+	}
+
 	//
 	// Interface functions
 	//
@@ -1391,7 +1686,17 @@ public class svm {
 			model.nr_class = 2;
 			model.label = null;
 			model.nSV = null;
+			model.probA = null; model.probB = null;
 			model.sv_coef = new double[1][];
+
+			if(param.probability == 1 &&
+			   (param.svm_type == svm_parameter.EPSILON_SVR ||
+			    param.svm_type == svm_parameter.NU_SVR))
+			{
+				model.probA = new double[1];
+				model.probA[0] = svm_svr_probability(prob,param);
+			}
+
 			decision_function f = svm_train_one(prob,param,0,0);
 			model.rho = new double[1];
 			model.rho[0] = f.rho;
@@ -1490,12 +1795,19 @@ public class svm {
 					weighted_C[j] *= param.weight[i];
 			}
 
-			// train n*(n-1)/2 models
+			// train k*(k-1)/2 models
 		
 			boolean[] nonzero = new boolean[l];
 			for(i=0;i<l;i++)
 				nonzero[i] = false;
 			decision_function[] f = new decision_function[nr_class*(nr_class-1)/2];
+
+			double[] probA=null,probB=null;
+			if (param.probability == 1)
+			{
+				probA=new double[nr_class*(nr_class-1)/2];
+				probB=new double[nr_class*(nr_class-1)/2];
+			}
 
 			int p = 0;
 			for(i=0;i<nr_class;i++)
@@ -1519,6 +1831,14 @@ public class svm {
 						sub_prob.y[ci+k] = -1;
 					}
 				
+					if(param.probability == 1)
+					{
+						double[] probAB=new double[2];
+						svm_binary_svc_probability(sub_prob,param,weighted_C[i],weighted_C[j],probAB);
+						probA[p]=probAB[0];
+						probB[p]=probAB[1];
+					}
+
 					f[p] = svm_train_one(sub_prob,param,weighted_C[i],weighted_C[j]);
 					for(k=0;k<ci;k++)
 						if(!nonzero[si+k] && Math.abs(f[p].alpha[k]) > 0)
@@ -1540,6 +1860,22 @@ public class svm {
 			model.rho = new double[nr_class*(nr_class-1)/2];
 			for(i=0;i<nr_class*(nr_class-1)/2;i++)
 				model.rho[i] = f[i].rho;
+
+			if(param.probability == 1)
+			{
+				model.probA = new double[nr_class*(nr_class-1)/2];
+				model.probB = new double[nr_class*(nr_class-1)/2];
+				for(i=0;i<nr_class*(nr_class-1)/2;i++)
+				{
+					model.probA[i] = probA[i];
+					model.probB[i] = probB[i];
+				}
+			}
+			else
+			{
+				model.probA=null;
+				model.probB=null;
+			}
 
 			int nnz = 0;
 			int[] nz_count = new int[nr_class];
@@ -1602,6 +1938,62 @@ public class svm {
 		return model;
 	}
 
+	public static void svm_cross_validation(svm_problem prob, svm_parameter param, int nr_fold, double[] target)
+	{
+		int i;
+		int[] perm = new int[prob.l];		
+
+		// random shuffle
+		for(i=0;i<prob.l;i++) perm[i]=i;
+		for(i=0;i<prob.l;i++)
+		{
+			int j = i+(int)(Math.random()*(prob.l-i));
+			swap(int,perm[i],perm[j]);
+		}
+		for(i=0;i<nr_fold;i++)
+		{
+			int begin = i*prob.l/nr_fold;
+			int end = (i+1)*prob.l/nr_fold;
+			int j,k;
+			svm_problem subprob = new svm_problem();
+
+			subprob.l = prob.l-(end-begin);
+			subprob.x = new svm_node[subprob.l][];
+			subprob.y = new double[subprob.l];
+
+			k=0;
+			for(j=0;j<begin;j++)
+			{
+				subprob.x[k] = prob.x[perm[j]];
+				subprob.y[k] = prob.y[perm[j]];
+				++k;
+			}
+			for(j=end;j<prob.l;j++)
+			{
+				subprob.x[k] = prob.x[perm[j]];
+				subprob.y[k] = prob.y[perm[j]];
+				++k;
+			}
+			svm_model submodel = svm_train(subprob,param);
+			if(param.probability == 1 &&
+			   (param.svm_type == svm_parameter.C_SVC ||
+			    param.svm_type == svm_parameter.NU_SVC))
+			{
+				double[] prob_estimates= new double[svm_get_nr_class(submodel)];
+				for(j=begin;j<end;j++)
+					target[perm[j]] = svm_predict_probability(submodel,prob.x[perm[j]],prob_estimates);
+			}
+			else
+				for(j=begin;j<end;j++)
+					target[perm[j]] = svm_predict(submodel,prob.x[perm[j]]);
+		}
+	}
+
+	public static int svm_get_svm_type(svm_model model)
+	{
+		return model.param.svm_type;
+	}
+
 	public static int svm_get_nr_class(svm_model model)
 	{
 		return model.nr_class;
@@ -1609,8 +2001,21 @@ public class svm {
 
 	public static void svm_get_labels(svm_model model, int[] label)
 	{
-		for(int i=0;i<model.nr_class;i++)
-			label[i] = model.label[i];
+		if (model.label != null)
+			for(int i=0;i<model.nr_class;i++)
+				label[i] = model.label[i];
+	}
+
+	public static double svm_get_svr_probability(svm_model model)
+	{
+		if ((model.param.svm_type == svm_parameter.EPSILON_SVR || model.param.svm_type == svm_parameter.NU_SVR) &&
+		    model.probA!=null)
+		return model.probA[0];
+		else
+		{
+			System.err.print("Model doesn't contain information for SVR probability inference\n");
+			return 0;
+		}
 	}
 
 	public static void svm_predict_values(svm_model model, svm_node[] x, double[] dec_values)
@@ -1707,6 +2112,39 @@ public class svm {
 		}
 	}
 
+	public static double svm_predict_probability(svm_model model, svm_node[] x, double[] prob_estimates)
+	{
+		if ((model.param.svm_type == svm_parameter.C_SVC || model.param.svm_type == svm_parameter.NU_SVC) &&
+		    model.probA!=null && model.probB!=null)
+		{
+			int i;
+			int nr_class = model.nr_class;
+			double[] dec_values = new double[nr_class*(nr_class-1)/2];
+			svm_predict_values(model, x, dec_values);
+
+			double min_prob=1e-7;
+			double[][] pairwise_prob=new double[nr_class][nr_class];
+			
+			int k=0;
+			for(i=0;i<nr_class;i++)
+				for(int j=i+1;j<nr_class;j++)
+				{
+					pairwise_prob[i][j]=Math.min(Math.max(sigmoid_predict(dec_values[k],model.probA[k],model.probB[k]),min_prob),1-min_prob);
+					pairwise_prob[j][i]=1-pairwise_prob[i][j];
+					k++;
+				}
+			multiclass_probability(nr_class,pairwise_prob,prob_estimates);
+
+			int prob_max_idx = 0;
+			for(i=1;i<nr_class;i++)
+				if(prob_estimates[i] > prob_estimates[prob_max_idx])
+					prob_max_idx = i;
+			return model.label[prob_max_idx];
+		}
+		else 
+			return svm_predict(model, x);
+	}
+
 	static final String svm_type_table[] =
 	{
 		"c_svc","nu_svc","one_class","epsilon_svr","nu_svr",
@@ -1758,6 +2196,21 @@ public class svm {
 			fp.writeBytes("\n");
 		}
 
+		if(model.probA != null) // regression has probA only
+		{
+			fp.writeBytes("probA");
+			for(int i=0;i<nr_class*(nr_class-1)/2;i++)
+				fp.writeBytes(" "+model.probA[i]);
+			fp.writeBytes("\n");
+		}
+		if(model.probB != null) 
+		{
+			fp.writeBytes("probB");
+			for(int i=0;i<nr_class*(nr_class-1)/2;i++)
+				fp.writeBytes(" "+model.probB[i]);
+			fp.writeBytes("\n");
+		}
+
 		if(model.nSV != null)
 		{
 			fp.writeBytes("nr_sv");
@@ -1804,6 +2257,8 @@ public class svm {
 		svm_parameter param = new svm_parameter();
 		model.param = param;
 		model.rho = null;
+		model.probA = null;
+		model.probB = null;
 		model.label = null;
 		model.nSV = null;
 
@@ -1871,6 +2326,22 @@ public class svm {
 				StringTokenizer st = new StringTokenizer(arg);
 				for(int i=0;i<n;i++)
 					model.label[i] = atoi(st.nextToken());					
+			}
+			else if(cmd.startsWith("probA"))
+			{
+				int n = model.nr_class*(model.nr_class-1)/2;
+				model.probA = new double[n];
+				StringTokenizer st = new StringTokenizer(arg);
+				for(int i=0;i<n;i++)
+					model.probA[i] = atof(st.nextToken());					
+			}
+			else if(cmd.startsWith("probB"))
+			{
+				int n = model.nr_class*(model.nr_class-1)/2;
+				model.probB = new double[n];
+				StringTokenizer st = new StringTokenizer(arg);
+				for(int i=0;i<n;i++)
+					model.probB[i] = atof(st.nextToken());					
 			}
 			else if(cmd.startsWith("nr_sv"))
 			{
@@ -1968,6 +2439,9 @@ public class svm {
 		   param.shrinking != 1)
 			return "shrinking != 0 and shrinking != 1";
 
+		if(param.probability != 0 &&
+		   param.probability != 1)
+			return "probability != 0 and probability != 1";
 
 		// check whether nu-svc is feasible
 	
@@ -2023,5 +2497,16 @@ public class svm {
 		}
 
 		return null;
+	}
+
+	public static int svm_check_probability_model(svm_model model)
+	{
+		if (((model.param.svm_type == svm_parameter.C_SVC || model.param.svm_type == svm_parameter.NU_SVC) &&
+		model.probA!=null && model.probB!=null) ||
+		((model.param.svm_type == svm_parameter.EPSILON_SVR || model.param.svm_type == svm_parameter.NU_SVR) &&
+		 model.probA!=null))
+			return 1;
+		else
+			return 0;
 	}
 }
