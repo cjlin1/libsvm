@@ -8,7 +8,9 @@ LIB = $(QTDIR)/lib
 #LIB = /usr/lib/qt
 
 svm-toy: svm-toy.cpp svm-toy.moc ../../svm.o
-	$(CXXC) -I$(INCLUDE) $(CFLAGS) svm-toy.cpp ../../svm.o -o svm-toy -L$(LIB) -lqt-mt
+	$(CXXC) -I$(INCLUDE) $(CFLAGS) svm-toy.cpp ../../svm.o -o svm-toy -L$(LIB) -lqt-mt 
+# add -pthread for bsd
+
 svm-toy.moc: svm-toy.cpp
 	$(BIN)/moc svm-toy.cpp -o svm-toy.moc
 ../../svm.o:
