@@ -121,7 +121,7 @@ def redraw (db,tofile=0):
     begin_level = round(max(map(lambda(x):x[2],db))) - 3
     step_size = 0.5
     if tofile:
-        gnuplot.write("set term png transparent small color\n")
+        gnuplot.write("set term png transparent small\n")
         gnuplot.write("set output \"%s\"\n" % png_filename.replace('\\','\\\\'))
         #gnuplot.write("set term postscript color solid\n")
         #gnuplot.write("set output \"%s.ps\"\n" % dataset_title)
