@@ -2156,13 +2156,13 @@ void svm_cross_validation(const svm_problem *prob, const svm_parameter *param, i
 	int l = prob->l;
 	int *perm = Malloc(int,l);
 	int nr_class = 0;
-	int *label = NULL;
-	int *start = NULL;
-	int *count = NULL;
 
 	if(param->svm_type == C_SVC ||
 	   param->svm_type == NU_SVC)
 	{
+		int *start = NULL;
+		int *label = NULL;
+		int *count = NULL;
 		svm_group_classes(prob,&nr_class,&label,&start,&count,perm);
 
 		// random shuffle and then data grouped by fold using the array perm
@@ -2258,6 +2258,7 @@ void svm_cross_validation(const svm_problem *prob, const svm_parameter *param, i
 		free(subprob.x);
 		free(subprob.y);
 	}		
+	free(fold_start);
 	free(perm);	
 }
 
