@@ -2443,7 +2443,7 @@ public class svm {
 		   param.probability != 1)
 			return "probability != 0 and probability != 1";
 
-		if(param->probability == 1 &&
+		if(param.probability == 1 &&
 		   svm_type == svm_parameter.ONE_CLASS)
 			return "one-class SVM probability output not supported yet";
 		
