@@ -11,24 +11,6 @@ int max_nr_attr = 64;
 
 struct svm_model* model;
 
-char* readline(FILE *input)
-{
-	int len;
-	
-	if(fgets(line,max_line_len,input) == NULL)
-		return NULL;
-
-	while(strrchr(line,'\n') == NULL)
-	{
-		max_line_len *= 2;
-		line = (char *) realloc(line, max_line_len);
-		len = strlen(line);
-		if(fgets(line+len,max_line_len-len,input) == NULL)
-			break;
-	}
-	return line;
-}
-
 void predict(FILE *input, FILE *output)
 {
 	int correct = 0;
@@ -36,38 +18,35 @@ void predict(FILE *input, FILE *output)
 	double error = 0;
 	double sumv = 0, sumy = 0, sumvv = 0, sumyy = 0, sumvy = 0;
 	
-#define SKIP_TARGET\
-	while(isspace(*p)) ++p;\
-	while(!isspace(*p)) ++p;
-
-#define SKIP_ELEMENT\
-	while(*p!=':') ++p;\
-	++p;\
-	while(isspace(*p)) ++p;\
-	while(*p && !isspace(*p)) ++p;
-
-	while(readline(input)!=NULL)
+	while(1)
 	{
 		int i = 0;
+		int c;
 		double target,v;
-		const char *p = line;
 
-		if(sscanf(p,"%lf",&target)!=1) break;
+		if (fscanf(input,"%lf",&target)==EOF)
+			break;
 
-		SKIP_TARGET
-
-		while(sscanf(p,"%d:%lf",&x[i].index,&x[i].value)==2)
+		while(1)
 		{
-			SKIP_ELEMENT;
-			++i;
 			if(i>=max_nr_attr-1)	// need one more for index = -1
 			{
 				max_nr_attr *= 2;
 				x = (struct svm_node *) realloc(x,max_nr_attr*sizeof(struct svm_node));
 			}
-		}
 
-		x[i].index = -1;
+			do {
+				c = getc(input);
+				if(c=='\n' || c==EOF) goto out2;
+			} while(isspace(c));
+			ungetc(c,input);
+			fscanf(input,"%d:%lf",&x[i].index,&x[i].value);
+			++i;
+		}	
+
+out2:
+		x[i++].index = -1;
+
 		v = svm_predict(model,x);
 		if(v == target)
 			++correct;
