@@ -11,7 +11,7 @@ size = len(samples)
 kernels = [LINEAR, POLY, RBF, SIGMOID]
 kname = ['linear','polynomial','rbf','sigmoid']
 
-param = svm_parameter(C = 10)
+param = svm_parameter(C=10,nr_weight = 2,weight_label = [1,0],weight = [10,1])
 for k in kernels:
 	param.kernel_type = k;
 	model = svm_model(problem,param)
