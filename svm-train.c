@@ -45,7 +45,7 @@ struct svm_parameter param;		// set by parse_command_line
 struct svm_problem prob;		// set by read_problem
 struct svm_model *model;
 struct svm_node *x_space;
-int cross_validation = 0;
+int cross_validation;
 int nr_fold;
 
 int main(int argc, char **argv)
@@ -141,6 +141,7 @@ void parse_command_line(int argc, char **argv, char *input_file_name, char *mode
 	param.nr_weight = 0;
 	param.weight_label = NULL;
 	param.weight = NULL;
+	cross_validation = 0;
 
 	// parse options
 	for(i=1;i<argc;i++)
