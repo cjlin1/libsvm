@@ -7,10 +7,10 @@
 <a name="_TOP"><b><h1><a
 href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a>  FAQ </h1></b></a>
 <b>last modified : </b>
-Sun, 24 Oct 2004 01:42:17 GMT
+Wed, 23 Mar 2005 01:13:38 GMT
 <class="categories">
 <li><a
-href="#_TOP">All Questions</a>(48)</li>
+href="#_TOP">All Questions</a>(49)</li>
 <ul><b>
 <li><a
 href="#/Q1:_Some_courses_which_have_used_libsvm_as_a_tool">Q1:_Some_courses_which_have_used_libsvm_as_a_tool</a>(1)</li>
@@ -19,7 +19,7 @@ href="#/Q2:_Installation_and_running_the_program">Q2:_Installation_and_running_t
 <li><a
 href="#/Q3:_Data_preparation">Q3:_Data_preparation</a>(3)</li>
 <li><a
-href="#/Q4:_Training_and_prediction">Q4:_Training_and_prediction</a>(25)</li>
+href="#/Q4:_Training_and_prediction">Q4:_Training_and_prediction</a>(26)</li>
 <li><a
 href="#/Q5:_Graphic_Interface">Q5:_Graphic_Interface</a>(3)</li>
 <li><a
@@ -42,21 +42,21 @@ href="#/Q7:_Python_Interface">Q7:_Python_Interface</a>(4)</li>
 <li class="headlines_item"><a href="#f301">Why sometimes not all attributes of a data appear in the training/model files ?</a></li>
 <li class="headlines_item"><a href="#f302">What if my data are non-numerical ?</a></li>
 <li class="headlines_item"><a href="#f303">Why do you consider sparse format ? Will the training of dense data be much slower ?</a></li>
-<li class="headlines_item"><a href="#f401">The output of training C-SVM is like the following. What do they mean ?</a></li>
-<li class="headlines_item"><a href="#f402">Can you explain more about the model file ?</a></li>
+<li class="headlines_item"><a href="#f401">The output of training C-SVM is like the following. What do they mean?</a></li>
+<li class="headlines_item"><a href="#f402">Can you explain more about the model file?</a></li>
 <li class="headlines_item"><a href="#f403">Should I use float or double to store numbers in the cache ?</a></li>
-<li class="headlines_item"><a href="#f404">How do I choose the kernel ?</a></li>
-<li class="headlines_item"><a href="#f405">Does libsvm have special treatments for linear SVM ?</a></li>
-<li class="headlines_item"><a href="#f406">The number of free support vectors is large. What should I do ?</a></li>
-<li class="headlines_item"><a href="#f407">Should I scale training and testing data in a similar way ?</a></li>
-<li class="headlines_item"><a href="#f408">Does it make a big difference  if I scale each attribute to [0,1] instead of [-1,1] ?</a></li>
-<li class="headlines_item"><a href="#f409">The prediction rate is low. How could I improve it ?</a></li>
-<li class="headlines_item"><a href="#f410">My data are unbalanced. Could libsvm handle such problems ?</a></li>
-<li class="headlines_item"><a href="#f411">What is the difference between nu-SVC and C-SVC ?</a></li>
-<li class="headlines_item"><a href="#f412">The program keeps running without showing any output. What should I do ?</a></li>
-<li class="headlines_item"><a href="#f413">The program keeps running (with output, i.e. many dots). What should I do ?</a></li>
-<li class="headlines_item"><a href="#f414">The training time is too long. What should I do ?</a></li>
-<li class="headlines_item"><a href="#f415">How do I get the decision value(s) ?</a></li>
+<li class="headlines_item"><a href="#f404">How do I choose the kernel?</a></li>
+<li class="headlines_item"><a href="#f405">Does libsvm have special treatments for linear SVM?</a></li>
+<li class="headlines_item"><a href="#f406">The number of free support vectors is large. What should I do?</a></li>
+<li class="headlines_item"><a href="#f407">Should I scale training and testing data in a similar way?</a></li>
+<li class="headlines_item"><a href="#f408">Does it make a big difference  if I scale each attribute to [0,1] instead of [-1,1]?</a></li>
+<li class="headlines_item"><a href="#f409">The prediction rate is low. How could I improve it?</a></li>
+<li class="headlines_item"><a href="#f410">My data are unbalanced. Could libsvm handle such problems?</a></li>
+<li class="headlines_item"><a href="#f411">What is the difference between nu-SVC and C-SVC?</a></li>
+<li class="headlines_item"><a href="#f412">The program keeps running without showing any output. What should I do?</a></li>
+<li class="headlines_item"><a href="#f413">The program keeps running (with output, i.e. many dots). What should I do?</a></li>
+<li class="headlines_item"><a href="#f414">The training time is too long. What should I do?</a></li>
+<li class="headlines_item"><a href="#f415">How do I get the decision value(s)?</a></li>
 <li class="headlines_item"><a href="#f416">For some problem sets if I use a large cache (i.e. large -m) on a linux machine, why sometimes I get "segmentation fault ?"</a></li>
 <li class="headlines_item"><a href="#f417">How do I disable screen output of svm-train and svm-predict ?</a></li>
 <li class="headlines_item"><a href="#f418">I would like to use my own kernel but find out that there are two subroutines for kernel evaluations: k_function() and kernel_function(). Which one should I modify ?</a></li>
@@ -65,8 +65,9 @@ href="#/Q7:_Python_Interface">Q7:_Python_Interface</a>(4)</li>
 <li class="headlines_item"><a href="#f421">I would like to try different random partition for cross validation, how could I do it ?</a></li>
 <li class="headlines_item"><a href="#f422">I would like to solve L2-SVM (i.e., error term is quadratic). How should I modify the code ?</a></li>
 <li class="headlines_item"><a href="#f423">There seems to be a zero division ?</a></li>
-<li class="headlines_item"><a href="#f424">How do I choose parameters for one-class svm as training data are in only one class ?</a></li>
-<li class="headlines_item"><a href="#f425">Why training a probability model (i.e., -b 1) takes longer time ?</a></li>
+<li class="headlines_item"><a href="#f424">How do I choose parameters for one-class svm as training data are in only one class?</a></li>
+<li class="headlines_item"><a href="#f425">Why training a probability model (i.e., -b 1) takes longer time</a></li>
+<li class="headlines_item"><a href="#f426">Why using the -b option does not give me better accuracy?</a></li>
 <li class="headlines_item"><a href="#f501">How can I save images drawn by svm-toy?</a></li>
 <li class="headlines_item"><a href="#f502">I press the "load" button to load data points but why svm-toy does not draw them ?</a></li>
 <li class="headlines_item"><a href="#f503">I would like svm-toy to handle more than three classes of data, what should I do ?</a></li>
@@ -140,6 +141,9 @@ libsvm in detail.
 <a name="f202"><b>Q: What are changes in previous versions?</b></a>
 <br/>                                                                                
 <p>See <a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm/log">the change log</a>.
+
+<p> You can download earlier versions 
+<a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm/oldfiles">here</a>.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
@@ -159,7 +163,7 @@ The bibtex format is as follows
   author =	 {Chih-Chung Chang and Chih-Jen Lin},
   title =	 {{LIBSVM}: a library for support vector machines},
   year =	 {2001},
-  note =	 {Software available at {\tt http://www.csie.ntu.edu.tw/\verb"~"cjlin/libsvm}},
+  note =	 {Software available at \url{http://www.csie.ntu.edu.tw/~cjlin/libsvm}}
 }
 </pre>
 <p align="right">
@@ -203,9 +207,9 @@ Try to recompile the program on that machine or use static linking.
 <br/>                                                                                
 
 <p>
-Build it as a project by choosing "Win32 Application."
+Build it as a project by choosing "Win32 Project."
 On the other hand, for "svm-train" and "svm-predict"
-you want to choose "Win32 Console Application."
+you want to choose "Win32 Console Project."
 After libsvm 2.5, you can also use the file Makefile.win.
 See details in README.
 
@@ -276,7 +280,7 @@ the sparse format only.
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q4:_Training_and_prediction"></a>
-<a name="f401"><b>Q: The output of training C-SVM is like the following. What do they mean ?</b></a>
+<a name="f401"><b>Q: The output of training C-SVM is like the following. What do they mean?</b></a>
 <br/>                                                                                
 <br>optimization finished, #iter = 219
 <br>nu = 0.431030
@@ -297,7 +301,7 @@ libsvm document</a>.
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q4:_Training_and_prediction"></a>
-<a name="f402"><b>Q: Can you explain more about the model file ?</b></a>
+<a name="f402"><b>Q: Can you explain more about the model file?</b></a>
 <br/>                                                                                
 
 <p>
@@ -355,7 +359,7 @@ enough using only float.
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q4:_Training_and_prediction"></a>
-<a name="f404"><b>Q: How do I choose the kernel ?</b></a>
+<a name="f404"><b>Q: How do I choose the kernel?</b></a>
 <br/>                                                                                
 
 <p>
@@ -378,7 +382,7 @@ and (>1) goes to infinity).
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q4:_Training_and_prediction"></a>
-<a name="f405"><b>Q: Does libsvm have special treatments for linear SVM ?</b></a>
+<a name="f405"><b>Q: Does libsvm have special treatments for linear SVM?</b></a>
 <br/>                                                                                
 
 <p>
@@ -389,20 +393,44 @@ Note that there are some possible
 tricks to save training/testing time if the
 linear kernel is used.
 Hence libsvm is <b>NOT</b> particularly efficient for linear SVM,
-especially for problems whose number of data is much larger
+especially for 
+using large C on
+problems whose number of data is much larger
 than number of attributes.
-If you plan to solve this type of problems, you may want 
-to check <a href=http://www.csie.ntu.edu.tw/~cjlin/bsvm>bsvm</a>,
+You can 
+<ul>
+<li>
+Use small C only. We have shown in the following paper
+that after C is larger than a certain threshold,
+the decision function is the same. 
+<p>
+<a href="http://guppy.mpe.nus.edu.sg/~mpessk/">S. S. Keerthi</a>
+and
+<B>C.-J. Lin</B>.
+<A HREF="papers/limit.ps.gz">
+Asymptotic behaviors of support vector machines with 
+Gaussian kernel
+</A>
+.
+<I><A HREF="http://mitpress.mit.edu/journal-home.tcl?issn=08997667">Neural Computation</A></I>, 15(2003), 1667-1689.
+
+
+<li>
+Check <a href=http://www.csie.ntu.edu.tw/~cjlin/bsvm>bsvm</a>,
 which includes an efficient implementation for
 linear SVMs.
 More details can be found in the following study:
+<p>
 K.-M. Chung, W.-C. Kao, 
 T. Sun, 
 and
 C.-J. Lin.
 <A HREF="http://www.csie.ntu.edu.tw/~cjlin/papers/linear.pdf">
-Decomposition Methods for Linear Support Vector Machines
-</a>
+Decomposition Methods for Linear Support Vector Machines.
+</A> 
+<I><A HREF="http://mitpress.mit.edu/journal-home.tcl?issn=08997667">Neural Computation</A></I>,
+16(2004), 1689-1704. 
+</ul>
 
 <p> On the other hand, you do not really need to solve
 linear SVMs. See the previous question about choosing
@@ -411,7 +439,7 @@ kernels for details.
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q4:_Training_and_prediction"></a>
-<a name="f406"><b>Q: The number of free support vectors is large. What should I do ?</b></a>
+<a name="f406"><b>Q: The number of free support vectors is large. What should I do?</b></a>
 <br/>                                                                                
  <p>
 This usually happens when the data are overfitted.
@@ -424,7 +452,7 @@ in libsvm.
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q4:_Training_and_prediction"></a>
-<a name="f407"><b>Q: Should I scale training and testing data in a similar way ?</b></a>
+<a name="f407"><b>Q: Should I scale training and testing data in a similar way?</b></a>
 <br/>                                                                                
 <p>
 Yes, you can do the following:
@@ -434,7 +462,7 @@ Yes, you can do the following:
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q4:_Training_and_prediction"></a>
-<a name="f408"><b>Q: Does it make a big difference  if I scale each attribute to [0,1] instead of [-1,1] ?</b></a>
+<a name="f408"><b>Q: Does it make a big difference  if I scale each attribute to [0,1] instead of [-1,1]?</b></a>
 <br/>                                                                                
 
 <p>
@@ -465,7 +493,7 @@ may save the time.
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q4:_Training_and_prediction"></a>
-<a name="f409"><b>Q: The prediction rate is low. How could I improve it ?</b></a>
+<a name="f409"><b>Q: The prediction rate is low. How could I improve it?</b></a>
 <br/>                                                                                
 <p>
 Try to use the model selection tool grid.py in the python
@@ -481,7 +509,7 @@ classification
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q4:_Training_and_prediction"></a>
-<a name="f410"><b>Q: My data are unbalanced. Could libsvm handle such problems ?</b></a>
+<a name="f410"><b>Q: My data are unbalanced. Could libsvm handle such problems?</b></a>
 <br/>                                                                                
 <p>
 Yes, there is a -wi options. For example, if you use
@@ -494,7 +522,7 @@ Note that this -w option is for C-SVC only.
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q4:_Training_and_prediction"></a>
-<a name="f411"><b>Q: What is the difference between nu-SVC and C-SVC ?</b></a>
+<a name="f411"><b>Q: What is the difference between nu-SVC and C-SVC?</b></a>
 <br/>                                                                                
 <p>
 Basically they are the same thing but with different
@@ -507,7 +535,7 @@ error.
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q4:_Training_and_prediction"></a>
-<a name="f412"><b>Q: The program keeps running without showing any output. What should I do ?</b></a>
+<a name="f412"><b>Q: The program keeps running without showing any output. What should I do?</b></a>
 <br/>                                                                                
 <p>
 You may want to check your data. Each training/testing
@@ -517,7 +545,7 @@ In addition, you have to remove empty lines.
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q4:_Training_and_prediction"></a>
-<a name="f413"><b>Q: The program keeps running (with output, i.e. many dots). What should I do ?</b></a>
+<a name="f413"><b>Q: The program keeps running (with output, i.e. many dots). What should I do?</b></a>
 <br/>                                                                                
 <p>
 In theory libsvm guarantees to converge if the kernel
@@ -532,7 +560,7 @@ difficulties occur.
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q4:_Training_and_prediction"></a>
-<a name="f414"><b>Q: The training time is too long. What should I do ?</b></a>
+<a name="f414"><b>Q: The training time is too long. What should I do?</b></a>
 <br/>                                                                                
 <p>
 This may happen for some difficult cases (e.g. -c is large).
@@ -543,7 +571,7 @@ tricks on improving the training time.
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q4:_Training_and_prediction"></a>
-<a name="f415"><b>Q: How do I get the decision value(s) ?</b></a>
+<a name="f415"><b>Q: How do I get the decision value(s)?</b></a>
 <br/>                                                                                
 <p>
 We print out decision values for regression. For classification,
@@ -584,7 +612,7 @@ On 32-bit machines, the maximum addressable
 memory is 4GB. The Linux kernel uses 3:1
 split which means user space is 3G and
 kernel space is 1G. Although there are
-3G user space, the maximum dymanic allocation
+3G user space, the maximum dynamic allocation
 memory is 2G. So, if you specify -m near 2G,
 the memory will be exhausted. And svm-train
 will fail when it asks more memory.
@@ -718,8 +746,9 @@ data without the -v option.
 <a name="f421"><b>Q: I would like to try different random partition for cross validation, how could I do it ?</b></a>
 <br/>                                                                                
 <p>
-Right now we use the default seed so each time when you
-run svm-train -v, folds of validation data are the same.
+If you use GNU C library,
+the default seed 1 is considered. Thus you always
+get the same result of running svm-train -v.
 To have different seeds, you can add the following code
 in svm-train.c:
 <pre>
@@ -742,12 +771,12 @@ First, modify the following line of
 solve_c_svc from 
 <pre>
 	s.Solve(l, SVC_Q(*prob,*param,y), minus_ones, y,
-		alpha, Cp, Cn, param->eps, si, param->shrinking, param->cal_partial, param->gamma);
+		alpha, Cp, Cn, param->eps, si, param->shrinking);
 </pre>
 to
 <pre>
 	s.Solve(l, SVC_Q(*prob,*param,y), minus_ones, y,
-		alpha, INF, INF, param->eps, si, param->shrinking, param->cal_partial, param->gamma);
+		alpha, INF, INF, param->eps, si, param->shrinking);
 </pre>
 Second, in  the class  of SVC_Q, declare C as 
 a private variable:
@@ -789,7 +818,7 @@ Reasons of doing so are described in libsvm document.
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q4:_Training_and_prediction"></a>
-<a name="f424"><b>Q: How do I choose parameters for one-class svm as training data are in only one class ?</b></a>
+<a name="f424"><b>Q: How do I choose parameters for one-class svm as training data are in only one class?</b></a>
 <br/>                                                                                
 <p>
 You have pre-specified true positive rate in mind and then search for
@@ -798,7 +827,7 @@ parameters which achieve similar cross-validation accuracy.
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q4:_Training_and_prediction"></a>
-<a name="f425"><b>Q: Why training a probability model (i.e., -b 1) takes longer time ?</b></a>
+<a name="f425"><b>Q: Why training a probability model (i.e., -b 1) takes longer time</b></a>
 <br/>                                                                                
 <p>
 To construct this probability model, we internaly conduct a 
@@ -808,6 +837,23 @@ Hence, in general you do parameter selection first without
 -b 1. You only use -b 1 when good parameters have been
 selected. In other words, you avoid using -b 1 and -v
 together.
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q4:_Training_and_prediction"></a>
+<a name="f426"><b>Q: Why using the -b option does not give me better accuracy?</b></a>
+<br/>                                                                                
+<p>
+There is absolutely no reason the probability outputs guarantee
+you better accuracy. The main purpose of this option is
+to provide you the probability estimates, but not to boost
+prediction accuracy. From our experience, 
+after proper parameter selections, in general with
+and without -b have similar accuracy. Occasionally there
+are some differences.
+It is not recommended to compare the two under 
+just a fixed parameter
+set as more differences will be observed.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
