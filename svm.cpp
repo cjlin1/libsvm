@@ -1774,7 +1774,7 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 	return model;
 }
 
-double svm_predict(const svm_model *model, const svm_node *x)
+void svm_predict_values(const svm_model *model, const svm_node *x, double* dec_values)
 {
 	if(model->param.svm_type == ONE_CLASS ||
 	   model->param.svm_type == EPSILON_SVR ||
@@ -1785,10 +1785,7 @@ double svm_predict(const svm_model *model, const svm_node *x)
 		for(int i=0;i<model->l;i++)
 			sum += sv_coef[i] * Kernel::k_function(x,model->SV[i],model->param);
 		sum -= model->rho[0];
-		if(model->param.svm_type == ONE_CLASS)
-			return (sum>0)?1:-1;
-		else
-			return sum;
+		*dec_values = sum;
 	}
 	else
 	{
@@ -1805,10 +1802,8 @@ double svm_predict(const svm_model *model, const svm_node *x)
 		for(i=1;i<nr_class;i++)
 			start[i] = start[i-1]+model->nSV[i-1];
 
-		int *vote = Malloc(int,nr_class);
-		for(i=0;i<nr_class;i++)
-			vote[i] = 0;
 		int p=0;
+		int pos=0;
 		for(i=0;i<nr_class;i++)
 			for(int j=i+1;j<nr_class;j++)
 			{
@@ -1826,7 +1821,54 @@ double svm_predict(const svm_model *model, const svm_node *x)
 				for(k=0;k<cj;k++)
 					sum += coef2[sj+k] * kvalue[sj+k];
 				sum -= model->rho[p++];
-				if(sum > 0)
+				dec_values[pos++] = sum;
+			}
+
+		free(kvalue);
+		free(start);
+	}
+}
+
+int svm_get_nr_class(const svm_model *model)
+{
+	return model->nr_class;
+}
+
+void svm_get_labels(const svm_model *model, int* label)
+{
+	for(int i=0;i<model->nr_class;i++)
+		label[i] = model->label[i];
+}
+
+double svm_predict(const svm_model *model, const svm_node *x)
+{
+	if(model->param.svm_type == ONE_CLASS ||
+	   model->param.svm_type == EPSILON_SVR ||
+	   model->param.svm_type == NU_SVR)
+	{
+		double res;
+		svm_predict_values(model, x, &res);
+		
+		if(model->param.svm_type == ONE_CLASS)
+			return (res>0)?1:-1;
+		else
+			return res;
+	}
+	else
+	{
+		int i;
+		int nr_class = model->nr_class;
+		double *dec_values = Malloc(double, nr_class * (nr_class - 1) / 2);
+		svm_predict_values(model, x, dec_values);
+
+		int *vote = Malloc(int,nr_class);
+		for(i=0;i<nr_class;i++)
+			vote[i] = 0;
+		int pos=0;
+		for(i=0;i<nr_class;i++)
+			for(int j=i+1;j<nr_class;j++)
+			{
+				if(dec_values[pos++] > 0)
 					++vote[i];
 				else
 					++vote[j];
@@ -1836,12 +1878,12 @@ double svm_predict(const svm_model *model, const svm_node *x)
 		for(i=1;i<nr_class;i++)
 			if(vote[i] > vote[vote_max_idx])
 				vote_max_idx = i;
-		free(kvalue);
-		free(start);
 		free(vote);
+		free(dec_values);
 		return model->label[vote_max_idx];
 	}
 }
+
 
 const char *svm_type_table[] =
 {

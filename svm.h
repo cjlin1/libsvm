@@ -41,13 +41,16 @@ struct svm_parameter
 	int shrinking;	/* use the shrinking heuristics */
 };
 
-struct svm_model *svm_train(const struct svm_problem *prob,
-			    const struct svm_parameter *param);
+struct svm_model *svm_train(const struct svm_problem *prob, const struct svm_parameter *param);
 
 int svm_save_model(const char *model_file_name, const struct svm_model *model);
 
 struct svm_model *svm_load_model(const char *model_file_name);
 
+int svm_get_nr_class(const struct svm_model *model);
+void svm_get_labels(const struct svm_model *model, int *label);
+
+void svm_predict_values(const struct svm_model *model, const struct svm_node *x, double* dec_values);
 double svm_predict(const struct svm_model *model, const struct svm_node *x);
 
 void svm_destroy_model(struct svm_model *model);
