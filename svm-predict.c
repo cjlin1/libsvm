@@ -136,6 +136,8 @@ int main(int argc, char **argv)
 				exit_with_help();
 		}
 	}
+	if(i>=argc)
+		exit_with_help();
 	
 	input = fopen(argv[i],"r");
 	if(input == NULL)

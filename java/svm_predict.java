@@ -120,6 +120,8 @@ class svm_predict {
 					exit_with_help();
 			}
 		}
+		if(i>=argv.length)
+			exit_with_help();
 
 		BufferedReader input = new BufferedReader(new FileReader(argv[i]));
 		DataOutputStream output = new DataOutputStream(new FileOutputStream(argv[i+2]));
