@@ -119,7 +119,7 @@ Usage
 =====
 To use the module, the files svm.py and the shared library (namely svmc.so
 or svmc.dll) must be placed in the current directory, the python library
-directory, or the directory where the environment variable PYTHONHOME
+directory, or the directory where the environment variable PYTHONPATH
 points to. The user then imports everything in svm.py to use libsvm in
 python:
 
