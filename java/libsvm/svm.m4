@@ -1602,6 +1602,16 @@ public class svm {
 		return model;
 	}
 
+	public static int svm_get_nr_class(svm_model model)
+	{
+		return model.nr_class;
+	}
+
+	public static void svm_get_labels(svm_model model, int[] label)
+	{
+		for(int i=0;i<model.nr_class;i++)
+			label[i] = model.label[i];
+	}
 
 	public static void svm_predict_values(svm_model model, svm_node[] x, double[] dec_values)
 	{
@@ -1653,17 +1663,6 @@ public class svm {
 					dec_values[pos++] = sum;					
 				}
 		}
-	}
-
-	public static int svm_get_nr_class(svm_model model)
-	{
-		return model.nr_class;
-	}
-
-	public static void svm_get_labels(svm_model model, int[] label)
-	{
-		for(int i=0;i<model.nr_class;i++)
-			label[i] = model.label[i];
 	}
 
 	public static double svm_predict(svm_model model, svm_node[] x)

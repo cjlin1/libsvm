@@ -1774,6 +1774,17 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 	return model;
 }
 
+int svm_get_nr_class(const svm_model *model)
+{
+	return model->nr_class;
+}
+
+void svm_get_labels(const svm_model *model, int* label)
+{
+	for(int i=0;i<model->nr_class;i++)
+		label[i] = model->label[i];
+}
+
 void svm_predict_values(const svm_model *model, const svm_node *x, double* dec_values)
 {
 	if(model->param.svm_type == ONE_CLASS ||
@@ -1827,17 +1838,6 @@ void svm_predict_values(const svm_model *model, const svm_node *x, double* dec_v
 		free(kvalue);
 		free(start);
 	}
-}
-
-int svm_get_nr_class(const svm_model *model)
-{
-	return model->nr_class;
-}
-
-void svm_get_labels(const svm_model *model, int* label)
-{
-	for(int i=0;i<model->nr_class;i++)
-		label[i] = model->label[i];
 }
 
 double svm_predict(const svm_model *model, const svm_node *x)
