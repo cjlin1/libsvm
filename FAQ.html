@@ -1,0 +1,568 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>libsvm faq</title>
+  </head>
+<body text="#000000" bgcolor="#FFEFD5" link="#FF0000" vlink="#0000FF">
+
+  <body>
+    <h1><a href=index.html>LIBSVM</a> FAQ</h1>
+<!-- Created: Wed Apr 18 19:26:54 CST 2001 -->
+<!-- hhmts start -->
+Last modified: Mon Mar  3 19:25:00 CST 2003
+<!-- hhmts end -->
+
+<hr>
+<h3>Some courses which have used libsvm as a tool</h3>
+<ul>
+<li><a href=http://lmb.informatik.uni-freiburg.de/lectures/svm_seminar/>Institute for Computer Science,           
+Faculty of Applied Science, University of Freiburg, Germany 
+</a>
+<li> <a href=http://www.cs.vu.nl/~elena/ml.html>
+Division of Mathematics and Computer Science. 
+Faculteit der Exacte Wetenschappen 
+Vrije Universiteit, The Netherlands. </a>
+<li>
+<a href=
+http://progwww.vub.ac.be/poolteaching/proj1lic/svm.htm>
+Department of (Applied) Computer Science (Faculty of Sciences), Vrije Universiteit Brussel,  Belgium
+</a>
+<li>
+<a href=http://www.cae.wisc.edu/~ece539/matlab/>
+Electrical and Computer Engineering Department, 
+University of Wisconsin-Madison 
+</a>
+<li>
+<a href=http://www.hpl.hp.com/personal/Carl_Staelin/cs236601/project.html>
+Technion (Israel Institute of Technology), Israel.
+<li>
+<a href=http://www.cise.ufl.edu/~fu/learn.html>
+Computer and Information Sciences Dept., University of Florida</a>
+<li>
+<a href=http://www.uonbi.ac.ke/acad_depts/ics/course_material/machine_learning/ML_and_DM_Resources.html>
+The Institue of Computer Science,
+University of Nairobi, Kenya.
+</a>
+</ul>
+
+<hr>
+<h3>Installation and and running the program</h3>
+<ul>
+
+<p><li> Where can I find documents of libsvm ? <p>
+In the package there is a README file which 
+details all options, data format, and library calls.
+The model selection tool and the python interface
+have a separate README under the directory python.
+The paper <a href="http://www.csie.ntu.edu.tw/~cjlin/papers/libsvm.pdf">LIBSVM
+: a library for support vector machines</a> discusses the implementation of
+libsvm in detail.
+<p><li> What are changes in previous versions? <p>
+See <a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm/log">the change log</a>.
+<p><li> I have modified the source and would like to 
+build the graphic interface "svm-toy"
+on MS windows. How should I do it ?<p>
+Build it as a project by chooising "Win32 Application."
+On the other hand, for "svm-train" and "svm-predict"
+you want to choose "Win32 Console Application."
+
+<p><li> I would like to cite libsvm. Which paper should
+I cite ?<p>
+Please cite the following document:
+<p>
+Chih-Chung Chang and Chih-Jen Lin, LIBSVM
+: a library for support vector machines, 2001.
+Software available at http://www.csie.ntu.edu.tw/~cjlin/libsvm
+<p>
+The bibtex format is as follows
+<pre>
+@Manual{CC01a,
+  author =	 {Chih-Chung Chang and Chih-Jen Lin},
+  title =	 {{LIBSVM}: a library for support vector machines},
+  year =	 {2001},
+  note =	 {Software available at {\tt http://www.csie.ntu.edu.tw/\verb"~"cjlin/libsvm}},
+}
+</pre>
+<p><li> I would like to use libsvm in my software. 
+Is there any license problem ?
+<p>
+The libsvm license ("the modified BSD license")
+is compatible with many
+free software licenses such as GPL. Hence, it is very easy to
+use libsvm in your software.
+It can also be used in commercial products.
+
+</ul>
+<hr>
+<h3>Data preparation</h3>
+<ul>
+<p><li>Why sometimes not all attributes of a data 
+appear in the training/model files ?
+<p>
+libsvm uses the so called "sparse" format where zero
+values do not need to be stored. Hence a data with attributes
+<pre>
+1 0 2 0
+</pre>
+is represented as
+<pre>
+1:1 3:2
+</pre>
+<p><li>What if my data are non-numerical ?
+<p>
+Currently libsvm supports only numerical data.
+You may have to change non-numerical data to 
+numerical. For example, you can use several
+binary attributes to represent a categorical
+attribute.
+</ul>
+<hr>
+<h3>Training and prediction</h3>
+<ul>
+
+<p><li> Should I use float or double to store numbers in the cache ?<p>
+We have float as the default as you can store more numbers
+in the cache. 
+In general this is good enough but for few difficult
+cases (e.g. C very very large) where solutions are huge
+numbers, it might be possible that the numerical precision is not
+enough using only float.
+
+<p><li>How do I choose the kernel ?
+<p>
+In general we suggest you to try the RBF kernel first.
+A recent result by Keerthi and Lin
+(<a href=http://www.csie.ntu.edu.tw/~cjlin/papers/limit.ps.gz>
+download paper here</a>)
+shows that if RBF is used with model selection,
+then there is no need to consider the linear kernel.
+
+
+<p><li> Does libsvm have special treatments
+for linear SVM ?<p>
+
+No, at this point libsvm solves linear/nonlinear SVMs by the
+same way.
+Note that there are some possible
+tricks to save training/testing time if the
+linear kernel is used.
+Hence libsvm is NOT particularly efficient for linear SVM,
+especially for problems whose number of data is much larger
+than number of attributes.
+If you plan to solve this type of problems, you may want 
+to check some software which are specially suitable for 
+linear SVMs.
+More details can be found in the following study:
+K.-M. Chung, W.-C. Kao, 
+T. Sun, 
+and
+C.-J. Lin.
+<A HREF="../papers/linear.pdf">
+Decomposition Methods for Linear Support Vector Machines
+</a>
+
+<p> On the other hand, you do not really need to solve
+linear SVMs. See the previous question about choosing
+kernels for details.
+
+<p><li>The number of free support vectors is large. What 
+should I do ? <p>
+This usually happens when the data are overfitted.
+If attributes of your data are in large ranges,
+try to scale them. Then the region
+of appropriate parameters may be larger.
+Note that there is a scale program
+in libsvm. 
+
+<p><li>Should I scale 
+training and testing data in a similar way ?
+<p>
+Yes, usually we merge the two files as one and 
+scale it.
+We then split them again for training and testing.
+
+<p><li>The prediction rate is low. How could I improve it ?<p>
+Try to use the model selection tool grid.py in the python
+directory find
+out good parameters. To see the importance of model selction,
+please 
+see my  talk:
+<A HREF="../talks/tuebingen.ps.gz">
+Can support vector machines become 
+a major classification method ? 
+</A>
+
+
+<p><li>My data are unbalanced. Could libsvm handle such problems ?<p>
+Yes, there is a -wi options. For example, if you use
+<p>
+ svm-train -s 0 -c 10 -w1 1 -w-1 5 data_file
+<p>
+the penalty for class "-1" is larger.
+
+<p><li>What is the difference between nu-SVC and C-SVC ?
+<p>
+Basically they are the same thing but with different
+parameters. The range of C is from zero to infinity
+but nu is always between [0,1]. A nice property
+of nu is that it is related to the ratio of 
+support vectors and the ratio of the training
+error.
+
+
+
+<p><li>The program keeps running without showing
+any output. What should I do ?
+<p>
+You may want to check your data. Each training/testing
+data must be in one line. It cannot be separated.
+In addition, you have to remove empty lines.
+
+<p><li>The program keeps running (with output, i.e. many dots).
+What should I do ?
+<p>
+In theory libsvm guarantees to converge if the kernel
+matrix is positive semidefinite. 
+Hence, this may mean
+that you are using the signomidal kernel where
+for some parameters the kernel matrix is not Positive Semi Definite.
+
+<p><li>The training time is too long. What should I do ?
+<p>
+This may happen for some difficult cases (e.g. -c is large).
+You can try to use a looser stopping tolerance with -e.
+If that still doesn't work, you may want to contact us. We can show you some
+tricks on improving the training time.
+
+<p><li>I want to know the value of the decision function. How do I get it ?
+<p>
+We print out decision values for regression. For classification,
+as we have to solve several binary SVMs for multi-class cases,
+we do not print out them. 
+However, you can easily modify the program for 
+printing them. Just add 
+<pre>
+       printf("%f ", sum);
+</pre>
+after the line
+<pre>
+       sum -= model->rho[p++];
+</pre>
+of the file svm.cpp.
+Note that
+for binary SVC, in the implementation,
+the class of the first training point is treated as y = +1 in the decision
+function.
+
+<p><li>For some problem sets if I use a large cache 
+(i.e. large -m) on a linux machine, why sometimes
+I get "segmentation fault ?"
+
+<p>
+This may happen only  when the cache is large, but each cached row is
+not large enough. <b>Note:</b> This problem is specific to 
+gnu C library which is used in linux.
+The solution is as follows:
+
+<p>
+In our program we have malloc() which uses two methods 
+to allocate memory from kernel. One is
+sbrk() and another is mmap(). sbrk is faster, but mmap 
+has a larger address
+space. So malloc uses mmap only if the wanted memory size is larger
+than some threshold (default 128k).
+In the case where each row is not large enough (#elements < 128k/sizeof(float)) but we need a large cache ,
+the address space for sbrk can be exhausted. The solution is to
+lower the threshold to force malloc to use mmap
+and increase the maximum number of chunks to allocate
+with mmap.
+
+<p>
+Therefore, in the main program (i.e. svm-train.c) you want
+to have
+<pre>
+      #include &lt;malloc.h&gt;
+</pre>
+and then in main():
+<pre>
+      mallopt(M_MMAP_THRESHOLD, 32768);
+      mallopt(M_MMAP_MAX,1000000);
+</pre>
+You can also set the environment variables instead
+of writing thems in the program:
+<pre>
+$ M_MMAP_MAX=1000000 M_MMAP_THRESHOLD=32768 ./svm-train .....
+</pre>
+More information can be found by 
+<pre>
+$ info libc "Malloc Tunable Parameters"
+</pre>
+<p><li>Now for different classes I can assign weights. 
+What if I want to give weights to different data ?
+<p>
+Please contact us so we can give you our preliminary
+code.
+<p><li>How do I disable screen output of svm-train and svm-predict ?
+<p>
+Simply update svm.cpp:
+<pre>
+#if 1
+void info(char *fmt,...)
+</pre>
+to
+<pre>
+#if 0
+void info(char *fmt,...)
+</pre>
+
+<p><li>I would like to use my own kernel but find out that
+there are two subtourines for kernel 
+evaluations: k_function() and kernel_function(). Which one
+should I modify ?
+<p>
+The reason why we have two functions is as follows:
+For the RBF kernel exp(-g |xi - xj|^2), if we calculate
+xi - xj first and then the norm square, there are 3n operations.
+Thus we consider exp(-g (|xi|^2 - 2dot(xi,xj) +|xj|^2))
+and by calculating all |xi|^2 in the beginning, 
+the number of operations is reduced to 2n.
+This is for the training.  For prediction we cannot
+do this so a regular subrouting using that 3n operations is
+needed.
+
+The easiest way to have your own kernel is
+to  put the same code in these two
+subourines by replacing any kernel.
+
+<p><li>What method does libsvm use for mulsit-class SVM ?
+<p>
+It is one-against-one. We chose it after doing the following
+comparison:
+C.-W. Hsu and C.-J. Lin.
+<A HREF="http://www.csie.ntu.edu.tw/~cjlin/papers/multisvm.ps.gz">
+A comparison of methods 
+for multi-class support vector machines
+</A>, 
+<I>IEEE Transactions on Neural Networks</A></I>, 13(2002), 415-425.
+
+<p><li>I would like to calculate the radius of the smallest
+sphere containing all data. How should I do it ?
+<p>
+It is very easy to modify the code for doing this.
+However, to keep the code simple, we do not include
+this in the package. Please email me about the details.
+
+
+
+<p><li> After doing cross validation, why there is no
+model file outputed ?
+<p>
+Cross validation is used for selecting good parameters.
+After finding them, you want to re-train the whole
+data without the -v option.
+
+<p><li> I would like to solve L2-SVM (i.e., error term is 
+quadratic). How should I modify the code ?
+<p>
+It is extremely easy. Taking c-svc for example, only two 
+places of svm.cpp have to be changed. 
+First, modify the following line of 
+solve_c_svc from 
+<pre>
+	s.Solve(l, SVC_Q(*prob,*param,y), minus_ones, y,
+		alpha, Cp, Cn, param->eps, si, param->shrinking, param->cal_partial, param->gamma);
+</pre>
+to
+<pre>
+	s.Solve(l, SVC_Q(*prob,*param,y), minus_ones, y,
+		alpha, INF, INF, param->eps, si, param->shrinking, param->cal_partial, param->gamma);
+</pre>
+Second, in  the class  of SVC_Q, declair C as 
+a private variable:
+<pre>
+	double C;
+</pre> 
+In the constructor we assign it to param.C:
+<pre>
+        this->C = param.C;		
+</pre>
+Than in the the subroutine get_Q, after the for loop, add
+<pre>
+        if(i >= start && i < len) 
+		data[i] += 1/param.C;
+</pre>
+
+</ul>
+<hr>
+<h3>Graphic Interface</h3>
+<ul>
+<p><li>How can I save images drawn by svm-toy? <p>
+For Microsoft windows, first press the "print screen" key on the keyboard.
+Open "Microsoft Paint" 
+(included in Windows) 
+and press "ctrl-v." Then you can clip
+the part of picture which you want.
+For X windows, you can 
+use the program "xv" to grab the picture of the svm-toy window.
+
+<p><li>I press the "load" button to load data points but why
+svm-toy does not draw them ?
+<p>
+The program svm-toy assumes both attributes (i.e. x-axis and y-axis
+values) are in (0,1). Hence you want to scale your 
+data to between a small positive number and 
+a number less than but very close to 1.
+<p><li>
+I would like svm-toy to handle more than three classes of
+data, what should I do ?
+<p>
+Taking windows/svm-toy.cpp as an example, you need to
+modify it and  the difference
+from the original file is as the following: (for five classes of
+data)
+<pre>
+30,32c30
+< 	RGB(200,0,200),
+< 	RGB(0,160,0),
+< 	RGB(160,0,0)
+---
+> 	RGB(200,0,200)
+39c37
+< HBRUSH brush1, brush2, brush3, brush4, brush5;
+---
+> HBRUSH brush1, brush2, brush3;
+113,114d110
+< 	brush4 = CreateSolidBrush(colors[7]);
+< 	brush5 = CreateSolidBrush(colors[8]);
+155,157c151
+< 	else if(v==3) return brush3;
+< 	else if(v==4) return brush4;
+< 	else return brush5;
+---
+> 	else return brush3;
+325d318
+< 	  int colornum = 5;
+327c320
+< 		svm_node *x_space = new svm_node[colornum * prob.l];
+---
+> 		svm_node *x_space = new svm_node[3 * prob.l];
+333,338c326,331
+< 			x_space[colornum * i].index = 1;
+< 			x_space[colornum * i].value = q->x;
+< 			x_space[colornum * i + 1].index = 2;
+< 			x_space[colornum * i + 1].value = q->y;
+< 			x_space[colornum * i + 2].index = -1;
+< 			prob.x[i] = &x_space[colornum * i];
+---
+> 			x_space[3 * i].index = 1;
+> 			x_space[3 * i].value = q->x;
+> 			x_space[3 * i + 1].index = 2;
+> 			x_space[3 * i + 1].value = q->y;
+> 			x_space[3 * i + 2].index = -1;
+> 			prob.x[i] = &x_space[3 * i];
+397c390
+< 				if(current_value > 5) current_value = 1;
+---
+> 				if(current_value > 3) current_value = 1;
+</pre>
+</ul>
+<hr>
+<h3>Java version of libsvm</h3>
+<ul>
+<p><li>What is the difference between Java version and C++
+version of libsvm ?
+<p>
+They are the same thing. We just rewrote the C++ code
+in Java.
+<p><li>Is the Java version significantly slower than the
+C++ version?
+<p>
+This depends on the VM you used. We have seen good
+VM which leads the Java version to be quite competitive with
+the C++ code. (though still slower)
+<p><li> While training I get the following error 
+message: java.lang.OutOfMemoryError. What is wrong ?
+<p>
+You should try to increase the maximum Java heap size.
+For example,
+<pre>
+java -Xmx256m svm_train.java ...
+</pre>
+sets the maximum heap size to 256M.
+</ul>
+<hr>
+<h3>Python Interface</h3>
+<ul>
+<!--
+<p><li> I include libsvm-python interface in my scripts but
+get "segmentation fault" ?
+<p>
+There are two bugs in svm.py (version 2.35). 
+Please manually correct them before we release the new version.
+First, please add 
+<pre>
+            self.prob = prob
+</pre>
+after the line
+<pre>
+            prob,param = arg1,arg2
+</pre>
+in svm.py
+
+<p>
+Second, please 
+move the first line 
+of svm_parameter.__del__ to the last, so
+the function becomes:
+<pre>	
+	def __del__(self):
+                _free_int_array(self.weight_label)
+                _free_double_array(self.weight)
+                svmc.delete_svm_parameter(self.param)
+</pre>
+-->
+<p><li>Using python on MS windows, it fails to load the dll file.
+<p>
+It seems the dll file is version dependent. So far we haven't
+found out a good solution. Please email us if you have any
+good suggestions.
+
+<p><li> How to modify the python interface on MS windows
+and rebuild the dll file ?
+<p>
+
+To modify the interface, follow the instructions given in
+<a href=http://www.swig.org/Doc1.1/HTML/Python.html#n2>
+http://www.swig.org/Doc1.1/HTML/Python.html#n2</a>
+
+<p>
+If you just want to build DLL for a different python version,
+you need only
+Visual C++ and but not SWIG:
+<ol>
+<li> Create a Win32 DLL project and set (Build->Active Configuration) to "Release."
+<li> Add svm.cpp, svmc_wrap.c, python21.lib to your project.
+<li> Add the directories containing Python.h and svm.h to
+the Additional include directories. (in Project
+Settings->C/C++->Preprocessor)
+<li> add __WIN32__ to Preprocessor definitions
+<li> Make sure that in the "General" category of
+Project->Settings->Settings For "Win32 Release", Output
+directories should be "Release"
+<li> Build the DLL.
+</ol>
+<!--
+There do exist work arounds, however. In
+http://aspn.activestate.com/ASPN/Mail/Message/python-list/983252
+they presented a solution: 1) find the version of python in the
+registry 2) perform LoadLibrary("pythonxx.dll") and 3) resolve the
+reference to functions through GetProcAddress. It is said that SWIG
+may help on this.
+http://mailman.cs.uchicago.edu/pipermail/swig/2001-July/002744.html
+presented a similar example.
+-->
+<p><li>Except the python-C++ interface provided, could I use Jython to call libsvm ?
+<p> Yes, an example is <a href=http://www.csie.ntu.edu.tw/~cjlin/libsvm/jython>here</a>
+</ul>
+  </body>
+</html>
