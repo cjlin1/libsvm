@@ -1673,7 +1673,7 @@ void multiclass_probability(int k, double **r, double *p)
 	int iter = 0, max_iter=100;
 	double **Q=Malloc(double *,k);
 	double *Qp=Malloc(double,k);
-	double pQp, eps=0.001/k;
+	double pQp, eps=0.005/k;
 	
 	for (t=0;t<k;t++)
 	{
