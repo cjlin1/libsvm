@@ -1523,7 +1523,7 @@ struct svm_model
 	svm_node **SV;		// SVs (SV[l])
 	double **sv_coef;	// coefficients for SVs in decision functions (sv_coef[n-1][l])
 	double *rho;		// constants in decision functions (rho[n*(n-1)/2])
-	double *probA;
+	double *probA;          // pariwise probability information
 	double *probB;
 
 	// for classification only
@@ -1811,14 +1811,15 @@ void svm_binary_svc_probability(
 	free(perm);
 }
 
-void svm_svr_probability(
-	const svm_problem *prob, const svm_parameter *param, double& mae)
+// Return parameter of a Laplace distribution 
+double svm_svr_probability(
+	const svm_problem *prob, const svm_parameter *param)
 {
 	int i;
 	int nr_fold = 5;
 	double *ymv = Malloc(double,prob->l);
+	double mae = 0;
 
-	mae = 0;
 	svm_parameter newparam = *param;
 	newparam.probability = 0;
 	svm_cross_validation(prob,&newparam,nr_fold,ymv);
@@ -1839,6 +1840,7 @@ void svm_svr_probability(
 	mae /= (prob->l-count);
 	info("Prob. model for test data: target value = predicted value + z,\nz: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma= %g\n",mae);
 	free(ymv);
+	return mae;
 }
 
 //
@@ -1866,7 +1868,7 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 		    param->svm_type == NU_SVR))
 		{
 			model->probA = Malloc(double,1);
-			svm_svr_probability(prob,param,model->probA[0]);
+			model->probA[0] = svm_svr_probability(prob,param);
 		}
 
 		decision_function f = svm_train_one(prob,param,0,0);
@@ -2029,8 +2031,13 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 
 		if(param->probability)
 		{
-			model->probA=probA;
-			model->probB=probB;
+			model->probA = Malloc(double,nr_class);
+			model->probB = Malloc(double,nr_class);
+			for(i=0;i<nr_class;i++)
+			{
+				model->probA[i] = probA[i];
+				model->probB[i] = probB[i];
+			}
 		}
 		else
 		{
@@ -2097,6 +2104,8 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 			}
 		
 		free(label);
+		free(probA);
+		free(probB);
 		free(count);
 		free(index);
 		free(start);
@@ -2333,7 +2342,6 @@ double svm_predict_probability(
 	else 
 		return svm_predict(model, x);
 }
-
 
 const char *svm_type_table[] =
 {
@@ -2691,7 +2699,7 @@ const char *svm_check_parameter(const svm_problem *prob, const svm_parameter *pa
 
 	if(param->probability != 0 &&
 	   param->probability != 1)
-		return "shrinking != 0 and shrinking != 1";
+		return "probability != 0 and probability != 1";
 
 
 	// check whether nu-svc is feasible

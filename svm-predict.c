@@ -10,7 +10,7 @@ struct svm_node *x;
 int max_nr_attr = 64;
 
 struct svm_model* model;
-int predict_prob=0;
+int predict_probability=0;
 
 void predict(FILE *input, FILE *output)
 {
@@ -24,13 +24,10 @@ void predict(FILE *input, FILE *output)
 	int *labels=(int *) malloc(nr_class*sizeof(int));
 	double *prob_estimates=NULL;
 
-	if(predict_prob)
+	if(predict_probability)
 	{
 		if (svm_type==NU_SVR || svm_type==EPSILON_SVR)
-		{
-			prob_estimates = (double *) malloc(sizeof(double));
 			printf("Prob. model for test data: target value = predicted value + z,\nz: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma=%g\n",svm_get_svr_probability(model));
-		}
 		else
 		{
 			svm_get_labels(model,labels);
@@ -71,7 +68,7 @@ void predict(FILE *input, FILE *output)
 out2:
 		x[i++].index = -1;
 
-		if (predict_prob && (svm_type==C_SVC || svm_type==NU_SVC))
+		if (predict_probability && (svm_type==C_SVC || svm_type==NU_SVC))
 		{
 			v = svm_predict_probability(model,x,prob_estimates);
 			fprintf(output,"%g ",v);
@@ -102,7 +99,7 @@ out2:
 		((total*sumvy-sumv*sumy)*(total*sumvy-sumv*sumy))/
 		((total*sumvv-sumv*sumv)*(total*sumyy-sumy*sumy))
 		);
-	if(predict_prob)
+	if(predict_probability)
 	{
 		free(prob_estimates);
 		free(labels);
@@ -122,7 +119,7 @@ void exit_with_help()
 int main(int argc, char **argv)
 {
 	FILE *input, *output;
-	int i=0;
+	int i;
 
 	// parse options
 	for(i=1;i<argc;i++)
@@ -132,7 +129,7 @@ int main(int argc, char **argv)
 		switch(argv[i-1][1])
 		{
 			case 'b':
-				predict_prob = atoi(argv[i]);
+				predict_probability = atoi(argv[i]);
 				break;
 			default:
 				fprintf(stderr,"unknown option\n");
@@ -162,11 +159,11 @@ int main(int argc, char **argv)
 	
 	line = (char *) malloc(max_line_len*sizeof(char));
 	x = (struct svm_node *) malloc(max_nr_attr*sizeof(struct svm_node));
-	if(predict_prob)
+	if(predict_probability)
 		if(svm_check_probability_model(model)==0)
 		{
 			fprintf(stderr,"model does not support probabiliy estimates\n");
-			predict_prob=0;
+			predict_probability=0;
 		}
 	predict(input,output);
 	svm_destroy_model(model);
