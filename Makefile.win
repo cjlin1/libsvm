@@ -3,8 +3,8 @@
 #Under dosbox prompt
 #nmake -f Makefile.win
 
-PYTHON_INC = c:\python23\include
-PYTHON_LIB = c:\python23\libs\python23.lib
+PYTHON_INC = c:\python24\include
+PYTHON_LIB = c:\python24\libs\python24.lib
 ##########################################
 CXXC = cl.exe
 CFLAGS = -nologo -O2 -GX -I. -D __WIN32__
