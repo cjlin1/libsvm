@@ -723,7 +723,7 @@ int Solver::select_working_set(int &out_i, int &out_j)
 		{
 			if(!is_upper_bound(i))	// d = +1
 			{
-				if(-G[i] > Gmax1)
+				if(-G[i] >= Gmax1)
 				{
 					Gmax1 = -G[i];
 					Gmax1_idx = i;
@@ -731,7 +731,7 @@ int Solver::select_working_set(int &out_i, int &out_j)
 			}
 			if(!is_lower_bound(i))	// d = -1
 			{
-				if(G[i] > Gmax2)
+				if(G[i] >= Gmax2)
 				{
 					Gmax2 = G[i];
 					Gmax2_idx = i;
@@ -742,7 +742,7 @@ int Solver::select_working_set(int &out_i, int &out_j)
 		{
 			if(!is_upper_bound(i))	// d = +1
 			{
-				if(-G[i] > Gmax2)
+				if(-G[i] >= Gmax2)
 				{
 					Gmax2 = -G[i];
 					Gmax2_idx = i;
@@ -750,7 +750,7 @@ int Solver::select_working_set(int &out_i, int &out_j)
 			}
 			if(!is_lower_bound(i))	// d = -1
 			{
-				if(G[i] > Gmax1)
+				if(G[i] >= Gmax1)
 				{
 					Gmax1 = G[i];
 					Gmax1_idx = i;
@@ -919,7 +919,7 @@ int Solver_NU::select_working_set(int &out_i, int &out_j)
 		{
 			if(!is_upper_bound(i))	// d = +1
 			{
-				if(-G[i] > Gmax1)
+				if(-G[i] >= Gmax1)
 				{
 					Gmax1 = -G[i];
 					Gmax1_idx = i;
@@ -927,7 +927,7 @@ int Solver_NU::select_working_set(int &out_i, int &out_j)
 			}
 			if(!is_lower_bound(i))	// d = -1
 			{
-				if(G[i] > Gmax2)
+				if(G[i] >= Gmax2)
 				{
 					Gmax2 = G[i];
 					Gmax2_idx = i;
@@ -938,7 +938,7 @@ int Solver_NU::select_working_set(int &out_i, int &out_j)
 		{
 			if(!is_upper_bound(i))	// d = +1
 			{
-				if(-G[i] > Gmax3)
+				if(-G[i] >= Gmax3)
 				{
 					Gmax3 = -G[i];
 					Gmax3_idx = i;
@@ -946,7 +946,7 @@ int Solver_NU::select_working_set(int &out_i, int &out_j)
 			}
 			if(!is_lower_bound(i))	// d = -1
 			{
-				if(G[i] > Gmax4)
+				if(G[i] >= Gmax4)
 				{
 					Gmax4 = G[i];
 					Gmax4_idx = i;
