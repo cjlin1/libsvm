@@ -118,7 +118,10 @@ When the build process completes, a shared object called svmc.so will be
 created.
 
 For win32 systems, the shared library svmc.dll is ready in the
-directory windows/python. You need to copy it to this directory.
+directory windows/python. You need to copy it to this directory.  The
+dll file depends on different versions of python, so you may have to
+re-make it by following the instruction of building windows binaries
+in libsvm README.
 
 Usage
 =====
