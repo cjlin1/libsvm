@@ -165,7 +165,7 @@ int main(int argc,char **argv)
 	if(restore_filename)
 	{
 		FILE *fp = fopen(restore_filename,"r");
-		int idx;
+		int idx, c;
 		double fmin, fmax;
 		
 		if(fp==NULL)
@@ -173,13 +173,24 @@ int main(int argc,char **argv)
 			fprintf(stderr,"can't open file %s\n", restore_filename);
 			exit(1);
 		}
-		fscanf(fp, "%lf %lf\n", &lower, &upper);
-		while(fscanf(fp,"%d %lf %lf\n",&idx,&fmin,&fmax)==3)
+		if((c = fgetc(fp)) == 'y')
 		{
-			if(idx<=max_index)
+			fscanf(fp, "%lf %lf\n", &y_lower, &y_upper);
+			fscanf(fp, "%lf %lf\n", &y_min, &y_max);
+			y_scaling = 1;
+		}
+		else
+			ungetc(c, fp);
+
+		if (fgetc(fp) == 'x') {
+			fscanf(fp, "%lf %lf\n", &lower, &upper);
+			while(fscanf(fp,"%d %lf %lf\n",&idx,&fmin,&fmax)==3)
 			{
-				feature_min[idx] = fmin;
-				feature_max[idx] = fmax;
+				if(idx<=max_index)
+				{
+					feature_min[idx] = fmin;
+					feature_max[idx] = fmax;
+				}
 			}
 		}
 		fclose(fp);
@@ -193,6 +204,13 @@ int main(int argc,char **argv)
 			fprintf(stderr,"can't open file %s\n", save_filename);
 			exit(1);
 		}
+		if(y_scaling)
+		{
+			fprintf(fp, "y\n");
+			fprintf(fp, "%.16g %.16g\n", y_lower, y_upper);
+			fprintf(fp, "%.16g %.16g\n", y_min, y_max);
+		}
+		fprintf(fp, "x\n");
 		fprintf(fp, "%.16g %.16g\n", lower, upper);
 		for(i=1;i<=max_index;i++)
 		{
