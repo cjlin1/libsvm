@@ -21,7 +21,7 @@ template <class S, class T> inline void clone(T*& dst, S* src, int n)
 	memcpy((void *)dst,(void *)src,sizeof(T)*n);
 }
 #define INF HUGE_VAL
-#define TAU 10e-12
+#define TAU 1e-12
 #define Malloc(type,n) (type *)malloc((n)*sizeof(type))
 #if 1
 void info(char *fmt,...)

@@ -1,7 +1,7 @@
 define(`swap',`do {$1 _=$2; $2=$3; $3=_;} while(false)')
 define(`Qfloat',`float')
 define(`SIZE_OF_QFLOAT',4)
-define(`TAU',10e-12)
+define(`TAU',1e-12)
 package libsvm;
 import java.io.*;
 import java.util.*;
