@@ -1,5 +1,5 @@
 CXXC = g++
-CFLAGS = -Wall -O3 -g
+CFLAGS = -Wall -O3 
 
 all: svm-train svm-predict svm-scale
 
