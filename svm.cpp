@@ -1669,7 +1669,7 @@ double sigmoid_predict(double decision_value, double A, double B)
 // Method 2 from the multiclass_prob paper by Wu, Lin, and Weng
 void multiclass_probability(int k, double **r, double *p)
 {
-	int t;
+	int t,j;
 	int iter = 0, max_iter=100;
 	double **Q=Malloc(double *,k);
 	double *Qp=Malloc(double,k);
@@ -1680,12 +1680,13 @@ void multiclass_probability(int k, double **r, double *p)
 		p[t]=1.0/k;  // Valid if k = 1
 		Q[t]=Malloc(double,k);
 		Q[t][t]=0;
-		for (int j=0;j<t;j++)
+		int j;
+		for (j=0;j<t;j++)
 		{
 			Q[t][t]+=r[j][t]*r[j][t];
 			Q[t][j]=Q[j][t];
 		}
-		for (int j=t+1;j<k;j++)
+		for (j=t+1;j<k;j++)
 		{
 			Q[t][t]+=r[j][t]*r[j][t];
 			Q[t][j]=-r[j][t]*r[t][j];
@@ -1716,7 +1717,7 @@ void multiclass_probability(int k, double **r, double *p)
 			double diff=(-Qp[t]+pQp)/Q[t][t];
 			p[t]+=diff;
 			pQp=(pQp+diff*(diff*Q[t][t]+2*Qp[t]))/(1+diff)/(1+diff);
-			for (int j=0;j<k;j++)
+			for (j=0;j<k;j++)
 			{
 				Qp[j]=(Qp[j]+diff*Q[t][j])/(1+diff);
 				p[j]/=(1+diff);
