@@ -1,7 +1,7 @@
 CC = g++
 SWIG ?= swig
 PYTHON_INCLUDEDIR ?= /usr/include/python2.2
-CFLAGS = -O2 -I$(PYTHON_INCLUDEDIR) -I..
+CFLAGS = -O3 -I$(PYTHON_INCLUDEDIR) -I..
 LDFLAGS = -shared
 
 all: svmc.so
@@ -13,7 +13,7 @@ svmc_wrap.o: svmc_wrap.c ../svm.h
 	$(CC) $(CFLAGS) -c svmc_wrap.c
 
 svmc_wrap.c: svmc.i
-	$(SWIG) -python svmc.i
+	$(SWIG) -python -dnone svmc.i
 
 ../svm.o:	
 	cd ..; make svm.o
