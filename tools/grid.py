@@ -289,7 +289,7 @@ def main():
     # will only be updated in the end
 
     def _put(self,item):
-        if sys.hexversion >= 0x020400F0:
+        if sys.hexversion >= 0x020400A1:
             self.queue.appendleft(item)
         else:
             self.queue.insert(0,item)
