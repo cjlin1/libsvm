@@ -1858,7 +1858,7 @@ double svm_predict(const svm_model *model, const svm_node *x)
 	{
 		int i;
 		int nr_class = model->nr_class;
-		double *dec_values = Malloc(double, nr_class * (nr_class - 1) / 2);
+		double *dec_values = Malloc(double, nr_class*(nr_class-1)/2);
 		svm_predict_values(model, x, dec_values);
 
 		int *vote = Malloc(int,nr_class);
