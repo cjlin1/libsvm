@@ -25,7 +25,7 @@ os.system(cmd)
 
 cmd = "./grid.py %s" % (scaled_file)
 print 'Cross validation...'
-dummy, f, dummy = os.popen3(cmd)
+dummy, f = os.popen2(cmd)
 
 line = ''
 while 1:
