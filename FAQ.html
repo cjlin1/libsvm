@@ -9,7 +9,7 @@
     <h1><a href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a> FAQ</h1>
 <!-- Created: Wed Apr 18 19:26:54 CST 2001 -->
 <!-- hhmts start -->
-Last modified: Wed Mar 31 10:49:17 CST 2004
+Last modified: Tue Apr 27 08:51:11 CST 2004
 <!-- hhmts end -->
 
 <hr>
@@ -116,6 +116,17 @@ On the other hand, for "svm-train" and "svm-predict"
 you want to choose "Win32 Console Application."
 After libsvm 2.5, you can also use the file Makefile.win.
 See details in README.
+
+
+<p>
+If you are not using Makefile.win and see the following 
+link error
+<pre>
+LIBCMTD.lib(wwincrt0.obj) : error LNK2001: unresolved external symbol
+_wWinMain@16
+</pre>
+you may have selected a wrong project type.
+
 
 <p><li>
 I am an MS windows user but why
@@ -224,7 +235,6 @@ For example, if there are 4 classes, the file looks like:
 +-+-+-+--------------------+
 </pre>
 
-
 <p><li> Should I use float or double to store numbers in the cache ?<p>
 We have float as the default as you can store more numbers
 in the cache. 
@@ -329,9 +339,9 @@ directory find
 out good parameters. To see the importance of model selection,
 please 
 see my  talk:
-<A HREF="http://www.csie.ntu.edu.tw/~cjlin/talks/tuebingen.ps.gz">
-Can support vector machines become 
-a major classification method ? 
+<A HREF="http://www.csie.ntu.edu.tw/~cjlin/talks/freiburg.pdf">
+A practical guide to support vector 
+classification 
 </A>
 
 
@@ -486,6 +496,7 @@ to  put the same code in these two
 subroutines by replacing any kernel.
 
 <p><li>What method does libsvm use for multi-class SVM ?
+Why don't you use the "1-against-the rest" method ?
 <p>
 It is one-against-one. We chose it after doing the following
 comparison:
@@ -496,6 +507,10 @@ for multi-class support vector machines
 </A>, 
 <I>IEEE Transactions on Neural Networks</A></I>, 13(2002), 415-425.
 
+<p>
+"1-against-the rest" is a good method whose performance
+is comparable to "1-against-1." We do the latter
+simply because its training time is shorter.
 
 <p><li> After doing cross validation, why there is no
 model file outputted ?
@@ -570,6 +585,18 @@ How do I choose parameters for one-class svm as training data are in only one cl
 You have pre-specified true positive rate in mind and then search for
 parameters which achieve similar cross-validation accuracy.
 
+
+<p><li> 
+Why training a probability model (i.e., -b 1) takes
+longer time ?
+<p>
+To construct this probability model, we internaly conduct a 
+cross validation, which is more time consuming than
+a regular training.
+Hence, in general you do parameter selection first without
+-b 1. You only use -b 1 when good parameters have been
+selected. In other words, you avoid using -b 1 and -v
+together.
 </ul>
 <hr>
 <h3>Graphic Interface</h3>
