@@ -108,6 +108,7 @@ private slots:
 		param.eps = 1e-3;
 		param.p = 0.1;
 		param.shrinking = 1;
+		param.probability = 0;
 		param.nr_weight = 0;
 		param.weight_label = NULL;
 		param.weight = NULL;
@@ -156,6 +157,9 @@ private slots:
 					break;
 				case 'h':
 					param.shrinking = atoi(p);
+					break;
+			        case 'b':
+					param.probability = atoi(p);
 					break;
 				case 'w':
 					++param.nr_weight;

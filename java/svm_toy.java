@@ -171,6 +171,7 @@ public class svm_toy extends Applet {
 		param.eps = 1e-3;
 		param.p = 0.1;
 		param.shrinking = 1;
+		param.probability = 0;
 		param.nr_weight = 0;
 		param.weight_label = new int[0];
 		param.weight = new double[0];
@@ -219,6 +220,9 @@ public class svm_toy extends Applet {
 					break;
 				case 'h':
 					param.shrinking = atoi(argv[i]);
+					break;
+				case 'b':
+					param.probability = atoi(argv[i]);
 					break;
 				case 'w':
 					++param.nr_weight;
