@@ -36,12 +36,13 @@ The format of training and testing data file is:
 .
 
 <label> is the target value of the training data. For classification,
-it should be an integer which identifies a class (multi-class classification
-is supported). For regression, it's any real number. For one-class SVM,
-it's not used so can be any number. <index> is an integer starting from 1,
-<value> is a real number. The labels in the testing data file are only used to
-calculate accuracy or error. If they are unknown, just fill this column with a
-number.
+it should be an integer which identifies a class (multi-class
+classification is supported). For regression, it's any real
+number. For one-class SVM, it's not used so can be any number. <index>
+is an integer starting from 1, <value> is a real number. The indices
+must be in an ascending order. The labels in the testing data file are
+only used to calculate accuracy or error. If they are unknown, just
+fill this column with a number.
 
 There is a sample data for classification in this package:
 heart_scale.
