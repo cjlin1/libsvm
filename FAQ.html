@@ -9,7 +9,7 @@
     <h1><a href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a> FAQ</h1>
 <!-- Created: Wed Apr 18 19:26:54 CST 2001 -->
 <!-- hhmts start -->
-Last modified: Sat Nov 15 10:42:38 CST 2003
+Last modified: Sat Nov 22 00:00:11 CST 2003
 <!-- hhmts end -->
 
 <hr>
@@ -385,25 +385,28 @@ tricks on improving the training time.
 We print out decision values for regression. For classification,
 we solve several binary SVMs for multi-class cases, so 
 you obtain values by easily calling the subroutine
-svm_predict_values. Details are in 
+svm_predict_values. Their corresponding labels
+can be obtained from svm_get_labels. 
+Details are in 
 README of libsvm package. 
 
 <p>
-We do not recommend the following, but if you would
-like to get the value for 
-TWO-class classification in the easiest way, simply add 
+We do not recommend the following. But if you would
+like to get values for 
+TWO-class classification with labels +1 and -1
+(note: +1 and -1 but not things like 5 and 10)
+in the easiest way, simply add 
 <pre>
-		printf("%f\n", dec_values[0]);
+		printf("%f\n", dec_values[0]*model->label[0]);
 </pre>
 after the line
 <pre>
 		svm_predict_values(model, x, dec_values);
 </pre>
 of the file svm.cpp.
-Note that
-for two-class SVC, in the implementation,
-the class of the first training point is treated as y = +1 in the decision
-function.
+Positive (negative)
+decision values correspond to data predicted as +1 (-1).
+
 
 <p><li>For some problem sets if I use a large cache 
 (i.e. large -m) on a linux machine, why sometimes
