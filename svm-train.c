@@ -147,7 +147,8 @@ void parse_command_line(int argc, char **argv, char *input_file_name, char *mode
 	for(i=1;i<argc;i++)
 	{
 		if(argv[i][0] != '-') break;
-		++i;
+		if(++i>=argc)
+			exit_with_help();
 		switch(argv[i-1][1])
 		{
 			case 's':

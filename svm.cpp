@@ -816,9 +816,7 @@ int Solver::select_working_set(int &out_i, int &out_j)
 // return 1 if already optimal, return 0 otherwise
 int Solver::max_violating_pair(int &out_i, int &out_j)
 {
-	// return i,j which maximize -grad(f)^T d , under constraint
-	// if alpha_i == C, d <= 0
-	// if alpha_i == 0, d >= 0
+	// return i,j: maximal violating pair
 
 	double Gmax1 = -INF;		// max { -y_i * grad(f)_i | i in I_up(\alpha) }
 	int Gmax1_idx = -1;
