@@ -463,7 +463,7 @@ Building Windows Binaries
 Windows binaries are in the directory `windows'. To build them via
 Visual C++, use the following steps:
 
-1. Open a dos command box and change to libsvm directory.  If
+1. Open a dos command box and change to libsvm directory. If
 environment variables of VC++ have not been set, type
 
 "C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\bin\vcvars32.bat"
