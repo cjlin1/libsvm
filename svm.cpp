@@ -486,7 +486,7 @@ void Solver::Solve(int l, const QMatrix& Q, const double *b_, const schar *y_,
 		for(i=0;i<l;i++)
 			if(!is_lower_bound(i))
 			{
-				Qfloat *Q_i = Q.get_Q(i,l);
+				const Qfloat *Q_i = Q.get_Q(i,l);
 				double alpha_i = alpha[i];
 				int j;
 				for(j=0;j<l;j++)
