@@ -1,6 +1,7 @@
 define(`swap',`do {$1 _=$2; $2=$3; $3=_;} while(false)')
 define(`Qfloat',`float')
 define(`SIZE_OF_QFLOAT',4)
+define(`TAU',10e-12)
 package libsvm;
 import java.io.*;
 import java.util.*;
@@ -127,6 +128,7 @@ class Cache {
 //
 abstract class QMatrix {
 	abstract Qfloat[] get_Q(int column, int len);
+	abstract Qfloat[] get_QD();
 	abstract void swap_index(int i, int j);
 };
 
@@ -141,6 +143,7 @@ abstract class Kernel extends QMatrix {
 	private final double coef0;
 
 	abstract Qfloat[] get_Q(int column, int len);
+	abstract Qfloat[] get_QD();
 
 	void swap_index(int i, int j)
 	{
@@ -296,6 +299,7 @@ class Solver {
 	byte[] alpha_status;	// LOWER_BOUND, UPPER_BOUND, FREE
 	double[] alpha;
 	QMatrix Q;
+	Qfloat[] QD;
 	double eps;
 	double Cp,Cn;
 	double[] b;
@@ -369,6 +373,7 @@ class Solver {
 	{
 		this.l = l;
 		this.Q = Q;
+		QD = Q.get_QD();
 		b = (double[])b_.clone();
 		y = (byte[])y_.clone();
 		alpha = (double[])alpha_.clone();
@@ -464,7 +469,10 @@ class Solver {
 
 			if(y[i]!=y[j])
 			{
-				double delta = (-G[i]-G[j])/Math.max(Q_i[i]+Q_j[j]+2*Q_i[j],(Qfloat)0);
+				double quad_coef = Q_i[i]+Q_j[j]+2*Q_i[j];
+				if (quad_coef <= 0)
+					quad_coef = TAU;
+				double delta = (-G[i]-G[j])/quad_coef;
 				double diff = alpha[i] - alpha[j];
 				alpha[i] += delta;
 				alpha[j] += delta;
@@ -504,10 +512,14 @@ class Solver {
 			}
 			else
 			{
-				double delta = (G[i]-G[j])/Math.max(Q_i[i]+Q_j[j]-2*Q_i[j],(Qfloat)0);
+				double quad_coef = Q_i[i]+Q_j[j]-2*Q_i[j];
+				if (quad_coef <= 0)
+					quad_coef = TAU;
+				double delta = (G[i]-G[j])/quad_coef;
 				double sum = alpha[i] + alpha[j];
 				alpha[i] -= delta;
 				alpha[j] += delta;
+
 				if(sum > C_i)
 				{
 					if(alpha[i] > C_i)
@@ -614,15 +626,110 @@ class Solver {
 	// return 1 if already optimal, return 0 otherwise
 	int select_working_set(int[] working_set)
 	{
+		// return i,j such that
+		// i: maximizes -y_i * grad(f)_i, i in I_up(\alpha)
+		// j: mimimizes the decrease of obj value
+		//    (if quadratic coefficeint <= 0, replace it with tau)
+		//    -y_j*grad(f)_j < -y_i*grad(f)_i, j in I_low(\alpha)
+		
+		double Gmax = -INF;
+		int Gmax_idx = -1;
+		int Gmin_idx = -1;
+		double obj_diff_min = INF;
+	
+		for(int t=0;t<active_size;t++)
+			if(y[t]==+1)	
+			{
+				if(!is_upper_bound(t))
+					if(-G[t] >= Gmax)
+					{
+						Gmax = -G[t];
+						Gmax_idx = t;
+					}
+			}
+			else
+			{
+				if(!is_lower_bound(t))
+					if(G[t] >= Gmax)
+					{
+						Gmax = G[t];
+						Gmax_idx = t;
+					}
+			}
+	
+		int i = Gmax_idx;
+		Qfloat[] Q_i = null;
+		if(i != -1) // null Q_i not accessed: Gmax=-INF if i=-1
+			Q_i = Q.get_Q(i,active_size);
+	
+		for(int j=0;j<active_size;j++)
+		{
+			if(y[j]==+1)
+			{
+				if (!is_lower_bound(j))
+				{
+					double grad_diff=Gmax+G[j];
+					if (grad_diff >= eps)
+					{
+						double obj_diff; 
+						double quad_coef=Q_i[i]+QD[j]-2*y[i]*Q_i[j];
+						if (quad_coef > 0)
+							obj_diff = -(grad_diff*grad_diff)/quad_coef;
+						else
+							obj_diff = -(grad_diff*grad_diff)/TAU;
+	
+						if (obj_diff <= obj_diff_min)
+						{
+							Gmin_idx=j;
+							obj_diff_min = obj_diff;
+						}
+					}
+				}
+			}
+			else
+			{
+				if (!is_upper_bound(j))
+				{
+					double grad_diff= Gmax-G[j];
+					if (grad_diff >= eps)
+					{
+						double obj_diff; 
+						double quad_coef=Q_i[i]+QD[j]+2*y[i]*Q_i[j];
+						if (quad_coef > 0)
+							obj_diff = -(grad_diff*grad_diff)/quad_coef;
+						else
+							obj_diff = -(grad_diff*grad_diff)/TAU;
+	
+						if (obj_diff <= obj_diff_min)
+						{
+							Gmin_idx=j;
+							obj_diff_min = obj_diff;
+						}
+					}
+				}
+			}
+		}
+	
+		if(Gmin_idx == -1)
+	 		return 1;
+	
+		working_set[0] = Gmax_idx;
+		working_set[1] = Gmin_idx;
+		return 0;
+	}
+
+	// return 1 if already optimal, return 0 otherwise
+	int max_violating_pair(int[] working_set)
+	{
 		// return i,j which maximize -grad(f)^T d , under constraint
 		// if alpha_i == C, d != +1
 		// if alpha_i == 0, d != -1
 
-		double Gmax1 = -INF;		// max { -grad(f)_i * d | y_i*d = +1 }
+		double Gmax1 = -INF;		// max { -y_i * grad(f)_i | i in I_up(\alpha) }
 		int Gmax1_idx = -1;
 
-		double Gmax2 = -INF;		// max { -grad(f)_i * d | y_i*d = -1 }
 		int Gmax2_idx = -1;
+		double Gmax2 = -INF;		// max { y_i * grad(f)_i | i in I_low(\alpha) }
 
 		for(int i=0;i<active_size;i++)
 		{
@@ -678,7 +785,7 @@ class Solver {
 	{
 		int i,j,k;
 		int[] working_set = new int[2];
-		if(select_working_set(working_set)!=0) return;
+		if(max_violating_pair(working_set)!=0) return;
 		i = working_set[0];
 		j = working_set[1];
 		double Gm1 = -y[j]*G[j];
@@ -801,89 +908,121 @@ final class Solver_NU extends Solver
 		super.Solve(l,Q,b,y,alpha,Cp,Cn,eps,si,shrinking);
 	}
 
+	// return 1 if already optimal, return 0 otherwise
 	int select_working_set(int[] working_set)
 	{
-		// return i,j which maximize -grad(f)^T d , under constraint
-		// if alpha_i == C, d != +1
-		// if alpha_i == 0, d != -1
-
-		double Gmax1 = -INF;	// max { -grad(f)_i * d | y_i = +1, d = +1 }
-		int Gmax1_idx = -1;
-
-		double Gmax2 = -INF;	// max { -grad(f)_i * d | y_i = +1, d = -1 }
-		int Gmax2_idx = -1;
-
-		double Gmax3 = -INF;	// max { -grad(f)_i * d | y_i = -1, d = +1 }
-		int Gmax3_idx = -1;
-
-		double Gmax4 = -INF;	// max { -grad(f)_i * d | y_i = -1, d = -1 }
-		int Gmax4_idx = -1;
-
-		for(int i=0;i<active_size;i++)
-		{
-			if(y[i]==+1)	// y == +1
+		// return i,j such that y_i = y_j and
+		// i: maximizes -y_i * grad(f)_i, i in I_up(\alpha)
+		// j: minimizes the decrease of obj value
+		//    (if quadratic coefficeint <= 0, replace it with tau)
+		//    -y_j*grad(f)_j < -y_i*grad(f)_i, j in I_low(\alpha)
+	
+		double Gmaxp = -INF;
+		int Gmaxp_idx = -1;
+	
+		double Gmaxn = -INF;
+		int Gmaxn_idx = -1;
+	
+		int Gmin_idx = -1;
+		double obj_diff_min = INF;
+	
+		for(int t=0;t<active_size;t++)
+			if(y[t]==+1)
 			{
-				if(!is_upper_bound(i))	// d = +1
-				{
-					if(-G[i] >= Gmax1)
+				if(!is_upper_bound(t))
+					if(-G[t] >= Gmaxp)
 					{
-						Gmax1 = -G[i];
-						Gmax1_idx = i;
+						Gmaxp = -G[t];
+						Gmaxp_idx = t;
 					}
-				}
-				if(!is_lower_bound(i))	// d = -1
-				{
-					if(G[i] >= Gmax2)
+			}
+			else
+			{
+				if(!is_lower_bound(t))
+					if(G[t] >= Gmaxn)
 					{
-						Gmax2 = G[i];
-						Gmax2_idx = i;
+						Gmaxn = G[t];
+						Gmaxn_idx = t;
+					}
+			}
+	
+		int ip = Gmaxp_idx;
+		int in = Gmaxn_idx;
+		Qfloat[] Q_ip = null;
+		Qfloat[] Q_in = null;
+		if(ip != -1) // null Q_ip not accessed: Gmaxp=-INF if ip=-1
+			Q_ip = Q.get_Q(ip,active_size);
+		if(in != -1)
+			Q_in = Q.get_Q(in,active_size);
+	
+		for(int j=0;j<active_size;j++)
+		{
+			if(y[j]==+1)
+			{
+				if (!is_lower_bound(j))	
+				{
+					double grad_diff=Gmaxp+G[j];
+					if (grad_diff >= eps)
+					{
+						double obj_diff; 
+						double quad_coef = Q_ip[ip]+QD[j]-2*Q_ip[j];
+						if (quad_coef > 0)
+							obj_diff = -(grad_diff*grad_diff)/quad_coef;
+						else
+							obj_diff = -(grad_diff*grad_diff)/TAU;
+	
+						if (obj_diff <= obj_diff_min)
+						{
+							Gmin_idx=j;
+							obj_diff_min = obj_diff;
+						}
 					}
 				}
 			}
-			else		// y == -1
+			else
 			{
-				if(!is_upper_bound(i))	// d = +1
+				if (!is_upper_bound(j))
 				{
-					if(-G[i] >= Gmax3)
+					double grad_diff=Gmaxn-G[j];
+					if (grad_diff >= eps)
 					{
-						Gmax3 = -G[i];
-						Gmax3_idx = i;
-					}
-				}
-				if(!is_lower_bound(i))	// d = -1
-				{
-					if(G[i] >= Gmax4)
-					{
-						Gmax4 = G[i];
-						Gmax4_idx = i;
+						double obj_diff; 
+						double quad_coef = Q_in[in]+QD[j]-2*Q_in[j];
+						if (quad_coef > 0)
+							obj_diff = -(grad_diff*grad_diff)/quad_coef;
+						else
+							obj_diff = -(grad_diff*grad_diff)/TAU;
+	
+						if (obj_diff <= obj_diff_min)
+						{
+							Gmin_idx=j;
+							obj_diff_min = obj_diff;
+						}
 					}
 				}
 			}
 		}
-
-		if(Math.max(Gmax1+Gmax2,Gmax3+Gmax4) < eps)
- 			return 1;
-
-		if(Gmax1+Gmax2 > Gmax3+Gmax4)
-		{
-			working_set[0] = Gmax1_idx;
-			working_set[1] = Gmax2_idx;
-		}
+	
+		if(Gmin_idx == -1)
+	 		return 1;
+	
+		if(y[Gmin_idx] == +1)
+			working_set[0] = Gmaxp_idx;
 		else
-		{
-			working_set[0] = Gmax3_idx;
-			working_set[1] = Gmax4_idx;
-		}
+			working_set[0] = Gmaxn_idx;
+		working_set[1] = Gmin_idx;
+	
 		return 0;
 	}
 
 	void do_shrinking()
 	{
-		double Gmax1 = -INF;	// max { -grad(f)_i * d | y_i = +1, d = +1 }
-		double Gmax2 = -INF;	// max { -grad(f)_i * d | y_i = +1, d = -1 }
-		double Gmax3 = -INF;	// max { -grad(f)_i * d | y_i = -1, d = +1 }
-		double Gmax4 = -INF;	// max { -grad(f)_i * d | y_i = -1, d = -1 }
-
+		double Gmax1 = -INF;	// max { -y_i * grad(f)_i | y_i = +1, i in I_up(\alpha) }
+		double Gmax2 = -INF;	// max { y_i * grad(f)_i | y_i = +1, i in I_low(\alpha) }
+		double Gmax3 = -INF;	// max { -y_i * grad(f)_i | y_i = -1, i in I_up(\alpha) }
+		double Gmax4 = -INF;	// max { y_i * grad(f)_i | y_i = -1, i in I_low(\alpha) }
+ 
+		// find maximal violating pair first
 		int k;
 		for(k=0;k<active_size;k++)
 		{
@@ -904,6 +1043,8 @@ final class Solver_NU extends Solver
 				else	if(G[k] > Gmax4) Gmax4 = G[k];
 			}
 		}
+
+		// shrinking
 
 		double Gm1 = -Gmax2;
 		double Gm2 = -Gmax1;
@@ -1026,12 +1167,16 @@ class SVC_Q extends Kernel
 {
 	private final byte[] y;
 	private final Cache cache;
+	private final Qfloat[] QD;
 
 	SVC_Q(svm_problem prob, svm_parameter param, byte[] y_)
 	{
 		super(prob.l, prob.x, param);
 		y = (byte[])y_.clone();
 		cache = new Cache(prob.l,(int)(param.cache_size*(1<<20)));
+		QD = new Qfloat[prob.l];
+		for(int i=0;i<prob.l;i++)
+			QD[i]= (Qfloat)kernel_function(i,i);
 	}
 
 	Qfloat[] get_Q(int i, int len)
@@ -1046,22 +1191,32 @@ class SVC_Q extends Kernel
 		return data[0];
 	}
 
+	Qfloat[] get_QD()
+	{
+		return QD;
+	}
+
 	void swap_index(int i, int j)
 	{
 		cache.swap_index(i,j);
 		super.swap_index(i,j);
 		swap(byte,y[i],y[j]);
+		swap(Qfloat,QD[i],QD[j]);
 	}
 }
 
 class ONE_CLASS_Q extends Kernel
 {
 	private final Cache cache;
+	private final Qfloat[] QD;
 
 	ONE_CLASS_Q(svm_problem prob, svm_parameter param)
 	{
 		super(prob.l, prob.x, param);
 		cache = new Cache(prob.l,(int)(param.cache_size*(1<<20)));
+		QD = new Qfloat[prob.l];
+		for(int i=0;i<prob.l;i++)
+			QD[i]= (Qfloat)kernel_function(i,i);
 	}
 
 	Qfloat[] get_Q(int i, int len)
@@ -1076,10 +1231,16 @@ class ONE_CLASS_Q extends Kernel
 		return data[0];
 	}
 
+	Qfloat[] get_QD()
+	{
+		return QD;
+	}
+
 	void swap_index(int i, int j)
 	{
 		cache.swap_index(i,j);
 		super.swap_index(i,j);
+		swap(Qfloat,QD[i],QD[j]);
 	}
 }
 
@@ -1091,12 +1252,14 @@ class SVR_Q extends Kernel
 	private final int[] index;
 	private int next_buffer;
 	private Qfloat[][] buffer;
+	private final Qfloat[] QD;
 
 	SVR_Q(svm_problem prob, svm_parameter param)
 	{
 		super(prob.l, prob.x, param);
 		l = prob.l;
 		cache = new Cache(l,(int)(param.cache_size*(1<<20)));
+		QD = new Qfloat[2*l];
 		sign = new byte[2*l];
 		index = new int[2*l];
 		for(int k=0;k<l;k++)
@@ -1105,6 +1268,8 @@ class SVR_Q extends Kernel
 			sign[k+l] = -1;
 			index[k] = k;
 			index[k+l] = k;
+			QD[k] = (Qfloat)kernel_function(k,k);
+			QD[k+l] = QD[k];
 		}
 		buffer = new Qfloat[2][2*l];
 		next_buffer = 0;
@@ -1114,6 +1279,7 @@ class SVR_Q extends Kernel
 	{
 		swap(byte,sign[i],sign[j]);
 		swap(int,index[i],index[j]);
+		swap(Qfloat,QD[i],QD[j]);
 	}
 
 	Qfloat[] get_Q(int i, int len)
@@ -1133,6 +1299,11 @@ class SVR_Q extends Kernel
 		for(int j=0;j<len;j++)
 			buf[j] = si * sign[j] * data[0][index[j]];
 		return buf;
+	}
+
+	Qfloat[] get_QD()
+	{
+		return QD;
 	}
 }
 
@@ -1235,7 +1406,8 @@ public class svm {
 
 		for(i=0;i<n;i++)
 			alpha[i] = 1;
-		alpha[n] = param.nu * prob.l - n;
+		if(n<prob.l)
+			alpha[n] = param.nu * prob.l - n;
 		for(i=n+1;i<l;i++)
 			alpha[i] = 0;
 
@@ -1974,8 +2146,10 @@ public class svm {
 		int l = prob.l;
 		int[] perm = new int[l];
 		
-		if(param.svm_type == svm_parameter.C_SVC ||
-		   param.svm_type == svm_parameter.NU_SVC)		    
+		// stratified cv may not give leave-one-out rate
+		// Each class to l folds -> some folds may have zero elements
+		if((param.svm_type == svm_parameter.C_SVC ||
+		    param.svm_type == svm_parameter.NU_SVC) && nr_fold < l)
 		{
 			int[] tmp_nr_class = new int[1];
 			int[][] tmp_label = new int[1][];

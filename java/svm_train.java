@@ -9,7 +9,7 @@ class svm_train {
 	private String input_file_name;		// set by parse_command_line
 	private String model_file_name;		// set by parse_command_line
 	private String error_msg;
-	private int cross_validation = 0;
+	private int cross_validation;
 	private int nr_fold;
 
 	private static void exit_with_help()
@@ -140,12 +140,14 @@ class svm_train {
 		param.nr_weight = 0;
 		param.weight_label = new int[0];
 		param.weight = new double[0];
+		cross_validation = 0;
 
 		// parse options
 		for(i=0;i<argv.length;i++)
 		{
 			if(argv[i].charAt(0) != '-') break;
-			++i;
+			if(++i>=argv.length)
+				exit_with_help();
 			switch(argv[i-1].charAt(1))
 			{
 				case 's':
