@@ -122,10 +122,20 @@ class svm_predict {
 		}
 		if(i>=argv.length)
 			exit_with_help();
-
-		BufferedReader input = new BufferedReader(new FileReader(argv[i]));
-		DataOutputStream output = new DataOutputStream(new FileOutputStream(argv[i+2]));
-		svm_model model = svm.svm_load_model(argv[i+1]);
-		predict(input,output,model,predict_probability);
+		try 
+		{
+			BufferedReader input = new BufferedReader(new FileReader(argv[i]));
+			DataOutputStream output = new DataOutputStream(new FileOutputStream(argv[i+2]));
+			svm_model model = svm.svm_load_model(argv[i+1]);
+			predict(input,output,model,predict_probability);
+		} 
+		catch(FileNotFoundException e) 
+		{
+			exit_with_help();
+		}
+		catch(ArrayIndexOutOfBoundsException e) 
+		{
+			exit_with_help();
+		}
 	}
 }
