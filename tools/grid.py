@@ -317,7 +317,7 @@ def main():
     done_jobs = {}
     result_file = open(out_filename,'w',0)
     db = []
-    best_rate = 0
+    best_rate = -1
 
     for line in jobs:
         for (c,g) in line:
