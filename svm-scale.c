@@ -193,11 +193,11 @@ int main(int argc,char **argv)
 			fprintf(stderr,"can't open file %s\n", save_filename);
 			exit(1);
 		}
-		fprintf(fp, "%g %g\n", lower, upper);
+		fprintf(fp, "%.16g %.16g\n", lower, upper);
 		for(i=1;i<=max_index;i++)
 		{
 			if(feature_min[i]!=feature_max[i])
-				fprintf(fp,"%d %g %g\n",i,feature_min[i],feature_max[i]);
+				fprintf(fp,"%d %.16g %.16g\n",i,feature_min[i],feature_max[i]);
 		}
 		fclose(fp);
 	}
