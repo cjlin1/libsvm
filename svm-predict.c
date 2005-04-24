@@ -164,8 +164,8 @@ int main(int argc, char **argv)
 	if(predict_probability)
 		if(svm_check_probability_model(model)==0)
 		{
-			fprintf(stderr,"model does not support probabiliy estimates\n");
-			predict_probability=0;
+			fprintf(stderr,"Model does not support probabiliy estimates\n");
+			exit(1);
 		}
 	predict(input,output);
 	svm_destroy_model(model);

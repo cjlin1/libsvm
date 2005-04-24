@@ -127,6 +127,12 @@ class svm_predict {
 			BufferedReader input = new BufferedReader(new FileReader(argv[i]));
 			DataOutputStream output = new DataOutputStream(new FileOutputStream(argv[i+2]));
 			svm_model model = svm.svm_load_model(argv[i+1]);
+			if(predict_probability == 1)
+				if(svm.svm_check_probability_model(model)==0)
+				{
+					System.err.print("Model does not support probabiliy estimates\n");
+					System.exit(1);
+				}
 			predict(input,output,model,predict_probability);
 		} 
 		catch(FileNotFoundException e) 
