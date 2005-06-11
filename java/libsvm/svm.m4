@@ -1692,7 +1692,7 @@ public class svm {
 	private static void multiclass_probability(int k, double[][] r, double[] p)
 	{
 		int t,j;
-		int iter = 0, max_iter=100;
+		int iter = 0, max_iter=Math.max(100,k);
 		double[][] Q=new double[k][k];
 		double[] Qp= new double[k];
 		double pQp, eps=0.005/k;
