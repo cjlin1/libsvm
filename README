@@ -112,7 +112,7 @@ options:
 -c cost : set the parameter C of C-SVC, epsilon-SVR, and nu-SVR (default 1)
 -n nu : set the parameter nu of nu-SVC, one-class SVM, and nu-SVR (default 0.5)
 -p epsilon : set the epsilon in loss function of epsilon-SVR (default 0.1)
--m cachesize : set cache memory size in MB (default 40)
+-m cachesize : set cache memory size in MB (default 100)
 -e epsilon : set tolerance of termination criterion (default 0.001)
 -h shrinking: whether to use the shrinking heuristics, 0 or 1 (default 1)
 -b probability_estimates: whether to train an SVC or SVR model for probability estimates, 0 or 1 (default 0)
@@ -145,6 +145,7 @@ Tips on practical use
 * If data for classification are unbalanced (e.g. many positive and
   few negative), try different penalty parameters C by -wi (see
   examples below).
+* Specify larger cache size (i.e., larger -m) for huge problems.
 
 Examples
 ========

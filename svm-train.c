@@ -27,7 +27,7 @@ void exit_with_help()
 	"-c cost : set the parameter C of C-SVC, epsilon-SVR, and nu-SVR (default 1)\n"
 	"-n nu : set the parameter nu of nu-SVC, one-class SVM, and nu-SVR (default 0.5)\n"
 	"-p epsilon : set the epsilon in loss function of epsilon-SVR (default 0.1)\n"
-	"-m cachesize : set cache memory size in MB (default 40)\n"
+	"-m cachesize : set cache memory size in MB (default 100)\n"
 	"-e epsilon : set tolerance of termination criterion (default 0.001)\n"
 	"-h shrinking: whether to use the shrinking heuristics, 0 or 1 (default 1)\n"
 	"-b probability_estimates: whether to train a SVC or SVR model for probability estimates, 0 or 1 (default 0)\n"
@@ -132,7 +132,7 @@ void parse_command_line(int argc, char **argv, char *input_file_name, char *mode
 	param.gamma = 0;	// 1/k
 	param.coef0 = 0;
 	param.nu = 0.5;
-	param.cache_size = 40;
+	param.cache_size = 100;
 	param.C = 1;
 	param.eps = 1e-3;
 	param.p = 0.1;
