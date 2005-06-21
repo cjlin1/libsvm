@@ -1856,7 +1856,7 @@ double sigmoid_predict(double decision_value, double A, double B)
 void multiclass_probability(int k, double **r, double *p)
 {
 	int t,j;
-	int iter = 0, max_iter=100;
+	int iter = 0, max_iter=max(100,k);
 	double **Q=Malloc(double *,k);
 	double *Qp=Malloc(double,k);
 	double pQp, eps=0.005/k;
