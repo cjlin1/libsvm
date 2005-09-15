@@ -134,6 +134,8 @@ class svm_predict {
 					System.exit(1);
 				}
 			predict(input,output,model,predict_probability);
+			input.close();
+			output.close();
 		} 
 		catch(FileNotFoundException e) 
 		{
