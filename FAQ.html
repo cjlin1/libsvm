@@ -7,10 +7,10 @@
 <a name="_TOP"><b><h1><a
 href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a>  FAQ </h1></b></a>
 <b>last modified : </b>
-Fri, 22 Apr 2005 05:11:16 GMT
+Wed,  6 Jul 2005 12:14:52 GMT
 <class="categories">
 <li><a
-href="#_TOP">All Questions</a>(49)</li>
+href="#_TOP">All Questions</a>(50)</li>
 <ul><b>
 <li><a
 href="#/Q1:_Some_courses_which_have_used_libsvm_as_a_tool">Q1:_Some_courses_which_have_used_libsvm_as_a_tool</a>(1)</li>
@@ -19,7 +19,7 @@ href="#/Q2:_Installation_and_running_the_program">Q2:_Installation_and_running_t
 <li><a
 href="#/Q3:_Data_preparation">Q3:_Data_preparation</a>(3)</li>
 <li><a
-href="#/Q4:_Training_and_prediction">Q4:_Training_and_prediction</a>(26)</li>
+href="#/Q4:_Training_and_prediction">Q4:_Training_and_prediction</a>(27)</li>
 <li><a
 href="#/Q5:_Graphic_Interface">Q5:_Graphic_Interface</a>(3)</li>
 <li><a
@@ -57,6 +57,7 @@ href="#/Q7:_Python_Interface">Q7:_Python_Interface</a>(4)</li>
 <li class="headlines_item"><a href="#f413">The program keeps running (with output, i.e. many dots). What should I do?</a></li>
 <li class="headlines_item"><a href="#f414">The training time is too long. What should I do?</a></li>
 <li class="headlines_item"><a href="#f415">How do I get the decision value(s)?</a></li>
+<li class="headlines_item"><a href="#f4151">How do I get the distance between a point and the hyperplane?</a></li>
 <li class="headlines_item"><a href="#f416">For some problem sets if I use a large cache (i.e. large -m) on a linux machine, why sometimes I get "segmentation fault ?"</a></li>
 <li class="headlines_item"><a href="#f417">How do I disable screen output of svm-train and svm-predict ?</a></li>
 <li class="headlines_item"><a href="#f418">I would like to use my own kernel but find out that there are two subroutines for kernel evaluations: k_function() and kernel_function(). Which one should I modify ?</a></li>
@@ -114,6 +115,10 @@ University of Nairobi, Kenya.</a>
 <li>
 <a href=http://cerium.raunvis.hi.is/~tpr/courseware/svm/hugbunadur.html>
 Applied Mathematics and Computer Science, University of Iceland.
+<li>
+<a href=http://chicago05.mlss.cc/tiki/tiki-read_article.php?articleId=2>
+SVM tutorial in machine learning
+summer school, University of Chicago, 2005.
 </a>
 </ul>
 <p align="right">
@@ -563,7 +568,9 @@ difficulties occur.
 <a name="f414"><b>Q: The training time is too long. What should I do?</b></a>
 <br/>                                                                                
 <p>
-This may happen for some difficult cases (e.g. -c is large).
+For large problems, please specify enough cache size (i.e.,
+-m).
+Slow convergence may happen for some difficult cases (e.g. -c is large).
 You can try to use a looser stopping tolerance with -e.
 If that still doesn't work, you may want to contact us. We can show you some
 tricks on improving the training time.
@@ -599,6 +606,19 @@ of the file svm.cpp.
 Positive (negative)
 decision values correspond to data predicted as +1 (-1).
 
+
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q4:_Training_and_prediction"></a>
+<a name="f4151"><b>Q: How do I get the distance between a point and the hyperplane?</b></a>
+<br/>                                                                                
+<p>
+The distance is |decision_value| / |w|. 
+We have |w|^2 = w^Tw = alpha^T Q alpha = 2*(dual_obj + sum alpha_i). 
+Thus in svm.cpp please find the place 
+where we print the dual objective value
+and add a statement to print w^Tw.
 
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
