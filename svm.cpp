@@ -178,6 +178,7 @@ public:
 	virtual Qfloat *get_Q(int column, int len) const = 0;
 	virtual Qfloat *get_QD() const = 0;
 	virtual void swap_index(int i, int j) const = 0;
+	virtual ~QMatrix() {}
 };
 
 class Kernel: public QMatrix {
