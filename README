@@ -18,7 +18,8 @@ everything automatic -- from data scaling to parameter selection.
 
 Usage: easy.py training_file [testing_file]
 
-More information can be found in tools/README.
+More information about parameter selction can be found in
+tools/README.
 
 Installation
 ============
