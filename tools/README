@@ -14,7 +14,7 @@ specified number of samples. For classification data, we provide a
 stratified selection to ensure the same class distribution in the
 subset.
 
-Usage: %s [options] dataset number [output1] [output2]
+Usage: subset.py [options] dataset number [output1] [output2]
 
 This script selects a subset of the given data set.
 

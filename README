@@ -490,10 +490,10 @@ and then copy windows\python\svmc.dll to the python directory.
 Another way is to build them from Visual C++ environment. See details
 in libsvm faq.
 
-Model Selection
-===============
+Additional Tools: Model Selection, Sub-sampling, etc.
+====================================================
 
-See the README file in tools directory.
+See the README file in the tools directory.
 
 Python Interface
 ================
