@@ -4,8 +4,8 @@ BIN = $(QTDIR)/bin
 INCLUDE = $(QTDIR)/include
 LIB = $(QTDIR)/lib
 #BIN = /usr/bin
-#INCLUDE = /usr/include/qt
-#LIB = /usr/lib/qt
+#INCLUDE = /usr/include/qt3
+#LIB = /usr/lib/qt3
 
 svm-toy: svm-toy.cpp svm-toy.moc ../../svm.o
 	$(CXXC) -I$(INCLUDE) $(CFLAGS) svm-toy.cpp ../../svm.o -o svm-toy -L$(LIB) -lqt-mt 

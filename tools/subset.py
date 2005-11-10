@@ -13,7 +13,7 @@ def exit_with_help():
 	print """\
 Usage: %s [options] dataset number [output1] [output2]
 
-This script selects a subset of the given data set.
+This script selects a subset of the given dataset.
 
 options:
 -s method : method of selection (default 0)
@@ -22,7 +22,6 @@ options:
 
 output1 : the subset (optional)
 output2 : rest of the data (optional)
-
 If output1 is omitted, the subset will be printed on the screen.""" % argv[0]
 	exit(1)
 

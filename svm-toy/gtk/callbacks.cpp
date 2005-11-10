@@ -331,7 +331,7 @@ on_draw_main_expose_event              (GtkWidget       *widget,
 }
 
 GtkWidget *fileselection;
-enum { SAVE, LOAD } fileselection_flag;
+static enum { SAVE, LOAD } fileselection_flag;
 
 void show_fileselection()
 {
