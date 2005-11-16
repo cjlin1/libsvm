@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 from sys import argv, exit, stdout, stderr
-from math import ceil
 from random import randint
 
 method = 0
@@ -133,7 +132,7 @@ def main():
 Warning:
 1. You may have regression data. Please use -s 1.
 2. Classification data unbalanced or too small. We select at least 1 per class.
-   Therefore, subset contains %d instances.
+   The subset thus contains %d instances.
 """ % (n+warning))
 
 	# cleanup
