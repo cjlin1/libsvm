@@ -240,8 +240,8 @@ class svm_train {
 	private void read_problem() throws IOException
 	{
 		BufferedReader fp = new BufferedReader(new FileReader(input_file_name));
-		Vector vy = new Vector();
-		Vector vx = new Vector();
+		Vector<String> vy = new Vector<String>();
+		Vector<svm_node[]> vx = new Vector<svm_node[]>();
 		int max_index = 0;
 		
 		while(true)
