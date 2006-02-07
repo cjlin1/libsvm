@@ -38,23 +38,23 @@ The format of training and testing data file is:
 .
 .
 
-<label> is the target value of the training data. For classification,
-it should be an integer which identifies a class (multi-class
-classification is supported). For regression, it's any real
-number. For one-class SVM, it's not used so can be any number. <index>
-is an integer starting from 1, <value> is a real number. The indices
-must be in an ascending order. The labels in the testing data file are
-only used to calculate accuracy or error. If they are unknown, just
-fill this column with a number.
+For classification, <label> is an integer indicating the class label
+(multi-class is supported). For regression, <label> is
+the target value which can be any real number. For one-class SVM, it's
+not used so can be any number.  Except using precomputed kernels
+(explained in another section), <index>:<value> gives a feature
+(attribute) value.  <index> is an integer starting from 1 and <value>
+is a real number. Indices must be in an ASCENDING order. Labels in the
+testing file are only used to calculate accuracy or errors. If they
+are unknown, just fill this column with any numbers.
 
-There is a sample data for classification in this package:
-heart_scale.
+A sample classification data included in this package is heart_scale.
 
 Type `svm-train heart_scale', and the program will read the training
 data and output the model file `heart_scale.model'. If you have a test
 set called heart_scale.t, then you type `svm-predict heart_scale.t
-heart_scale.model output' to see the prediction accuracy on the test
-data. The `output' file contains the predicted class label.
+heart_scale.model output' to see the prediction accuracy. The `output'
+file contains the predicted class labels.
 
 There are some other useful programs in this package.
 
@@ -107,6 +107,7 @@ options:
 	1 -- polynomial: (gamma*u'*v + coef0)^degree
 	2 -- radial basis function: exp(-gamma*|u-v|^2)
 	3 -- sigmoid: tanh(gamma*u'*v + coef0)
+	4 -- precomputed kernel (kernel values in training_set_file)
 -d degree : set degree in kernel function (default 3)
 -g gamma : set gamma in kernel function (default 1/k)
 -r coef0 : set coef0 in kernel function (default 0)
@@ -184,6 +185,58 @@ the parameters C = 500 and gamma = 0.1
 Obtain a model with probability information and predict test data with
 probability estimates
 
+
+PRECOMPUTED KERNELS 
+===================
+
+Users may pre-compute kernel values and input them as training and
+testing files.  Then libsvm does not need the original
+training/testing sets.
+
+Assume L training and R testing instances. Their input formats are:
+
+Training:
+
+<label> 1:K(1,1) ... L:K(1,L) 
+.
+.
+<label> 1:K(L,1) ... L:K(L,L) 
+
+Testing:
+
+<label> 1:K(L+1,1) ... L:K(L+1,L) 
+.
+.
+<label> 1:K(L+R,1) ... L:K(L+R,L) 
+
+
+All kernel values including ZEROs must be explicitly provided.
+
+Examples:
+
+	Assume the original training data has three four-feature
+	instances and testing data has one:
+
+	1  1:1 2:1 3:1 4:1
+	3  2:3 4:3
+	2  3:1
+
+	1  1:1 3:1
+
+	If the linear kernel is used, we have the following new
+	training/testing sets:
+
+	1  1:4 2:6  3:1
+	3  1:6 2:18 3:0 
+	2  1:1 2:0  3:1
+ 
+	1  1:2 2:0  3:1
+
+Library users (e.g., if you write programs to call svm_train())
+must add sample_id before the first kernel value of any training
+instance. This, for TRAINING ONLY, is a bit annoying. Please see the
+description of the library call svm_train for details.
+
 Library Usage
 =============
 
@@ -215,7 +268,9 @@ to classify new data.
     where `l' is the number of training data, and `y' is an array containing
     their target values. (integers in classification, real numbers in
     regression) `x' is an array of pointers, each of which points to a sparse
-    representation (array of svm_node) of one training vector.
+    representation (array of svm_node) of one training vector. The
+    situation for pre-computed kernels is different and explained
+    later.
 
     For example, if we have the following training data:
 
@@ -248,6 +303,26 @@ to classify new data.
 	};
 
     index = -1 indicates the end of one vector.
+
+    For pre-computed kernels, the format must be
+
+    LABEL  SAMPLE_ID K(1,1) ... K(1,L)
+
+    Taking the example in the pre-computed kernel section, svm_problem
+    of the three training instances has:
+
+    l = 3
+
+    y -> 1 3 2
+
+    x -> [ ] -> (?,1) (1,4) (2,6) (3,1) (-1,?)
+	 [ ] -> (?,2) (1,6) (2,18) (3,0) (-1,?)
+	 [ ] -> (?,3) (1,1) (2,0) (3,1) (-1,?)
+
+    That is, before the first kernel element, sample_id must be
+    inserted. Please check svm-train.c for an example of doing
+    so. Note this is for TRAINING ONLY. There is no need to add
+    sample_id for test instances.
  
     struct svm_parameter describes the parameters of an SVM model:
 
@@ -331,6 +406,8 @@ to classify new data.
     validated using the model from training the remaining. Predicted
     labels in the validation process are stored in the array called
     target.
+
+    The format of svm_prob is same as that for svm_train(). Please be careful on the case of pre-computed kernels.
 
 - Function: int svm_get_svm_type(const struct svm_model *model);
 

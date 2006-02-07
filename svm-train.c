@@ -21,6 +21,7 @@ void exit_with_help()
 	"	1 -- polynomial: (gamma*u'*v + coef0)^degree\n"
 	"	2 -- radial basis function: exp(-gamma*|u-v|^2)\n"
 	"	3 -- sigmoid: tanh(gamma*u'*v + coef0)\n"
+	"	4 -- precomputed kernel (kernel values in training_set_file)\n"
 	"-d degree : set degree in kernel function (default 3)\n"
 	"-g gamma : set gamma in kernel function (default 1/k)\n"
 	"-r coef0 : set coef0 in kernel function (default 0)\n"
@@ -267,7 +268,10 @@ out:
 
 	prob.y = Malloc(double,prob.l);
 	prob.x = Malloc(struct svm_node *,prob.l);
-	x_space = Malloc(struct svm_node,elements);
+	if(param.kernel_type == PRECOMPUTED)
+		x_space = Malloc(struct svm_node, prob.l + elements);
+	else
+		x_space = Malloc(struct svm_node,elements);
 
 	max_index = 0;
 	j=0;
@@ -277,6 +281,13 @@ out:
 		prob.x[i] = &x_space[j];
 		fscanf(fp,"%lf",&label);
 		prob.y[i] = label;
+
+		if(param.kernel_type == PRECOMPUTED)	
+		{
+			x_space[j].value = i+1; // sample_id starts from 1 to l
+			j++;
+		}
+
 		while(1)
 		{
 			int c;

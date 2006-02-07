@@ -226,6 +226,10 @@ private:
 	{
 		return tanh(gamma*dot(x[i],x[j])+coef0);
 	}
+	double kernel_precomputed(int i, int j) const
+	{
+		return x[i][(int)(x[j][0].value)].value;
+	}
 };
 
 Kernel::Kernel(int l, svm_node * const * x_, const svm_parameter& param)
@@ -245,6 +249,9 @@ Kernel::Kernel(int l, svm_node * const * x_, const svm_parameter& param)
 			break;
 		case SIGMOID:
 			kernel_function = &Kernel::kernel_sigmoid;
+		case PRECOMPUTED:
+			kernel_function = &Kernel::kernel_precomputed;
+
 			break;
 	}
 
@@ -340,6 +347,9 @@ double Kernel::k_function(const svm_node *x, const svm_node *y,
 		}
 		case SIGMOID:
 			return tanh(param.gamma*dot(x,y)+param.coef0);
+		case PRECOMPUTED:  //x: test (validation), y: SV
+			x += (int)(y->value); 
+			return 	x->value;		
 		default:
 			return 0;	/* Unreachable */
 	}
@@ -2626,7 +2636,7 @@ const char *svm_type_table[] =
 
 const char *kernel_type_table[]=
 {
-	"linear","polynomial","rbf","sigmoid",NULL
+	"linear","polynomial","rbf","sigmoid","precomputed",NULL
 };
 
 int svm_save_model(const char *model_file_name, const svm_model *model)
@@ -2701,11 +2711,15 @@ int svm_save_model(const char *model_file_name, const svm_model *model)
 			fprintf(fp, "%.16g ",sv_coef[j][i]);
 
 		const svm_node *p = SV[i];
-		while(p->index != -1)
-		{
-			fprintf(fp,"%d:%.8g ",p->index,p->value);
-			p++;
-		}
+
+		if(param.kernel_type == PRECOMPUTED)
+			fprintf(fp,"0:%d ",(int)((p->value)-1));
+		else
+			while(p->index != -1)
+			{
+				fprintf(fp,"%d:%.8g ",p->index,p->value);
+				p++;
+			}
 		fprintf(fp, "\n");
 	}
 
@@ -2943,7 +2957,8 @@ const char *svm_check_parameter(const svm_problem *prob, const svm_parameter *pa
 	if(kernel_type != LINEAR &&
 	   kernel_type != POLY &&
 	   kernel_type != RBF &&
-	   kernel_type != SIGMOID)
+	   kernel_type != SIGMOID &&
+	   kernel_type != PRECOMPUTED)
 		return "unknown kernel type";
 
 	// cache_size,eps,C,nu,p,shrinking
