@@ -20,6 +20,15 @@ template <class S, class T> inline void clone(T*& dst, S* src, int n)
 	dst = new T[n];
 	memcpy((void *)dst,(void *)src,sizeof(T)*n);
 }
+inline double powi(double base, int times){
+        double tmp = base, ret = 1.0;
+
+        for(int t=times; t>0; t/=2){
+                if(t%2==1) ret*=tmp;
+                tmp = tmp * tmp;
+        }
+        return ret;
+}
 #define INF HUGE_VAL
 #define TAU 1e-12
 #define Malloc(type,n) (type *)malloc((n)*sizeof(type))
@@ -205,7 +214,7 @@ private:
 
 	// svm_parameter
 	const int kernel_type;
-	const double degree;
+	const int degree;
 	const double gamma;
 	const double coef0;
 
@@ -216,7 +225,7 @@ private:
 	}
 	double kernel_poly(int i, int j) const
 	{
-		return pow(gamma*dot(x[i],x[j])+coef0,degree);
+		return powi(gamma*dot(x[i],x[j])+coef0,degree);
 	}
 	double kernel_rbf(int i, int j) const
 	{
@@ -303,7 +312,7 @@ double Kernel::k_function(const svm_node *x, const svm_node *y,
 		case LINEAR:
 			return dot(x,y);
 		case POLY:
-			return pow(param.gamma*dot(x,y)+param.coef0,param.degree);
+			return powi(param.gamma*dot(x,y)+param.coef0,param.degree);
 		case RBF:
 		{
 			double sum = 0;
@@ -2650,7 +2659,7 @@ int svm_save_model(const char *model_file_name, const svm_model *model)
 	fprintf(fp,"kernel_type %s\n", kernel_type_table[param.kernel_type]);
 
 	if(param.kernel_type == POLY)
-		fprintf(fp,"degree %g\n", param.degree);
+		fprintf(fp,"degree %d\n", param.degree);
 
 	if(param.kernel_type == POLY || param.kernel_type == RBF || param.kernel_type == SIGMOID)
 		fprintf(fp,"gamma %g\n", param.gamma);
@@ -2792,7 +2801,7 @@ svm_model *svm_load_model(const char *model_file_name)
 			}
 		}
 		else if(strcmp(cmd,"degree")==0)
-			fscanf(fp,"%lf",&param.degree);
+			fscanf(fp,"%d",&param.degree);
 		else if(strcmp(cmd,"gamma")==0)
 			fscanf(fp,"%lf",&param.gamma);
 		else if(strcmp(cmd,"coef0")==0)
@@ -2951,7 +2960,7 @@ const char *svm_check_parameter(const svm_problem *prob, const svm_parameter *pa
 	   svm_type != NU_SVR)
 		return "unknown svm type";
 	
-	// kernel_type
+	// kernel_type, degree
 	
 	int kernel_type = param->kernel_type;
 	if(kernel_type != LINEAR &&
@@ -2960,6 +2969,9 @@ const char *svm_check_parameter(const svm_problem *prob, const svm_parameter *pa
 	   kernel_type != SIGMOID &&
 	   kernel_type != PRECOMPUTED)
 		return "unknown kernel type";
+
+	if(param->degree < 0)
+		return "degree of polynomial kernel < 0";
 
 	// cache_size,eps,C,nu,p,shrinking
 

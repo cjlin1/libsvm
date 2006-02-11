@@ -25,7 +25,7 @@ struct svm_parameter
 {
 	int svm_type;
 	int kernel_type;
-	double degree;	/* for poly */
+	int degree;	/* for poly */
 	double gamma;	/* for poly/rbf/sigmoid */
 	double coef0;	/* for poly/sigmoid */
 
