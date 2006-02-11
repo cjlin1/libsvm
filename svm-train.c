@@ -283,10 +283,7 @@ out:
 		prob.y[i] = label;
 
 		if(param.kernel_type == PRECOMPUTED)	
-		{
-			x_space[j].value = i+1; // sample_id starts from 1 to l
-			j++;
-		}
+			x_space[j++].value = i+1; // sample_id starts from 1 to l
 
 		while(1)
 		{
