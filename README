@@ -218,10 +218,10 @@ Examples:
 	instances and testing data has one:
 
 	1  1:1 2:1 3:1 4:1
-	3  2:3 4:3
-	2  3:1
+	3      2:3     4:3
+	2          3:1
 
-	1  1:1 3:1
+	1  1:1     3:1
 
 	If the linear kernel is used, we have the following new
 	training/testing sets:
@@ -233,7 +233,7 @@ Examples:
 	1  1:2 2:0  3:1
 
 Library users (e.g., if you write programs to call svm_train())
-must add sample_id before the first kernel value of any training
+must add sample_serial_number before the first kernel value of any training
 instance. This, for TRAINING ONLY, is a bit annoying. Please see the
 description of the library call svm_train for details.
 
@@ -306,7 +306,7 @@ to classify new data.
 
     For pre-computed kernels, the format must be
 
-    LABEL  SAMPLE_ID K(1,1) ... K(1,L)
+    LABEL  SAMPLE_SERIAL_NUM K(1,1) ... K(1,L)
 
     Taking the example in the pre-computed kernel section, svm_problem
     of the three training instances has:
@@ -319,10 +319,10 @@ to classify new data.
 	 [ ] -> (?,2) (1,6) (2,18) (3,0) (-1,?)
 	 [ ] -> (?,3) (1,1) (2,0) (3,1) (-1,?)
 
-    That is, before the first kernel element, sample_id must be
-    inserted. Please check svm-train.c for an example of doing
-    so. Note this is for TRAINING ONLY. There is no need to add
-    sample_id for test instances.
+    Before the first kernel element, sample_serial_number
+    (starting from 1) must be inserted. Please check svm-train.c for
+    an example of doing so. This is for TRAINING DATA ONLY. There is
+    no need to add sample_serial_number for test instances.
  
     struct svm_parameter describes the parameters of an SVM model:
 
@@ -361,6 +361,7 @@ to classify new data.
     POLY:	(gamma*u'*v + coef0)^degree
     RBF:	exp(-gamma*|u-v|^2)
     SIGMOID:	tanh(gamma*u'*v + coef0)
+    PRECOMPUTED: kernel values in training_set_file
 
     cache_size is the size of the kernel cache, specified in megabytes.
     C is the cost of constraints violation. (we usually use 1 to 1000)
