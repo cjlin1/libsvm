@@ -20,10 +20,12 @@ template <class S, class T> inline void clone(T*& dst, S* src, int n)
 	dst = new T[n];
 	memcpy((void *)dst,(void *)src,sizeof(T)*n);
 }
-inline double powi(double base, int times){
+inline double powi(double base, int times)
+{
         double tmp = base, ret = 1.0;
 
-        for(int t=times; t>0; t/=2){
+        for(int t=times; t>0; t/=2)
+	{
                 if(t%2==1) ret*=tmp;
                 tmp = tmp * tmp;
         }
