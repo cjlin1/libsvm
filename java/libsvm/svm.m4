@@ -138,7 +138,7 @@ abstract class Kernel extends QMatrix {
 
 	// svm_parameter
 	private final int kernel_type;
-	private final double degree;
+	private final int degree;
 	private final double gamma;
 	private final double coef0;
 
@@ -151,10 +151,16 @@ abstract class Kernel extends QMatrix {
 		if(x_square != null) swap(double,x_square[i],x_square[j]);
 	}
 
-	private static double tanh(double x)
+	private static double powi(double base, int times)
 	{
-		double e = Math.exp(x);
-		return 1.0-2.0/(e*e+1);
+	        double tmp = base, ret = 1.0;
+
+        	for(int t=times; t>0; t/=2)
+		{
+                	if(t%2==1) ret*=tmp;
+	                tmp = tmp * tmp;
+        	}
+	        return ret;
 	}
 
 	double kernel_function(int i, int j)
@@ -164,11 +170,11 @@ abstract class Kernel extends QMatrix {
 			case svm_parameter.LINEAR:
 				return dot(x[i],x[j]);
 			case svm_parameter.POLY:
-				return Math.pow(gamma*dot(x[i],x[j])+coef0,degree);
+				return powi(gamma*dot(x[i],x[j])+coef0,degree);
 			case svm_parameter.RBF:
 				return Math.exp(-gamma*(x_square[i]+x_square[j]-2*dot(x[i],x[j])));
 			case svm_parameter.SIGMOID:
-				return tanh(gamma*dot(x[i],x[j])+coef0);
+				return Math.tanh(gamma*dot(x[i],x[j])+coef0);
 			default:
 				return 0;	// java
 		}
@@ -222,7 +228,7 @@ abstract class Kernel extends QMatrix {
 			case svm_parameter.LINEAR:
 				return dot(x,y);
 			case svm_parameter.POLY:
-				return Math.pow(param.gamma*dot(x,y)+param.coef0,param.degree);
+				return powi(param.gamma*dot(x,y)+param.coef0,param.degree);
 			case svm_parameter.RBF:
 			{
 				double sum = 0;
@@ -264,7 +270,7 @@ abstract class Kernel extends QMatrix {
 				return Math.exp(-param.gamma*sum);
 			}
 			case svm_parameter.SIGMOID:
-				return tanh(param.gamma*dot(x,y)+param.coef0);
+				return Math.tanh(param.gamma*dot(x,y)+param.coef0);
 			default:
 				return 0;	// java
 		}
@@ -2574,7 +2580,7 @@ public class svm {
 				}
 			}
 			else if(cmd.startsWith("degree"))
-				param.degree = atof(arg);
+				param.degree = atoi(arg);
 			else if(cmd.startsWith("gamma"))
 				param.gamma = atof(arg);
 			else if(cmd.startsWith("coef0"))
@@ -2673,8 +2679,8 @@ public class svm {
 		   svm_type != svm_parameter.EPSILON_SVR &&
 		   svm_type != svm_parameter.NU_SVR)
 		return "unknown svm type";
-	
-		// kernel_type
+
+		// kernel_type, degree
 	
 		int kernel_type = param.kernel_type;
 		if(kernel_type != svm_parameter.LINEAR &&
@@ -2682,6 +2688,9 @@ public class svm {
 		   kernel_type != svm_parameter.RBF &&
 		   kernel_type != svm_parameter.SIGMOID)
 		return "unknown kernel type";
+
+		if(param.degree < 0)
+			return "degree of polynomial kernel < 0";
 
 		// cache_size,eps,C,nu,p,shrinking
 

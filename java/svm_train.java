@@ -159,7 +159,7 @@ class svm_train {
 					param.kernel_type = atoi(argv[i]);
 					break;
 				case 'd':
-					param.degree = atof(argv[i]);
+					param.degree = atoi(argv[i]);
 					break;
 				case 'g':
 					param.gamma = atof(argv[i]);
