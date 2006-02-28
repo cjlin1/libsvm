@@ -74,12 +74,10 @@ class svm_train {
 				);
 		}
 		else
-		{
 			for(i=0;i<prob.l;i++)
 				if(target[i] == prob.y[i])
 					++total_correct;
 			System.out.print("Cross Validation Accuracy = "+100.0*total_correct/prob.l+"%\n");
-		}
 	}
 	
 	private void run(String argv[]) throws IOException
@@ -242,8 +240,8 @@ class svm_train {
 	private void read_problem() throws IOException
 	{
 		BufferedReader fp = new BufferedReader(new FileReader(input_file_name));
-		Vector<String> vy = new Vector<String>();
-		Vector<svm_node[]> vx = new Vector<svm_node[]>();
+		Vector vy = new Vector();
+		Vector vx = new Vector();
 		int max_index = 0;
 		
 		while(true)

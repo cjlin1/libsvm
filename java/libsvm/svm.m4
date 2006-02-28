@@ -163,6 +163,12 @@ abstract class Kernel extends QMatrix {
 	        return ret;
 	}
 
+	private static double tanh(double x)
+	{
+		double e = Math.exp(x);
+		return 1.0-2.0/(e*e+1);
+	}
+
 	double kernel_function(int i, int j)
 	{
 		switch(kernel_type)
@@ -174,7 +180,7 @@ abstract class Kernel extends QMatrix {
 			case svm_parameter.RBF:
 				return Math.exp(-gamma*(x_square[i]+x_square[j]-2*dot(x[i],x[j])));
 			case svm_parameter.SIGMOID:
-				return Math.tanh(gamma*dot(x[i],x[j])+coef0);
+				return tanh(gamma*dot(x[i],x[j])+coef0);
 			default:
 				return 0;	// java
 		}
@@ -270,7 +276,7 @@ abstract class Kernel extends QMatrix {
 				return Math.exp(-param.gamma*sum);
 			}
 			case svm_parameter.SIGMOID:
-				return Math.tanh(param.gamma*dot(x,y)+param.coef0);
+				return tanh(param.gamma*dot(x,y)+param.coef0);
 			default:
 				return 0;	// java
 		}

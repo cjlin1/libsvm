@@ -4,7 +4,7 @@ FILES =	libsvm/svm.class libsvm/svm_model.class libsvm/svm_node.class \
 	svm_train.class svm_predict.class svm_toy.class
 
 #JAVAC = jikes
-#JAVAC_FLAGS = -target 1.1
+#JAVAC_FLAGS = -target 1.1 -source 1.3
 JAVAC = javac
 JAVAC_FLAGS =
 
