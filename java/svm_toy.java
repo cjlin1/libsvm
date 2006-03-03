@@ -435,9 +435,9 @@ public class svm_toy extends Applet {
 
 	public Dimension getPreferredSize() { return new Dimension(XLEN,YLEN+50); }
 
-	public void getSize(Dimension d) { getSize(d.width,d.height); }
-	public void getSize(int w,int h) {
-		super.getSize(w,h);
+	public void setSize(Dimension d) { setSize(d.width,d.height); }
+	public void setSize(int w,int h) {
+		super.setSize(w,h);
 		XLEN = w;
 		YLEN = h-50;
 		clear_all();
@@ -459,7 +459,7 @@ class AppletFrame extends Frame {
 			}
 		});
 		applet.init();
-		applet.getSize(width,height);
+		applet.setSize(width,height);
 		applet.start();
 		this.add(applet);
 		this.pack();
