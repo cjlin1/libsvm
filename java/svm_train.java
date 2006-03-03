@@ -28,6 +28,7 @@ class svm_train {
 		+"	1 -- polynomial: (gamma*u'*v + coef0)^degree\n"
 		+"	2 -- radial basis function: exp(-gamma*|u-v|^2)\n"
 		+"	3 -- sigmoid: tanh(gamma*u'*v + coef0)\n"
+		+"	4 -- precomputed kernel (kernel values in training_set_file)\n"
 		+"-d degree : set degree in kernel function (default 3)\n"
 		+"-g gamma : set gamma in kernel function (default 1/k)\n"
 		+"-r coef0 : set coef0 in kernel function (default 0)\n"
@@ -245,7 +246,8 @@ class svm_train {
 		Vector vy = new Vector();
 		Vector vx = new Vector();
 		int max_index = 0;
-		
+
+		int i = 0;
 		while(true)
 		{
 			String line = fp.readLine();
@@ -255,24 +257,40 @@ class svm_train {
 
 			vy.addElement(st.nextToken());
 			int m = st.countTokens()/2;
-			svm_node[] x = new svm_node[m];
-			for(int j=0;j<m;j++)
+			int start, end;
+			if (param.kernel_type == svm_parameter.PRECOMPUTED)
+			{
+				start=1; end=m+1;
+			}
+			else
+			{
+				start=0; end=m;
+			}
+			svm_node[] x = new svm_node[end];
+			if (param.kernel_type == svm_parameter.PRECOMPUTED)
+			{
+				x[0] = new svm_node();
+				x[0].value = i+1;
+			}
+			i++;
+
+			for(int j=start;j<end;j++)
 			{
 				x[j] = new svm_node();
 				x[j].index = atoi(st.nextToken());
 				x[j].value = atof(st.nextToken());
 			}
-			if(m>0) max_index = Math.max(max_index, x[m-1].index);
+			if(m>0) max_index = Math.max(max_index, x[end-1].index);
 			vx.addElement(x);
 		}
 
 		prob = new svm_problem();
 		prob.l = vy.size();
 		prob.x = new svm_node[prob.l][];
-		for(int i=0;i<prob.l;i++)
+		for(i=0;i<prob.l;i++)
 			prob.x[i] = (svm_node[])vx.elementAt(i);
 		prob.y = new double[prob.l];
-		for(int i=0;i<prob.l;i++)
+		for(i=0;i<prob.l;i++)
 			prob.y[i] = atof((String)vy.elementAt(i));
 
 		if(param.gamma == 0)

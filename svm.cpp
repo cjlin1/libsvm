@@ -359,8 +359,7 @@ double Kernel::k_function(const svm_node *x, const svm_node *y,
 		case SIGMOID:
 			return tanh(param.gamma*dot(x,y)+param.coef0);
 		case PRECOMPUTED:  //x: test (validation), y: SV
-			x += (int)(y->value); 
-			return 	x->value;		
+			return x[(int)(y->value)].value;
 		default:
 			return 0;	/* Unreachable */
 	}

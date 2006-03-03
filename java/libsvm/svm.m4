@@ -181,6 +181,8 @@ abstract class Kernel extends QMatrix {
 				return Math.exp(-gamma*(x_square[i]+x_square[j]-2*dot(x[i],x[j])));
 			case svm_parameter.SIGMOID:
 				return tanh(gamma*dot(x[i],x[j])+coef0);
+			case svm_parameter.PRECOMPUTED:
+				return x[i][(int)(x[j][0].value)].value;
 			default:
 				return 0;	// java
 		}
@@ -277,6 +279,8 @@ abstract class Kernel extends QMatrix {
 			}
 			case svm_parameter.SIGMOID:
 				return tanh(param.gamma*dot(x,y)+param.coef0);
+			case svm_parameter.PRECOMPUTED:
+				return 	x[(int)(y[0].value)].value;
 			default:
 				return 0;	// java
 		}
@@ -2436,7 +2440,7 @@ public class svm {
 
 	static final String kernel_type_table[]=
 	{
-		"linear","polynomial","rbf","sigmoid",
+		"linear","polynomial","rbf","sigmoid","precomputed"
 	};
 
 	public static void svm_save_model(String model_file_name, svm_model model) throws IOException
@@ -2513,8 +2517,11 @@ public class svm {
 				fp.writeBytes(sv_coef[j][i]+" ");
 
 			svm_node[] p = SV[i];
-			for(int j=0;j<p.length;j++)
-				fp.writeBytes(p[j].index+":"+p[j].value+" ");
+			if(param.kernel_type == svm_parameter.PRECOMPUTED)
+				fp.writeBytes("0:"+(int)(p[0].value-1));
+			else	
+				for(int j=0;j<p.length;j++)
+					fp.writeBytes(p[j].index+":"+p[j].value+" ");
 			fp.writeBytes("\n");
 		}
 
@@ -2692,8 +2699,9 @@ public class svm {
 		if(kernel_type != svm_parameter.LINEAR &&
 		   kernel_type != svm_parameter.POLY &&
 		   kernel_type != svm_parameter.RBF &&
-		   kernel_type != svm_parameter.SIGMOID)
-		return "unknown kernel type";
+		   kernel_type != svm_parameter.SIGMOID &&
+		   kernel_type != svm_parameter.PRECOMPUTED)
+			return "unknown kernel type";
 
 		if(param.degree < 0)
 			return "degree of polynomial kernel < 0";
