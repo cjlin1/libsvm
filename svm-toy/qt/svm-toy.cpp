@@ -132,7 +132,7 @@ private slots:
 					param.kernel_type = atoi(p);
 					break;
 				case 'd':
-					param.degree = atof(p);
+					param.degree = atoi(p);
 					break;
 				case 'g':
 					param.gamma = atof(p);
@@ -178,8 +178,11 @@ private slots:
 		prob.l = point_list.size();
 		prob.y = new double[prob.l];
 
-		if(param.svm_type == EPSILON_SVR ||
-		   param.svm_type == NU_SVR)
+		if(param.kernel_type == PRECOMPUTED)
+		{
+		}
+		else if(param.svm_type == EPSILON_SVR ||
+			param.svm_type == NU_SVR)
 		{
 			if(param.gamma == 0) param.gamma = 1;
 			svm_node *x_space = new svm_node[2 * prob.l];

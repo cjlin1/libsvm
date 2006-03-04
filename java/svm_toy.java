@@ -259,8 +259,11 @@ public class svm_toy extends Applet {
 		prob.l = point_list.size();
 		prob.y = new double[prob.l];
 
-		if(param.svm_type == svm_parameter.EPSILON_SVR ||
-		   param.svm_type == svm_parameter.NU_SVR)
+		if(param.kernel_type == svm_parameter.PRECOMPUTED)
+		{
+		}
+		else if(param.svm_type == svm_parameter.EPSILON_SVR ||
+			param.svm_type == svm_parameter.NU_SVR)
 		{
 			if(param.gamma == 0) param.gamma = 1;
 			prob.x = new svm_node[prob.l][1];
