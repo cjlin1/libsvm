@@ -7,10 +7,10 @@
 <a name="_TOP"><b><h1><a
 href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a>  FAQ </h1></b></a>
 <b>last modified : </b>
-Thu, 20 Oct 2005 09:03:48 GMT
+Wed,  8 Feb 2006 08:31:04 GMT
 <class="categories">
 <li><a
-href="#_TOP">All Questions</a>(52)</li>
+href="#_TOP">All Questions</a>(54)</li>
 <ul><b>
 <li><a
 href="#/Q1:_Some_courses_which_have_used_libsvm_as_a_tool">Q1:_Some_courses_which_have_used_libsvm_as_a_tool</a>(1)</li>
@@ -19,13 +19,15 @@ href="#/Q2:_Installation_and_running_the_program">Q2:_Installation_and_running_t
 <li><a
 href="#/Q3:_Data_preparation">Q3:_Data_preparation</a>(3)</li>
 <li><a
-href="#/Q4:_Training_and_prediction">Q4:_Training_and_prediction</a>(29)</li>
+href="#/Q4:_Training_and_prediction">Q4:_Training_and_prediction</a>(30)</li>
 <li><a
 href="#/Q5:_Graphic_Interface">Q5:_Graphic_Interface</a>(3)</li>
 <li><a
 href="#/Q6:_Java_version_of_libsvm">Q6:_Java_version_of_libsvm</a>(4)</li>
 <li><a
 href="#/Q7:_Python_Interface">Q7:_Python_Interface</a>(4)</li>
+<li><a
+href="#/Q8:_MATLAB_Interface">Q8:_MATLAB_Interface</a>(1)</li>
 </b></ul>
 </li>
 
@@ -65,12 +67,13 @@ href="#/Q7:_Python_Interface">Q7:_Python_Interface</a>(4)</li>
 <li class="headlines_item"><a href="#f420">After doing cross validation, why there is no model file outputted ?</a></li>
 <li class="headlines_item"><a href="#f421">I would like to try different random partition for cross validation, how could I do it ?</a></li>
 <li class="headlines_item"><a href="#f422">I would like to solve L2-SVM (i.e., error term is quadratic). How should I modify the code ?</a></li>
-<li class="headlines_item"><a href="#f423">There seems to be a zero division ?</a></li>
 <li class="headlines_item"><a href="#f424">How do I choose parameters for one-class svm as training data are in only one class?</a></li>
 <li class="headlines_item"><a href="#f425">Why training a probability model (i.e., -b 1) takes longer time</a></li>
 <li class="headlines_item"><a href="#f426">Why using the -b option does not give me better accuracy?</a></li>
 <li class="headlines_item"><a href="#f427">Why the code gives NaN (not a number) results?</a></li>
 <li class="headlines_item"><a href="#f428">Why on windows sometimes grid.py fails?</a></li>
+<li class="headlines_item"><a href="#f429">Why grid.py/easy.py sometimes generates the following warning message?</a></li>
+<li class="headlines_item"><a href="#f430">Is there a way to speed up the pow() function used in calculating polynomial kernels?</a></li>
 <li class="headlines_item"><a href="#f501">How can I save images drawn by svm-toy?</a></li>
 <li class="headlines_item"><a href="#f502">I press the "load" button to load data points but why svm-toy does not draw them ?</a></li>
 <li class="headlines_item"><a href="#f503">I would like svm-toy to handle more than three classes of data, what should I do ?</a></li>
@@ -78,10 +81,11 @@ href="#/Q7:_Python_Interface">Q7:_Python_Interface</a>(4)</li>
 <li class="headlines_item"><a href="#f602">Is the Java version significantly slower than the C++ version?</a></li>
 <li class="headlines_item"><a href="#f603">While training I get the following error message: java.lang.OutOfMemoryError. What is wrong?</a></li>
 <li class="headlines_item"><a href="#f604">Why you have the main source file svm.m4 and then transform it to svm.java?</a></li>
-<li class="headlines_item"><a href="#f702">Using python on MS windows, it fails to load the dll file.</a></li>
+<li class="headlines_item"><a href="#f702">On MS windows, why does python fail to load the dll file?</a></li>
 <li class="headlines_item"><a href="#f703">How to modify the python interface on MS windows and rebuild the dll file ?</a></li>
 <li class="headlines_item"><a href="#f704">Except the python-C++ interface provided, could I use Jython to call libsvm ?</a></li>
 <li class="headlines_item"><a href="#f705">How could I install the python interface on Mac OS? </a></li>
+<li class="headlines_item"><a href="#f801">I compile the MATLAB interface without problem, but why errors</a></li>
 </ul></ul>
 
 
@@ -576,6 +580,9 @@ Slow convergence may happen for some difficult cases (e.g. -c is large).
 You can try to use a looser stopping tolerance with -e.
 If that still doesn't work, you may want to contact us. We can show you some
 tricks on improving the training time.
+
+<p>
+If you are using polynomial kernels, please check the question on the pow() function.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
@@ -584,8 +591,8 @@ tricks on improving the training time.
 <br/>                                                                                
 <p>
 We print out decision values for regression. For classification,
-we solve several binary SVMs for multi-class cases, so 
-you obtain values by easily calling the subroutine
+we solve several binary SVMs for multi-class cases. You
+can obtain values by easily calling the subroutine
 svm_predict_values. Their corresponding labels
 can be obtained from svm_get_labels. 
 Details are in 
@@ -823,23 +830,6 @@ For one-class svm, the modification is exactly the same. For SVR, you don't need
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q4:_Training_and_prediction"></a>
-<a name="f423"><b>Q: There seems to be a zero division ?</b></a>
-<br/>                                                                                
-<p>
-We intend
-to have this zero division. 
-Under the IEEE floating point standard, zero
-division will returns infinity. Then with the 
-operations later to bound it, things go back to normal numbers without any problem.
-
-In general no warning messages happen. On some computers, you may
-need to add an option (e.g. -mieee on alpha).
-
-Reasons of doing so are described in libsvm document.
-<p align="right">
-<a href="#_TOP">[Go Top]</a>  
-<hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
 <a name="f424"><b>Q: How do I choose parameters for one-class svm as training data are in only one class?</b></a>
 <br/>                                                                                
 <p>
@@ -917,6 +907,41 @@ two lines in grid.py by inserting "#" in the beginning:
         redraw(db,1)
 </pre>
 Then you get accuracy only but not cross validation contours.
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q4:_Training_and_prediction"></a>
+<a name="f429"><b>Q: Why grid.py/easy.py sometimes generates the following warning message?</b></a>
+<br/>                                                                                
+<pre>
+Warning: empty z range [62.5:62.5], adjusting to [61.875:63.125]
+Notice: cannot contour non grid data!
+</pre>
+<p>Nothing is wrong and please disregard the 
+message. It is from gnuplot when drawing
+the contour.  
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q4:_Training_and_prediction"></a>
+<a name="f430"><b>Q: Is there a way to speed up the pow() function used in calculating polynomial kernels?</b></a>
+<br/>                                                                                
+<p>
+The pow() function of some libraries (e.g., glibc) is 
+inefficient when the degree is a small positive integer.
+You can add in svm.cpp the following simple mypow() function:
+<pre>
+inline double mypow(double base, int times){
+        double tmp = base, ret = 1.0;
+
+        for(int t=times; t>0; t/=2){
+                if(t%2==1) ret*=tmp;
+                tmp = tmp * tmp;
+        }
+        return ret;
+}
+</pre>
+and replace the two places of pow() with mypow().
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
@@ -1047,7 +1072,7 @@ However,  we need some macros (see first 3 lines of svm.m4).
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q7:_Python_Interface"></a>
-<a name="f702"><b>Q: Using python on MS windows, it fails to load the dll file.</b></a>
+<a name="f702"><b>Q: On MS windows, why does python fail to load the dll file?</b></a>
 <br/>                                                                                
 <p>
 It seems the dll file is version dependent. So far we haven't
@@ -1138,11 +1163,29 @@ Total nSV = 2
   <a name="/Q7:_Python_Interface"></a>
 <a name="f705"><b>Q: How could I install the python interface on Mac OS? </b></a>
 <br/>                                                                                
-<p> According to S V N Vishwanathan in Australian National University, instead of 
+<p> According to S V N Vishwanathan at Australian National University, instead of 
 LDFLAGS = -shared
 in the Makefile, you need
 <pre>
 LDFLAGS = -bundle -flat_namespace -undefined suppress
+</pre>
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q8:_MATLAB_Interface"></a>
+<a name="f801"><b>Q: I compile the MATLAB interface without problem, but why errors</b></a>
+<br/>                                                                                
+occue while running it?
+<p>
+Your compiler version may not be supported/compatible for MATLAB.
+Please check <a href=http://www.mathworks.com/support/tech-notes/1600/1601.html>this MATLAB page</a> first and then specify the version
+number. For example, if g++ 3.3 is supported, replace
+<pre>
+CXX = g++
+</pre>
+in the Makefile with
+<pre>
+CXX = g++-3.3
 </pre>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  

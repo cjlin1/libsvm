@@ -1,9 +1,8 @@
 Libsvm is a simple, easy-to-use, and efficient software for SVM
-classification and regression. It can solve C-SVM classification,
-nu-SVM classification, one-class-SVM, epsilon-SVM regression, and
-nu-SVM regression. It also provides an automatic model selection
-tool for C-SVM classification. This document explains the use of
-libsvm.
+classification and regression. It solves C-SVM classification, nu-SVM
+classification, one-class-SVM, epsilon-SVM regression, and nu-SVM
+regression. It also provides an automatic model selection tool for
+C-SVM classification. This document explains the use of libsvm.
 
 Libsvm is available at 
 http://www.csie.ntu.edu.tw/~cjlin/libsvm
@@ -13,12 +12,12 @@ Quick Start
 ===========
 
 If you are new to SVM and if the data is not large, please go to 
-tools directory and use easy.py after installation. It does 
+`tools' directory and use easy.py after installation. It does 
 everything automatic -- from data scaling to parameter selection.
 
 Usage: easy.py training_file [testing_file]
 
-More information about parameter selction can be found in
+More information about parameter selection can be found in
 tools/README.
 
 Installation
@@ -46,13 +45,13 @@ not used so can be any number.  Except using precomputed kernels
 (attribute) value.  <index> is an integer starting from 1 and <value>
 is a real number. Indices must be in an ASCENDING order. Labels in the
 testing file are only used to calculate accuracy or errors. If they
-are unknown, just fill this column with any numbers.
+are unknown, just fill the first column with any numbers.
 
-A sample classification data included in this package is heart_scale.
+A sample classification data included in this package is `heart_scale'.
 
 Type `svm-train heart_scale', and the program will read the training
 data and output the model file `heart_scale.model'. If you have a test
-set called heart_scale.t, then you type `svm-predict heart_scale.t
+set called heart_scale.t, then type `svm-predict heart_scale.t
 heart_scale.model output' to see the prediction accuracy. The `output'
 file contains the predicted class labels.
 
@@ -83,10 +82,10 @@ svm-toy:
 	Type `make' in respective directories to build them.
 
 	You need Qt library to build the Qt version.
-	(You can download it from http://www.trolltech.com)
+	(available from http://www.trolltech.com)
 
 	You need GTK+ library to build the GTK version.
-	(You can download it from http://www.gtk.org)
+	(available from http://www.gtk.org)
 	
 	We use Visual C++ to build the Windows version.
 	The pre-built Windows binaries are in the windows directory.
@@ -193,7 +192,9 @@ Users may pre-compute kernel values and input them as training and
 testing files.  Then libsvm does not need the original
 training/testing sets.
 
-Assume L training and R testing instances. Their input formats are:
+Assume L training and R testing instances. Let K(i,j) be the kernel
+value of the ith and the jth training instances. The input formats
+are:
 
 Training:
 
@@ -304,9 +305,9 @@ to classify new data.
 
     index = -1 indicates the end of one vector.
 
-    For pre-computed kernels, the format must be
+    For pre-computed kernels, the format is slightly different:
 
-    LABEL  SAMPLE_SERIAL_NUM K(1,1) ... K(1,L)
+    LABEL  SAMPLE_SERIAL_NUM K(SAMPLE_SERIAL_NUM,1) ... K(SAMPLE_SERIAL_NUM,L)
 
     Taking the example in the pre-computed kernel section, svm_problem
     of the three training instances has:
@@ -319,10 +320,12 @@ to classify new data.
 	 [ ] -> (?,2) (1,6) (2,18) (3,0) (-1,?)
 	 [ ] -> (?,3) (1,1) (2,0) (3,1) (-1,?)
 
-    Before the first kernel element, sample_serial_number
-    (starting from 1) must be inserted. Please check svm-train.c for
+    Before the kernel elements, sample_serial_number
+    (starting from 1) must be inserted as the first feature
+    value. Please check svm-train.c for
     an example of doing so. This is for TRAINING DATA ONLY. There is
     no need to add sample_serial_number for test instances.
+
  
     struct svm_parameter describes the parameters of an SVM model:
 
@@ -330,7 +333,7 @@ to classify new data.
 	{
 		int svm_type;
 		int kernel_type;
-		double degree;	/* for poly */
+		int degree;	/* for poly */
 		double gamma;	/* for poly/rbf/sigmoid */
 		double coef0;	/* for poly/sigmoid */
 
@@ -513,7 +516,6 @@ java -classpath libsvm.jar svm_train <arguments>
 java -classpath libsvm.jar svm_predict <arguments>
 java -classpath libsvm.jar svm_toy
 
-We have tried IBM's and Sun's JDK.
 You may need to add Java runtime library (like classes.zip) to the classpath.
 You may need to increase maximum Java heap size.
 
