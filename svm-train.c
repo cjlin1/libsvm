@@ -268,10 +268,7 @@ out:
 
 	prob.y = Malloc(double,prob.l);
 	prob.x = Malloc(struct svm_node *,prob.l);
-	if(param.kernel_type == PRECOMPUTED)
-		x_space = Malloc(struct svm_node, prob.l + elements);
-	else
-		x_space = Malloc(struct svm_node,elements);
+	x_space = Malloc(struct svm_node,elements);
 
 	max_index = 0;
 	j=0;
@@ -281,9 +278,6 @@ out:
 		prob.x[i] = &x_space[j];
 		fscanf(fp,"%lf",&label);
 		prob.y[i] = label;
-
-		if(param.kernel_type == PRECOMPUTED)	
-			x_space[j++].value = i+1; // sample_serial_number starts from 1 to l
 
 		while(1)
 		{
@@ -305,5 +299,23 @@ out2:
 	if(param.gamma == 0)
 		param.gamma = 1.0/max_index;
 
+	if(param.kernel_type == PRECOMPUTED)
+	{
+		if (max_index != prob.l)
+		{
+			fprintf(stderr,"Wrong kernel matrix: incorrect #features\n");
+			exit(1);
+		}
+		else
+		{
+			for(i=0;i<prob.l;i++)
+				if ((int)prob.x[i][0].value != i+1)
+				{
+					fprintf(stderr,"Wrong input format: first column must be sample_serial_number\n");
+					exit(1);
+				}
+		}
+	}
+		
 	fclose(fp);
 }

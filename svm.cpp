@@ -262,7 +262,6 @@ Kernel::Kernel(int l, svm_node * const * x_, const svm_parameter& param)
 			kernel_function = &Kernel::kernel_sigmoid;
 		case PRECOMPUTED:
 			kernel_function = &Kernel::kernel_precomputed;
-
 			break;
 	}
 
@@ -2723,7 +2722,7 @@ int svm_save_model(const char *model_file_name, const svm_model *model)
 		const svm_node *p = SV[i];
 
 		if(param.kernel_type == PRECOMPUTED)
-			fprintf(fp,"0:%d ",(int)((p->value)-1));
+			fprintf(fp,"0:%d ",(int)(p->value));
 		else
 			while(p->index != -1)
 			{

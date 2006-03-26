@@ -47,3 +47,11 @@ print "##########################################"
 print "predicted class: %d" % (pred_label)
 for i in model.get_labels():
 	print "prob(label=%d) = %f" % (i, pred_probability[i])
+
+print "##########################################"
+print " Precomputed kernels"
+print "##########################################"
+samples = [[1, 0, 0, 0, 0], [2, 0, 1, 0, 1], [3, 0, 0, 1, 1], [4, 0, 1, 1, 2]]
+problem = svm_problem(labels, samples);
+param = svm_parameter(kernel_type=PRECOMPUTED,C = 10,nr_weight = 2,weight_label = [1,0],weight = [10,1])
+model = svm_model(problem, param)

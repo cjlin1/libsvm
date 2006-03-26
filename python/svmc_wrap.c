@@ -3562,5 +3562,8 @@ SWIGEXPORT(void) SWIG_init(void) {
     {
         PyDict_SetItemString(d,"SIGMOID", SWIG_From_int((int)(SIGMOID))); 
     }
+    {
+        PyDict_SetItemString(d,"PRECOMPUTED", SWIG_From_int((int)(PRECOMPUTED))); 
+    }
 }
 

@@ -247,7 +247,6 @@ class svm_train {
 		Vector vx = new Vector();
 		int max_index = 0;
 
-		int i = 0;
 		while(true)
 		{
 			String line = fp.readLine();
@@ -257,44 +256,47 @@ class svm_train {
 
 			vy.addElement(st.nextToken());
 			int m = st.countTokens()/2;
-			int start, end;
-			if (param.kernel_type == svm_parameter.PRECOMPUTED)
-			{
-				start=1; end=m+1;
-			}
-			else
-			{
-				start=0; end=m;
-			}
-			svm_node[] x = new svm_node[end];
-			if (param.kernel_type == svm_parameter.PRECOMPUTED)
-			{
-				x[0] = new svm_node();
-				x[0].value = i+1;
-			}
-			i++;
-
-			for(int j=start;j<end;j++)
+			svm_node[] x = new svm_node[m];
+			for(int j=0;j<m;j++)
 			{
 				x[j] = new svm_node();
 				x[j].index = atoi(st.nextToken());
 				x[j].value = atof(st.nextToken());
 			}
-			if(m>0) max_index = Math.max(max_index, x[end-1].index);
+			if(m>0) max_index = Math.max(max_index, x[m-1].index);
 			vx.addElement(x);
 		}
 
 		prob = new svm_problem();
 		prob.l = vy.size();
 		prob.x = new svm_node[prob.l][];
-		for(i=0;i<prob.l;i++)
+		for(int i=0;i<prob.l;i++)
 			prob.x[i] = (svm_node[])vx.elementAt(i);
 		prob.y = new double[prob.l];
-		for(i=0;i<prob.l;i++)
+		for(int i=0;i<prob.l;i++)
 			prob.y[i] = atof((String)vy.elementAt(i));
 
 		if(param.gamma == 0)
 			param.gamma = 1.0/max_index;
+
+		if(param.kernel_type == svm_parameter.PRECOMPUTED)
+		{
+			if (max_index != prob.l)
+			{
+				System.err.print("Wrong kernel matrix: incorrect #features\n");
+				System.exit(1);
+		}
+		else
+		{
+			for(int i=0;i<prob.l;i++)
+				if ((int)prob.x[i][0].value != i+1)
+				{
+					System.err.print("Wrong input format: first column must be sample_serial_number\n");
+					System.exit(1);
+				}
+		}
+	}
+
 
 		fp.close();
 	}

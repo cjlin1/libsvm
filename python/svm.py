@@ -1,6 +1,6 @@
 import svmc
 from svmc import C_SVC, NU_SVC, ONE_CLASS, EPSILON_SVR, NU_SVR
-from svmc import LINEAR, POLY, RBF, SIGMOID
+from svmc import LINEAR, POLY, RBF, SIGMOID, PRECOMPUTED
 from math import exp, fabs
 
 def _int_array(seq):
@@ -107,11 +107,12 @@ def _convert_to_svm_node_array(x):
 	iter_range = []
 	if type(x) == dict:
 		for k, v in x.iteritems():
-			if v != 0:
+# all zeros kept due to the precomputed kernel; no good solution yet
+#			if v != 0:
 				iter_range.append( k )
 	elif operator.isSequenceType(x):
 		for j in range(len(x)):
-			if x[j] != 0:
+#			if x[j] != 0:
 				iter_range.append( j )
 	else:
 		raise TypeError,"data must be a mapping or a sequence"
