@@ -188,7 +188,7 @@ probability estimates
 PRECOMPUTED KERNELS 
 ===================
 
-Users may pre-computed kernel values and input them as training and
+Users may pre-compute kernel values and input them as training and
 testing files.  Then libsvm does not need the original
 training/testing sets.
 
@@ -215,11 +215,13 @@ That is, in training the fist column must be sample_serial_number. In
 testing, ? can be any value.
 
 All kernel values including ZEROs must be explicitly provided.
+Any permutation or random subsets of the above training/testing
+files are also valid (see examples below).
 
 Examples:
 
 	Assume the original training data has three four-feature
-	instances and testing data has one:
+	instances and testing data has one instance:
 
 	1  1:1 2:1 3:1 4:1
 	3      2:3     4:3
@@ -237,6 +239,16 @@ Examples:
 	1  0:? 1:2 2:0  3:1
 
 	? can be any value.
+
+	Any subset of the above training file is also valid. For example,
+
+	2  0:3 1:1 2:0  3:1
+	3  0:2 1:6 2:18 3:0 
+
+	implies that the kernel matrix is
+
+		0  1
+		18 0
 
 Library Usage
 =============
@@ -269,9 +281,7 @@ to classify new data.
     where `l' is the number of training data, and `y' is an array containing
     their target values. (integers in classification, real numbers in
     regression) `x' is an array of pointers, each of which points to a sparse
-    representation (array of svm_node) of one training vector. The
-    situation for pre-computed kernels is different and explained
-    later.
+    representation (array of svm_node) of one training vector. 
 
     For example, if we have the following training data:
 
@@ -389,7 +399,7 @@ to classify new data.
     labels in the validation process are stored in the array called
     target.
 
-    The format of svm_prob is same as that for svm_train(). Please be careful on the case of pre-computed kernels.
+    The format of svm_prob is same as that for svm_train(). 
 
 - Function: int svm_get_svm_type(const struct svm_model *model);
 
