@@ -192,31 +192,28 @@ Users may pre-compute kernel values and input them as training and
 testing files.  Then libsvm does not need the original
 training/testing sets.
 
-Assume L training and R testing instances. Let K(i,j) be the kernel
-value of the ith and the jth training instances. The input formats
+Assume there are L training instances x1, ..., xL and. 
+Let K(x, y) be the kernel
+value of two instances x and y. The input formats
 are:
 
-Training:
+New training instance for xi:
 
-<label> 0:1 1:K(1,1) ... L:K(1,L) 
-<label> 0:2 1:K(2,1) ... L:K(2,L) 
-.
-.
-<label> 0:L 1:K(L,1) ... L:K(L,L) 
+<label> 0:i 1:K(xi,x1) ... L:K(xi,xL) 
 
-Testing:
+New testing instance for any x:
 
-<label> 0:? 1:K(L+1,1) ... L:K(L+1,L) 
-.
-.
-<label> 0:? 1:K(L+R,1) ... L:K(L+R,L) 
+<label> 0:? 1:K(x,x1) ... L:K(x,xL) 
 
-That is, in training the fist column must be sample_serial_number. In
-testing, ? can be any value.
+That is, in the training file the first column must be the "ID" of
+xi. In testing, ? can be any value.
 
-All kernel values including ZEROs must be explicitly provided.
-Any permutation or random subsets of the above training/testing
-files are also valid (see examples below).
+All kernel values including ZEROs must be explicitly provided.  Any
+permutation or random subsets of the training/testing files are also
+valid (see examples below).
+
+Note: the format is slightly different from the precomputed kernel
+package released in libsvmtools earlier.
 
 Examples:
 
