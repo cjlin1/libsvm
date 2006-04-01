@@ -287,9 +287,9 @@ class svm_train {
 					System.err.print("Wrong kernel matrix: first column must be 0:sample_serial_number\n");
 					System.exit(1);
 				}
-				if ((int)prob.x[i][0].value > max_index)
+				if ((int)prob.x[i][0].value <= 0 || (int)prob.x[i][0].value > max_index)
 				{
-					System.err.print("Wrong input format: kernel column K(:,"+(int)prob.x[i][0].value+") is not provided\n");
+					System.err.print("Wrong input format: sample_serial_number out of range\n");
 					System.exit(1);
 				}
 			}
