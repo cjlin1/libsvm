@@ -280,23 +280,19 @@ class svm_train {
 			param.gamma = 1.0/max_index;
 
 		if(param.kernel_type == svm_parameter.PRECOMPUTED)
-		{
-			if (max_index != prob.l)
-			{
-				System.err.print("Wrong kernel matrix: incorrect #features\n");
-				System.exit(1);
-		}
-		else
-		{
 			for(int i=0;i<prob.l;i++)
-				if ((int)prob.x[i][0].value != i+1)
+			{
+				if (prob.x[i][0].index != 0)
 				{
-					System.err.print("Wrong input format: first column must be sample_serial_number\n");
+					System.err.print("Wrong kernel matrix: first column must be 0:sample_serial_number\n");
 					System.exit(1);
 				}
-		}
-	}
-
+				if ((int)prob.x[i][0].value > max_index)
+				{
+					System.err.print("Wrong input format: kernel column K(:,"+(int)prob.x[i][0].value+") is not provided\n");
+					System.exit(1);
+				}
+			}
 
 		fp.close();
 	}

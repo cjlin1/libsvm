@@ -300,22 +300,19 @@ out2:
 		param.gamma = 1.0/max_index;
 
 	if(param.kernel_type == PRECOMPUTED)
-	{
-		if (max_index != prob.l)
+		for(i=0;i<prob.l;i++)
 		{
-			fprintf(stderr,"Wrong kernel matrix: incorrect #features\n");
-			exit(1);
+			if (prob.x[i][0].index != 0)
+			{
+				fprintf(stderr,"Wrong input format: first column must be 0:sample_serial_number\n");
+				exit(1);
+			}
+			if ((int)prob.x[i][0].value > max_index)
+			{
+				fprintf(stderr,"Wrong input format: kernel column K(:,%d) is not provided\n", (int)prob.x[i][0].value);
+				exit(1);
+			}
 		}
-		else
-		{
-			for(i=0;i<prob.l;i++)
-				if ((int)prob.x[i][0].value != i+1)
-				{
-					fprintf(stderr,"Wrong input format: first column must be sample_serial_number\n");
-					exit(1);
-				}
-		}
-	}
-		
+
 	fclose(fp);
 }
