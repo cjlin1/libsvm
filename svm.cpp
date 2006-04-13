@@ -260,6 +260,7 @@ Kernel::Kernel(int l, svm_node * const * x_, const svm_parameter& param)
 			break;
 		case SIGMOID:
 			kernel_function = &Kernel::kernel_sigmoid;
+			break;
 		case PRECOMPUTED:
 			kernel_function = &Kernel::kernel_precomputed;
 			break;
