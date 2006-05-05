@@ -6,6 +6,8 @@ PYTHON_INCLUDEDIR ?= /usr/include/python2.4
 
 CFLAGS = -O3 -I$(PYTHON_INCLUDEDIR) -I..
 LDFLAGS = -shared
+# Mac OS
+# LDFLAGS = -framework Python -bundle
 
 all: svmc.so
 
