@@ -287,7 +287,11 @@ out:
 				if(c=='\n') goto out2;
 			} while(isspace(c));
 			ungetc(c,fp);
-			fscanf(fp,"%d:%lf",&(x_space[j].index),&(x_space[j].value));
+			if (fscanf(fp,"%d:%lf",&(x_space[j].index),&(x_space[j].value)) < 2)
+			{
+				fprintf(stderr,"Wrong input format at line %d\n", i+1);
+				exit(1);
+			}
 			++j;
 		}	
 out2:
