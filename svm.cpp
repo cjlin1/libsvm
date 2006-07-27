@@ -2530,7 +2530,6 @@ void svm_predict_values(const svm_model *model, const svm_node *x, double* dec_v
 			start[i] = start[i-1]+model->nSV[i-1];
 
 		int p=0;
-		int pos=0;
 		for(i=0;i<nr_class;i++)
 			for(int j=i+1;j<nr_class;j++)
 			{
@@ -2547,8 +2546,9 @@ void svm_predict_values(const svm_model *model, const svm_node *x, double* dec_v
 					sum += coef1[si+k] * kvalue[si+k];
 				for(k=0;k<cj;k++)
 					sum += coef2[sj+k] * kvalue[sj+k];
-				sum -= model->rho[p++];
-				dec_values[pos++] = sum;
+				sum -= model->rho[p];
+				dec_values[p] = sum;
+				p++;
 			}
 
 		free(kvalue);
