@@ -53,6 +53,13 @@ for cross validation and then draw contour of CV accuracy using gnuplot.
 You must have libsvm and gnuplot installed before using it. The package 
 gnuplot is available at http://www.gnuplot.info/
 
+On Mac OSX, the precompiled gnuplot file needs the library Aquarterm,
+which thus must be installed as well. In addition, this version of
+gnuplot does not support png, so you need to change "set term png
+transparent small" and use other image formats. For example, you may
+have "set term pbm small color".
+
+
 Usage: grid.py [-log2c begin,end,step] [-log2g begin,end,step] [-v fold] 
        [-svmtrain pathname] [-gnuplot pathname] [-out pathname] [-png pathname]  
        [additional parameters for svm-train] dataset
