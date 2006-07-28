@@ -55,3 +55,4 @@ samples = [[1, 0, 0, 0, 0], [2, 0, 1, 0, 1], [3, 0, 0, 1, 1], [4, 0, 1, 1, 2]]
 problem = svm_problem(labels, samples);
 param = svm_parameter(kernel_type=PRECOMPUTED,C = 10,nr_weight = 2,weight_label = [1,0],weight = [10,1])
 model = svm_model(problem, param)
+pred_label = model.predict(samples[0])
