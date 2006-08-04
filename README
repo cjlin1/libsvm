@@ -390,7 +390,10 @@ to classify new data.
 
     *NOTE* Because svm_model contains pointers to svm_problem, you can
     not free the memory used by svm_problem if you are still using the
-    svm_model produced by svm_train().
+    svm_model produced by svm_train(). 
+
+    *NOTE* To avoid wrong parameters, svm_check_parameter() should be
+    called before svm_train().
 
 - Function: double svm_predict(const struct svm_model *model,
                                const struct svm_node *x);
