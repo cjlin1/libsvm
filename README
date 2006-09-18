@@ -471,7 +471,8 @@ to classify new data.
     function gives nr_class probability estimates in the array
     prob_estimates. nr_class can be obtained from the function
     svm_get_nr_class. The class with the highest probability is
-    returned. For all other situations, the array prob_estimates is
+    returned. For regression/one-class SVM, the array prob_estimates
+    is
     unchanged and the returned value is the same as that of
     svm_predict.
 
