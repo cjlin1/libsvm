@@ -2015,9 +2015,9 @@ void svm_binary_svc_probability(
 			}		
 			svm_destroy_model(submodel);
 			svm_destroy_param(&subparam);
-			free(subprob.x);
-			free(subprob.y);
 		}
+		free(subprob.x);
+		free(subprob.y);
 	}		
 	sigmoid_train(prob->l,dec_values,prob->y,probA,probB);
 	free(dec_values);
