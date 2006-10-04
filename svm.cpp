@@ -2857,7 +2857,7 @@ svm_model *svm_load_model(const char *model_file_name)
 		}
 		else
 		{
-			fprintf(stderr,"unknown text in model file\n");
+			fprintf(stderr,"unknown text in model file: [%s]\n",cmd);
 			free(model->rho);
 			free(model->label);
 			free(model->nSV);
