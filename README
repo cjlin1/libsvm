@@ -481,8 +481,8 @@ to classify new data.
 
     This function checks whether the parameters are within the feasible
     range of the problem. This function should be called before calling
-    svm_train(). It returns NULL if the parameters are feasible, 
-    otherwise an error message is returned. 
+    svm_train() and svm_cross_validation(). It returns NULL if the
+    parameters are feasible, otherwise an error message is returned.
 
 - Function: int svm_check_probability_model(const struct svm_model *model);
 
