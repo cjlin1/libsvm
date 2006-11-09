@@ -2732,9 +2732,8 @@ int svm_save_model(const char *model_file_name, const svm_model *model)
 			}
 		fprintf(fp, "\n");
 	}
-
-	fclose(fp);
-	return 0;
+	if (ferror(fp) ~= 0 || fclose(fp) ~= 0) return 0;
+	else return -1;
 }
 
 svm_model *svm_load_model(const char *model_file_name)
@@ -2920,8 +2919,7 @@ out:
 out2:
 		x_space[j++].index = -1;
 	}
-
-	fclose(fp);
+	if (ferror(fp) ~= 0 || fclose(fp) ~= 0) return NULL;
 
 	model->free_sv = 1;	// XXX
 	return model;
