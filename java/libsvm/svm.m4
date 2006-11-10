@@ -2648,7 +2648,7 @@ public class svm {
 			}
 			else
 			{
-				System.err.print("unknown text in model file\n");
+				System.err.print("unknown text in model file: ["+cmd+"]\n");
 				return null;
 			}
 		}
