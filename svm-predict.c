@@ -61,7 +61,11 @@ void predict(FILE *input, FILE *output)
 				if(c=='\n' || c==EOF) goto out2;
 			} while(isspace(c));
 			ungetc(c,input);
-			fscanf(input,"%d:%lf",&x[i].index,&x[i].value);
+			if (fscanf(input,"%d:%lf",&x[i].index,&x[i].value) < 2)
+			{
+				fprintf(stderr,"Wrong input format at line %d\n", total+1);
+				exit(1);
+			}
 			++i;
 		}	
 
