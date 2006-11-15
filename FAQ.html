@@ -7,10 +7,10 @@
 <a name="_TOP"><b><h1><a
 href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a>  FAQ </h1></b></a>
 <b>last modified : </b>
-Wed,  8 Feb 2006 08:31:04 GMT
+Tue, 29 Aug 2006 22:14:04 GMT
 <class="categories">
 <li><a
-href="#_TOP">All Questions</a>(54)</li>
+href="#_TOP">All Questions</a>(56)</li>
 <ul><b>
 <li><a
 href="#/Q1:_Some_courses_which_have_used_libsvm_as_a_tool">Q1:_Some_courses_which_have_used_libsvm_as_a_tool</a>(1)</li>
@@ -19,15 +19,17 @@ href="#/Q2:_Installation_and_running_the_program">Q2:_Installation_and_running_t
 <li><a
 href="#/Q3:_Data_preparation">Q3:_Data_preparation</a>(3)</li>
 <li><a
-href="#/Q4:_Training_and_prediction">Q4:_Training_and_prediction</a>(30)</li>
+href="#/Q4:_Training_and_prediction">Q4:_Training_and_prediction</a>(27)</li>
 <li><a
-href="#/Q5:_Graphic_Interface">Q5:_Graphic_Interface</a>(3)</li>
+href="#/Q5:_Probability_outputs">Q5:_Probability_outputs</a>(3)</li>
 <li><a
-href="#/Q6:_Java_version_of_libsvm">Q6:_Java_version_of_libsvm</a>(4)</li>
+href="#/Q6:_Graphic_interface">Q6:_Graphic_interface</a>(3)</li>
 <li><a
-href="#/Q7:_Python_Interface">Q7:_Python_Interface</a>(4)</li>
+href="#/Q7:_Java_version_of_libsvm">Q7:_Java_version_of_libsvm</a>(4)</li>
 <li><a
-href="#/Q8:_MATLAB_Interface">Q8:_MATLAB_Interface</a>(1)</li>
+href="#/Q8:_Python_interface">Q8:_Python_interface</a>(5)</li>
+<li><a
+href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(2)</li>
 </b></ul>
 </li>
 
@@ -55,7 +57,7 @@ href="#/Q8:_MATLAB_Interface">Q8:_MATLAB_Interface</a>(1)</li>
 <li class="headlines_item"><a href="#f409">The prediction rate is low. How could I improve it?</a></li>
 <li class="headlines_item"><a href="#f410">My data are unbalanced. Could libsvm handle such problems?</a></li>
 <li class="headlines_item"><a href="#f411">What is the difference between nu-SVC and C-SVC?</a></li>
-<li class="headlines_item"><a href="#f412">The program keeps running without showing any output. What should I do?</a></li>
+<li class="headlines_item"><a href="#f412">The program keeps running (without showing any output). What should I do?</a></li>
 <li class="headlines_item"><a href="#f413">The program keeps running (with output, i.e. many dots). What should I do?</a></li>
 <li class="headlines_item"><a href="#f414">The training time is too long. What should I do?</a></li>
 <li class="headlines_item"><a href="#f415">How do I get the decision value(s)?</a></li>
@@ -68,12 +70,12 @@ href="#/Q8:_MATLAB_Interface">Q8:_MATLAB_Interface</a>(1)</li>
 <li class="headlines_item"><a href="#f421">I would like to try different random partition for cross validation, how could I do it ?</a></li>
 <li class="headlines_item"><a href="#f422">I would like to solve L2-SVM (i.e., error term is quadratic). How should I modify the code ?</a></li>
 <li class="headlines_item"><a href="#f424">How do I choose parameters for one-class svm as training data are in only one class?</a></li>
-<li class="headlines_item"><a href="#f425">Why training a probability model (i.e., -b 1) takes longer time</a></li>
-<li class="headlines_item"><a href="#f426">Why using the -b option does not give me better accuracy?</a></li>
 <li class="headlines_item"><a href="#f427">Why the code gives NaN (not a number) results?</a></li>
 <li class="headlines_item"><a href="#f428">Why on windows sometimes grid.py fails?</a></li>
 <li class="headlines_item"><a href="#f429">Why grid.py/easy.py sometimes generates the following warning message?</a></li>
-<li class="headlines_item"><a href="#f430">Is there a way to speed up the pow() function used in calculating polynomial kernels?</a></li>
+<li class="headlines_item"><a href="#f425">Why training a probability model (i.e., -b 1) takes longer time</a></li>
+<li class="headlines_item"><a href="#f426">Why using the -b option does not give me better accuracy?</a></li>
+<li class="headlines_item"><a href="#f427">Why using svm-predict -b 0 and -b 1 gives different accuracy values?</a></li>
 <li class="headlines_item"><a href="#f501">How can I save images drawn by svm-toy?</a></li>
 <li class="headlines_item"><a href="#f502">I press the "load" button to load data points but why svm-toy does not draw them ?</a></li>
 <li class="headlines_item"><a href="#f503">I would like svm-toy to handle more than three classes of data, what should I do ?</a></li>
@@ -85,7 +87,9 @@ href="#/Q8:_MATLAB_Interface">Q8:_MATLAB_Interface</a>(1)</li>
 <li class="headlines_item"><a href="#f703">How to modify the python interface on MS windows and rebuild the dll file ?</a></li>
 <li class="headlines_item"><a href="#f704">Except the python-C++ interface provided, could I use Jython to call libsvm ?</a></li>
 <li class="headlines_item"><a href="#f705">How could I install the python interface on Mac OS? </a></li>
+<li class="headlines_item"><a href="#f706">I typed "make" on a unix system, but it says "Python.h: No such file or directory?"</a></li>
 <li class="headlines_item"><a href="#f801">I compile the MATLAB interface without problem, but why errors</a></li>
+<li class="headlines_item"><a href="#f802">Doe the MATLAB interface provide a function to do scaling?</a></li>
 </ul></ul>
 
 
@@ -546,7 +550,7 @@ error.
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q4:_Training_and_prediction"></a>
-<a name="f412"><b>Q: The program keeps running without showing any output. What should I do?</b></a>
+<a name="f412"><b>Q: The program keeps running (without showing any output). What should I do?</b></a>
 <br/>                                                                                
 <p>
 You may want to check your data. Each training/testing
@@ -626,7 +630,8 @@ decision values correspond to data predicted as +1 (-1).
 The distance is |decision_value| / |w|. 
 We have |w|^2 = w^Tw = alpha^T Q alpha = 2*(dual_obj + sum alpha_i). 
 Thus in svm.cpp please find the place 
-where we print the dual objective value
+where we calculate the dual objective value
+(i.e., the subroutine Solve())
 and add a statement to print w^Tw.
 
 <p align="right">
@@ -839,37 +844,6 @@ parameters which achieve similar cross-validation accuracy.
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q4:_Training_and_prediction"></a>
-<a name="f425"><b>Q: Why training a probability model (i.e., -b 1) takes longer time</b></a>
-<br/>                                                                                
-<p>
-To construct this probability model, we internaly conduct a 
-cross validation, which is more time consuming than
-a regular training.
-Hence, in general you do parameter selection first without
--b 1. You only use -b 1 when good parameters have been
-selected. In other words, you avoid using -b 1 and -v
-together.
-<p align="right">
-<a href="#_TOP">[Go Top]</a>  
-<hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
-<a name="f426"><b>Q: Why using the -b option does not give me better accuracy?</b></a>
-<br/>                                                                                
-<p>
-There is absolutely no reason the probability outputs guarantee
-you better accuracy. The main purpose of this option is
-to provide you the probability estimates, but not to boost
-prediction accuracy. From our experience, 
-after proper parameter selections, in general with
-and without -b have similar accuracy. Occasionally there
-are some differences.
-It is not recommended to compare the two under 
-just a fixed parameter
-set as more differences will be observed.
-<p align="right">
-<a href="#_TOP">[Go Top]</a>  
-<hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
 <a name="f427"><b>Q: Why the code gives NaN (not a number) results?</b></a>
 <br/>                                                                                
 <p>
@@ -923,29 +897,51 @@ the contour.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
-<a name="f430"><b>Q: Is there a way to speed up the pow() function used in calculating polynomial kernels?</b></a>
+  <a name="/Q5:_Probability_outputs"></a>
+<a name="f425"><b>Q: Why training a probability model (i.e., -b 1) takes longer time</b></a>
 <br/>                                                                                
 <p>
-The pow() function of some libraries (e.g., glibc) is 
-inefficient when the degree is a small positive integer.
-You can add in svm.cpp the following simple mypow() function:
-<pre>
-inline double mypow(double base, int times){
-        double tmp = base, ret = 1.0;
-
-        for(int t=times; t>0; t/=2){
-                if(t%2==1) ret*=tmp;
-                tmp = tmp * tmp;
-        }
-        return ret;
-}
-</pre>
-and replace the two places of pow() with mypow().
+To construct this probability model, we internaly conduct a 
+cross validation, which is more time consuming than
+a regular training.
+Hence, in general you do parameter selection first without
+-b 1. You only use -b 1 when good parameters have been
+selected. In other words, you avoid using -b 1 and -v
+together.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q5:_Graphic_Interface"></a>
+  <a name="/Q5:_Probability_outputs"></a>
+<a name="f426"><b>Q: Why using the -b option does not give me better accuracy?</b></a>
+<br/>                                                                                
+<p>
+There is absolutely no reason the probability outputs guarantee
+you better accuracy. The main purpose of this option is
+to provide you the probability estimates, but not to boost
+prediction accuracy. From our experience, 
+after proper parameter selections, in general with
+and without -b have similar accuracy. Occasionally there
+are some differences.
+It is not recommended to compare the two under 
+just a fixed parameter
+set as more differences will be observed.
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q5:_Probability_outputs"></a>
+<a name="f427"><b>Q: Why using svm-predict -b 0 and -b 1 gives different accuracy values?</b></a>
+<br/>                                                                                
+<p>
+After probability information is obtained in training,
+we do not have
+<p>
+prob > = 0.5 if and only if decision value >= 0.
+<p>
+So predictions may be different with -b 0 and 1.
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q6:_Graphic_interface"></a>
 <a name="f501"><b>Q: How can I save images drawn by svm-toy?</b></a>
 <br/>                                                                                
 <p>
@@ -955,11 +951,11 @@ Open "Microsoft Paint"
 and press "ctrl-v." Then you can clip
 the part of picture which you want.
 For X windows, you can 
-use the program "xv" to grab the picture of the svm-toy window.
+use the program "xv" or "import" to grab the picture of the svm-toy window.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q5:_Graphic_Interface"></a>
+  <a name="/Q6:_Graphic_interface"></a>
 <a name="f502"><b>Q: I press the "load" button to load data points but why svm-toy does not draw them ?</b></a>
 <br/>                                                                                
 <p>
@@ -972,7 +968,7 @@ Moreover, class labels must be 1, 2, or 3
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q5:_Graphic_Interface"></a>
+  <a name="/Q6:_Graphic_interface"></a>
 <a name="f503"><b>Q: I would like svm-toy to handle more than three classes of data, what should I do ?</b></a>
 <br/>                                                                                
 <p>
@@ -1028,7 +1024,7 @@ data)
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q6:_Java_version_of_libsvm"></a>
+  <a name="/Q7:_Java_version_of_libsvm"></a>
 <a name="f601"><b>Q: What is the difference between Java version and C++ version of libsvm?</b></a>
 <br/>                                                                                
 <p>
@@ -1037,7 +1033,7 @@ in Java.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q6:_Java_version_of_libsvm"></a>
+  <a name="/Q7:_Java_version_of_libsvm"></a>
 <a name="f602"><b>Q: Is the Java version significantly slower than the C++ version?</b></a>
 <br/>                                                                                
 <p>
@@ -1047,7 +1043,7 @@ the C++ code. (though still slower)
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q6:_Java_version_of_libsvm"></a>
+  <a name="/Q7:_Java_version_of_libsvm"></a>
 <a name="f603"><b>Q: While training I get the following error message: java.lang.OutOfMemoryError. What is wrong?</b></a>
 <br/>                                                                                
 <p>
@@ -1060,7 +1056,7 @@ sets the maximum heap size to 256M.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q6:_Java_version_of_libsvm"></a>
+  <a name="/Q7:_Java_version_of_libsvm"></a>
 <a name="f604"><b>Q: Why you have the main source file svm.m4 and then transform it to svm.java?</b></a>
 <br/>                                                                                
 <p>
@@ -1071,7 +1067,7 @@ However,  we need some macros (see first 3 lines of svm.m4).
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q7:_Python_Interface"></a>
+  <a name="/Q8:_Python_interface"></a>
 <a name="f702"><b>Q: On MS windows, why does python fail to load the dll file?</b></a>
 <br/>                                                                                
 <p>
@@ -1081,7 +1077,7 @@ good suggestions.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q7:_Python_Interface"></a>
+  <a name="/Q8:_Python_interface"></a>
 <a name="f703"><b>Q: How to modify the python interface on MS windows and rebuild the dll file ?</b></a>
 <br/>                                                                                
 <p>
@@ -1124,7 +1120,7 @@ presented a similar example.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q7:_Python_Interface"></a>
+  <a name="/Q8:_Python_interface"></a>
 <a name="f704"><b>Q: Except the python-C++ interface provided, could I use Jython to call libsvm ?</b></a>
 <br/>                                                                                
 <p> Yes, here are some examples:
@@ -1160,19 +1156,37 @@ Total nSV = 2
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q7:_Python_Interface"></a>
+  <a name="/Q8:_Python_interface"></a>
 <a name="f705"><b>Q: How could I install the python interface on Mac OS? </b></a>
 <br/>                                                                                
-<p> According to S V N Vishwanathan at Australian National University, instead of 
+<p> Instead of 
 LDFLAGS = -shared
 in the Makefile, you need
 <pre>
-LDFLAGS = -bundle -flat_namespace -undefined suppress
+LDFLAGS = -framework Python -bundle
 </pre>
+<!-- 
+LDFLAGS = -bundle -flat_namespace -undefined suppress
+-->
+
+The problem is that under MacOs there is no "shared libraries."
+Instead they use "dynamic libraries."
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q8:_MATLAB_Interface"></a>
+  <a name="/Q8:_Python_interface"></a>
+<a name="f706"><b>Q: I typed "make" on a unix system, but it says "Python.h: No such file or directory?"</b></a>
+<br/>                                                                                
+<p> 
+Even though you may have python on your
+system, very likely 
+python development tools 
+are not installed. Please check with 
+your system administrator.
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q9:_MATLAB_interface"></a>
 <a name="f801"><b>Q: I compile the MATLAB interface without problem, but why errors</b></a>
 <br/>                                                                                
 occue while running it?
@@ -1186,6 +1200,19 @@ CXX = g++
 in the Makefile with
 <pre>
 CXX = g++-3.3
+</pre>
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q9:_MATLAB_interface"></a>
+<a name="f802"><b>Q: Doe the MATLAB interface provide a function to do scaling?</b></a>
+<br/>                                                                                
+<p>
+It is extremely easy to do scaling under MATLAB.
+The following one-line code scale each feature to the range
+of [0.1]:
+<pre>
+(data - repmat(min(data,[],1),size(data,1),1))./(repmat(max(data,[],1)-min(data,[],1),size(data,1),1))
 </pre>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
