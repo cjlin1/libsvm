@@ -96,13 +96,17 @@ out2:
 		sumvy += v*target;
 		++total;
 	}
-	printf("Accuracy = %g%% (%d/%d) (classification)\n",
-		(double)correct/total*100,correct,total);
-	printf("Mean squared error = %g (regression)\n",error/total);
-	printf("Squared correlation coefficient = %g (regression)\n",
-		((total*sumvy-sumv*sumy)*(total*sumvy-sumv*sumy))/
-		((total*sumvv-sumv*sumv)*(total*sumyy-sumy*sumy))
-		);
+	if (svm_type==NU_SVR || svm_type==EPSILON_SVR)
+	{
+		printf("Mean squared error = %g (regression)\n",error/total);
+		printf("Squared correlation coefficient = %g (regression)\n",
+		       ((total*sumvy-sumv*sumy)*(total*sumvy-sumv*sumy))/
+		       ((total*sumvv-sumv*sumv)*(total*sumyy-sumy*sumy))
+		       );
+	}
+	else
+		printf("Accuracy = %g%% (%d/%d) (classification)\n",
+		       (double)correct/total*100,correct,total);
 	if(predict_probability)
 	{
 		free(prob_estimates);
