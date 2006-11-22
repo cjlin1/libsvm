@@ -84,13 +84,18 @@ class svm_predict {
 			sumvy += v*target;
 			++total;
 		}
-		System.out.print("Accuracy = "+(double)correct/total*100+
+		if(svm_type == svm_parameter.EPSILON_SVR ||
+		   svm_type == svm_parameter.NU_SVR)
+		{
+			System.out.print("Mean squared error = "+error/total+" (regression)\n");
+			System.out.print("Squared correlation coefficient = "+
+			         ((total*sumvy-sumv*sumy)*(total*sumvy-sumv*sumy))/
+				 ((total*sumvv-sumv*sumv)*(total*sumyy-sumy*sumy))+
+				 " (regression)\n");
+		}
+		else
+			System.out.print("Accuracy = "+(double)correct/total*100+
 				 "% ("+correct+"/"+total+") (classification)\n");
-		System.out.print("Mean squared error = "+error/total+" (regression)\n");
-		System.out.print("Squared correlation coefficient = "+
-			((total*sumvy-sumv*sumy)*(total*sumvy-sumv*sumy))/
-			((total*sumvv-sumv*sumv)*(total*sumyy-sumy*sumy))+" (regression)\n"
-			);
 	}
 
 	private static void exit_with_help()
