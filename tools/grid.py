@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, sys
+import os, sys, traceback
 import Queue
 import getpass
 import re
@@ -90,6 +90,7 @@ Usage: grid.py [-log2c begin,end,step] [-log2g begin,end,step] [-v fold]
     pass_through_string = join(pass_through_options," ")
     assert os.path.exists(svmtrain_exe),"svm-train executable not found"    
     assert os.path.exists(gnuplot_exe),"gnuplot executable not found"
+    assert os.path.exists(dataset_pathname),"dataset not found"
     gnuplot = os.popen(gnuplot_exe,'w')
 
 
@@ -206,6 +207,7 @@ class Worker(Thread):
                 if rate is None: raise "get no rate"
             except:
                 # we failed, let others do that and we just quit
+                traceback.print_tb(sys.exc_traceback)
                 self.job_queue.put((cexp,gexp))
                 print 'worker %s quit.' % self.name
                 break
