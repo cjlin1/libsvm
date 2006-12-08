@@ -45,7 +45,7 @@ class svm_parameter:
 	'gamma' : 0,		# 1/k
 	'coef0' : 0,
 	'nu' : 0.5,
-	'cache_size' : 40,
+	'cache_size' : 100,
 	'C' : 1,
 	'eps' : 1e-3,
 	'p' : 0.1,
