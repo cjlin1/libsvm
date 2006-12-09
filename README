@@ -174,25 +174,25 @@ Scale each feature of the training data to be in [-1,1]. Scaling
 factors are stored in the file range and then used for scaling the
 test data.
 
-> svm-train -s 0 -c 1000 -t 2 -g 0.5 -e 0.00001 data_file 
+> svm-train -s 0 -c 5 -t 2 -g 0.5 -e 0.1 data_file 
 
-Train a classifier with RBF kernel exp(-0.5|u-v|^2) and stopping
-tolerance 0.00001
+Train a classifier with RBF kernel exp(-0.5|u-v|^2), C=10, and
+stopping tolerance 0.1.
 
-> svm-train -s 3 -p 0.1 -t 0 -c 10 data_file
+> svm-train -s 3 -p 0.1 -t 0 data_file
 
-Solve SVM regression with linear kernel u'v and C=10, and epsilon = 0.1
+Solve SVM regression with linear kernel u'v and epsilon=0.1
 in the loss function.
 
-> svm-train -s 0 -c 10 -w1 1 -w-1 5 data_file
+> svm-train -c 10 -w1 1 -w-1 5 data_file
 
 Train a classifier with penalty 10 for class 1 and penalty 50
 for class -1.
 
-> svm-train -s 0 -c 500 -g 0.1 -v 5 data_file
+> svm-train -s 0 -c 100 -g 0.1 -v 5 data_file
 
 Do five-fold cross validation for the classifier using
-the parameters C = 500 and gamma = 0.1
+the parameters C = 100 and gamma = 0.1
 
 > svm-train -s 0 -b 1 data_file
 > svm-predict -b 1 test_file data_file.model output_file
@@ -596,8 +596,7 @@ Software available at http://www.csie.ntu.edu.tw/~cjlin/libsvm
 LIBSVM implementation document is available at
 http://www.csie.ntu.edu.tw/~cjlin/papers/libsvm.pdf
 
-For any questions and comments, please send your email to
-cjlin@csie.ntu.edu.tw
+For any questions and comments, please email cjlin@csie.ntu.edu.tw
 
 Acknowledgments:
 This work was supported in part by the National Science 
