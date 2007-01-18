@@ -38,7 +38,7 @@ before building the module.
 When the build process completes, a shared object called svmc.so will be
 created.
 
-For win32 systems, the shared library svmc.dll is ready in the
+For win32 systems, the shared library svmc.pyd is ready in the
 directory windows/python. You need to copy it to this directory.  The
 dll file depends on different versions of python, so you may have to
 re-make it by following the instruction of building windows binaries
@@ -47,7 +47,7 @@ in libsvm README.
 Usage
 =====
 To use the module, the files svm.py and the shared library (namely svmc.so
-or svmc.dll) must be placed in the current directory, the python library
+or svmc.pyd) must be placed in the current directory, the python library
 directory, or the directory where the environment variable PYTHONPATH
 points to. The user then imports everything in svm.py to use libsvm in
 python:
