@@ -12,7 +12,7 @@ TARGET = windows
 
 all: $(TARGET)\svmtrain.exe $(TARGET)\svmpredict.exe $(TARGET)\svmscale.exe $(TARGET)\svmtoy.exe
 
-python: $(TARGET)\python\svmc.dll
+python: $(TARGET)\python\svmc.pyd
 
 $(TARGET)\svmpredict.exe: svm.h svm-predict.c svm.obj
     $(CXXC) $(CFLAGS) svm-predict.c svm.obj -o $(TARGET)\svmpredict.exe
@@ -29,8 +29,8 @@ $(TARGET)\svmtoy.exe: svm.h svm.obj svm-toy\windows\svm-toy.cpp
 svm.obj: svm.cpp svm.h
     $(CXXC) $(CFLAGS) -c svm.cpp
 
-$(TARGET)\python\svmc.dll: python\svmc_wrap.c svm.obj $(PYTHON_LIB)
-    $(CXXC) $(CFLAGS) -I$(PYTHON_INC) -ML -LD $** -o $(TARGET)\python\svmc.dll
+$(TARGET)\python\svmc.pyd: python\svmc_wrap.c svm.obj $(PYTHON_LIB)
+    $(CXXC) $(CFLAGS) -I$(PYTHON_INC) -ML -LD $** -o $(TARGET)\python\svmc.pyd
 # $** means all dependencies
 
 clean:
