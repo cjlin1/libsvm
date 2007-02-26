@@ -14,7 +14,7 @@ import java.util.*;
 //
 class Cache {
 	private final int l;
-	private int size;
+	private long size;
 	private final class head_t
 	{
 		head_t prev, next;	// a cicular list
@@ -24,7 +24,7 @@ class Cache {
 	private final head_t[] head;
 	private head_t lru_head;
 
-	Cache(int l_, int size_)
+	Cache(int l_, long size_)
 	{
 		l = l_;
 		size = size_;
@@ -1159,7 +1159,7 @@ class SVC_Q extends Kernel
 	{
 		super(prob.l, prob.x, param);
 		y = (byte[])y_.clone();
-		cache = new Cache(prob.l,(int)(param.cache_size*(1<<20)));
+		cache = new Cache(prob.l,(long)(param.cache_size*(1<<20)));
 		QD = new Qfloat[prob.l];
 		for(int i=0;i<prob.l;i++)
 			QD[i]= (Qfloat)kernel_function(i,i);
@@ -1199,7 +1199,7 @@ class ONE_CLASS_Q extends Kernel
 	ONE_CLASS_Q(svm_problem prob, svm_parameter param)
 	{
 		super(prob.l, prob.x, param);
-		cache = new Cache(prob.l,(int)(param.cache_size*(1<<20)));
+		cache = new Cache(prob.l,(long)(param.cache_size*(1<<20)));
 		QD = new Qfloat[prob.l];
 		for(int i=0;i<prob.l;i++)
 			QD[i]= (Qfloat)kernel_function(i,i);
@@ -1244,7 +1244,7 @@ class SVR_Q extends Kernel
 	{
 		super(prob.l, prob.x, param);
 		l = prob.l;
-		cache = new Cache(l,(int)(param.cache_size*(1<<20)));
+		cache = new Cache(l,(long)(param.cache_size*(1<<20)));
 		QD = new Qfloat[2*l];
 		sign = new byte[2*l];
 		index = new int[2*l];
