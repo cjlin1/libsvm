@@ -60,7 +60,7 @@ void info_flush() {}
 class Cache
 {
 public:
-	Cache(int l,int size);
+	Cache(int l,long int size);
 	~Cache();
 
 	// request data [0,len)
@@ -84,7 +84,7 @@ private:
 	void lru_insert(head_t *h);
 };
 
-Cache::Cache(int l_,int size_):l(l_),size(size_)
+Cache::Cache(int l_,long int size_):l(l_),size(size_)
 {
 	head = (head_t *)calloc(l,sizeof(head_t));	// initialized to 0
 	size /= sizeof(Qfloat);
@@ -1258,7 +1258,7 @@ public:
 	:Kernel(prob.l, prob.x, param)
 	{
 		clone(y,y_,prob.l);
-		cache = new Cache(prob.l,(int)(param.cache_size*(1<<20)));
+		cache = new Cache(prob.l,(long int)(param.cache_size*(1<<20)));
 		QD = new Qfloat[prob.l];
 		for(int i=0;i<prob.l;i++)
 			QD[i]= (Qfloat)(this->*kernel_function)(i,i);
@@ -1307,7 +1307,7 @@ public:
 	ONE_CLASS_Q(const svm_problem& prob, const svm_parameter& param)
 	:Kernel(prob.l, prob.x, param)
 	{
-		cache = new Cache(prob.l,(int)(param.cache_size*(1<<20)));
+		cache = new Cache(prob.l,(long int)(param.cache_size*(1<<20)));
 		QD = new Qfloat[prob.l];
 		for(int i=0;i<prob.l;i++)
 			QD[i]= (Qfloat)(this->*kernel_function)(i,i);
@@ -1354,7 +1354,7 @@ public:
 	:Kernel(prob.l, prob.x, param)
 	{
 		l = prob.l;
-		cache = new Cache(l,(int)(param.cache_size*(1<<20)));
+		cache = new Cache(l,(long int)(param.cache_size*(1<<20)));
 		QD = new Qfloat[2*l];
 		sign = new schar[2*l];
 		index = new int[2*l];
