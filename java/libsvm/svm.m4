@@ -32,7 +32,7 @@ class Cache {
 		for(int i=0;i<l;i++) head[i] = new head_t();
 		size /= SIZE_OF_QFLOAT;
 		size -= l * (16/SIZE_OF_QFLOAT);	// sizeof(head_t) == 16
-		size = Math.max(size, 2*l);  // cache must be large enough for two columns
+		size = Math.max(size, (long) 2*l);  // cache must be large enough for two columns
 		lru_head = new head_t();
 		lru_head.next = lru_head.prev = lru_head;
 	}
