@@ -435,8 +435,9 @@ protected:
 	void reconstruct_gradient();
 	virtual int select_working_set(int &i, int &j);
 	virtual double calculate_rho();
-	virtual bool be_shrunken(int i, double Gmax1, double Gmax2);
 	virtual void do_shrinking();
+private:
+	bool be_shrunken(int i, double Gmax1, double Gmax2);	
 };
 
 void Solver::swap_index(int i, int j)
