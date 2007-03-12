@@ -365,7 +365,7 @@ double Kernel::k_function(const svm_node *x, const svm_node *y,
 	}
 }
 
-// Generalized SMO+SVMlight algorithm
+// An SMO algorithm in Fan et al., JMLR 6(2005), p. 1889--1918
 // Solves:
 //
 //	min 0.5(\alpha^T Q \alpha) + p^T \alpha
@@ -379,7 +379,7 @@ double Kernel::k_function(const svm_node *x, const svm_node *y,
 //
 //	Q, p, y, Cp, Cn, and an initial feasible point \alpha
 //	l is the size of vectors and matrices
-//	eps is the stopping criterion
+//	eps is the stopping tolerance
 //
 // solution will be put in \alpha, objective value will be put in obj
 //
@@ -435,6 +435,7 @@ protected:
 	void reconstruct_gradient();
 	virtual int select_working_set(int &i, int &j);
 	virtual double calculate_rho();
+	virtual bool be_shrunken(int i, double Gmax1, double Gmax2);
 	virtual void do_shrinking();
 };
 
@@ -838,14 +839,34 @@ int Solver::select_working_set(int &out_i, int &out_j)
 	return 0;
 }
 
+bool Solver::be_shrunken(int i, double Gmax1, double Gmax2)
+{
+	if(is_upper_bound(i))
+	{
+		if(y[i]==+1)
+			return(-G[i] > Gmax1);
+		else
+			return(-G[i] > Gmax2);
+	}
+	else if(is_lower_bound(i))
+	{
+		if(y[i]==+1)
+			return(G[i] > Gmax2);
+		else	
+			return(G[i] > Gmax1);
+	}
+	else
+		return(false);
+}
+
 void Solver::do_shrinking()
 {
-	int k;
+	int i;
 	double Gmax1 = -INF;		// max { -y_i * grad(f)_i | i in I_up(\alpha) }
 	double Gmax2 = -INF;		// max { y_i * grad(f)_i | i in I_low(\alpha) }
 
 	// find maximal violating pair first
-	for(int i=0;i<active_size;i++)
+	for(i=0;i<active_size;i++)
 	{
 		if(y[i]==+1)	
 		{
@@ -876,31 +897,21 @@ void Solver::do_shrinking()
 	}
 
 	// shrink
-	
-	for(k=0;k<active_size;k++)
-	{
-		if(is_upper_bound(k))
-		{
-			if(y[k]==+1)
-			{
-				if(-G[k] <= Gmax1) continue;
-			}
-			else	if(-G[k] <= Gmax2) continue;
-		}
-		else if(is_lower_bound(k))
-		{
-			if(y[k]==+1)
-			{
-				if(G[k] <= Gmax2) continue;
-			}
-			else	if(G[k] <= Gmax1) continue;
-		}
-		else continue;
 
-		--active_size;
-		swap_index(k,active_size);
-		--k;	// look at the newcomer
-	}
+	for(i=0;i<active_size;i++)
+		if (be_shrunken(i, Gmax1, Gmax2))
+		{
+			active_size--;
+			while (active_size > i)
+			{
+				if (!be_shrunken(active_size, Gmax1, Gmax2))
+				{
+					swap_index(i,active_size);
+					break;
+				}
+				active_size--;
+			}
+		}
 
 	// unshrink, check all variables again before final iterations
 
@@ -909,30 +920,20 @@ void Solver::do_shrinking()
 	unshrinked = true;
 	reconstruct_gradient();
 
-	for(k=l-1;k>=active_size;k--)
-	{
-		if(is_upper_bound(k))
+	for(i=l-1;i>=active_size;i--)
+		if (!be_shrunken(i, Gmax1, Gmax2))
 		{
-			if(y[k]==+1)
+			while (active_size < i)
 			{
-				if(-G[k] > Gmax1) continue;
+				if (be_shrunken(active_size, Gmax1, Gmax2))
+				{
+					swap_index(i,active_size);
+					break;
+				}
+				active_size++;
 			}
-			else	if(-G[k] > Gmax2) continue;
+			active_size++;
 		}
-		else if(is_lower_bound(k))
-		{
-			if(y[k]==+1)
-			{
-				if(G[k] > Gmax2) continue;
-			}
-			else	if(G[k] > Gmax1) continue;
-		}
-		else continue;
-
-		swap_index(k,active_size);
-		active_size++;
-		++k;	// look at the newcomer
-	}
 }
 
 double Solver::calculate_rho()
@@ -993,6 +994,7 @@ private:
 	SolutionInfo *si;
 	int select_working_set(int &i, int &j);
 	double calculate_rho();
+	bool be_shrunken(int i, double Gmax1, double Gmax2, double Gmax3, double Gmax4);
 	void do_shrinking();
 };
 
@@ -1109,6 +1111,26 @@ int Solver_NU::select_working_set(int &out_i, int &out_j)
 	return 0;
 }
 
+bool Solver_NU::be_shrunken(int i, double Gmax1, double Gmax2, double Gmax3, double Gmax4)
+{
+	if(is_upper_bound(i))
+	{
+		if(y[i]==+1)
+			return(-G[i] > Gmax1);
+		else	
+			return(-G[i] > Gmax4);
+	}
+	else if(is_lower_bound(i))
+	{
+		if(y[i]==+1)
+			return(G[i] > Gmax2);
+		else	
+			return(G[i] > Gmax3);
+	}
+	else
+		return(false);
+}
+
 void Solver_NU::do_shrinking()
 {
 	double Gmax1 = -INF;	// max { -y_i * grad(f)_i | y_i = +1, i in I_up(\alpha) }
@@ -1117,53 +1139,43 @@ void Solver_NU::do_shrinking()
 	double Gmax4 = -INF;	// max { y_i * grad(f)_i | y_i = -1, i in I_low(\alpha) }
 
 	// find maximal violating pair first
-	int k;
-	for(k=0;k<active_size;k++)
+	int i;
+	for(i=0;i<active_size;i++)
 	{
-		if(!is_upper_bound(k))
+		if(!is_upper_bound(i))
 		{
-			if(y[k]==+1)
+			if(y[i]==+1)
 			{
-				if(-G[k] > Gmax1) Gmax1 = -G[k];
+				if(-G[i] > Gmax1) Gmax1 = -G[i];
 			}
-			else	if(-G[k] > Gmax4) Gmax4 = -G[k];
+			else	if(-G[i] > Gmax4) Gmax4 = -G[i];
 		}
-		if(!is_lower_bound(k))
+		if(!is_lower_bound(i))
 		{
-			if(y[k]==+1)
+			if(y[i]==+1)
 			{	
-				if(G[k] > Gmax2) Gmax2 = G[k];
+				if(G[i] > Gmax2) Gmax2 = G[i];
 			}
-			else	if(G[k] > Gmax3) Gmax3 = G[k];
+			else	if(G[i] > Gmax3) Gmax3 = G[i];
 		}
 	}
 
 	// shrinking
 
-	for(k=0;k<active_size;k++)
-	{
-		if(is_upper_bound(k))
+	for(i=0;i<active_size;i++)
+		if (be_shrunken(i, Gmax1, Gmax2, Gmax3, Gmax4))
 		{
-			if(y[k]==+1)
+			active_size--;
+			while (active_size > i)
 			{
-				if(-G[k] <= Gmax1) continue;
+				if (!be_shrunken(active_size, Gmax1, Gmax2, Gmax3, Gmax4))
+				{
+					swap_index(i,active_size);
+					break;
+				}
+				active_size--;
 			}
-			else	if(-G[k] <= Gmax4) continue;
 		}
-		else if(is_lower_bound(k))
-		{
-			if(y[k]==+1)
-			{
-				if(G[k] <= Gmax2) continue;
-			}
-			else	if(G[k] <= Gmax3) continue;
-		}
-		else continue;
-
-		--active_size;
-		swap_index(k,active_size);
-		--k;	// look at the newcomer
-	}
 
 	// unshrink, check all variables again before final iterations
 
@@ -1172,30 +1184,20 @@ void Solver_NU::do_shrinking()
 	unshrinked = true;
 	reconstruct_gradient();
 
-	for(k=l-1;k>=active_size;k--)
-	{
-		if(is_upper_bound(k))
+	for(i=l-1;i>=active_size;i--)
+		if (!be_shrunken(i, Gmax1, Gmax2, Gmax3, Gmax4))
 		{
-			if(y[k]==+1)
+			while (active_size < i)
 			{
-				if(-G[k] > Gmax1) continue;
+				if (be_shrunken(active_size, Gmax1, Gmax2, Gmax3, Gmax4))
+				{
+					swap_index(i,active_size);
+					break;
+				}
+				active_size++;
 			}
-			else	if(-G[k] > Gmax4) continue;
+			active_size++;
 		}
-		else if(is_lower_bound(k))
-		{
-			if(y[k]==+1)
-			{
-				if(G[k] > Gmax2) continue;
-			}
-			else	if(G[k] > Gmax3) continue;
-		}
-		else continue;
-
-		swap_index(k,active_size);
-		active_size++;
-		++k;	// look at the newcomer
-	}
 }
 
 double Solver_NU::calculate_rho()
