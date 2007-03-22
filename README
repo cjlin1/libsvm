@@ -11,10 +11,10 @@ Please read the COPYRIGHT file before using libsvm.
 Table of Contents
 =================
 - Quick Start
-- Installation
+- Installation and Data Format
 - `svm-train' Usage
 - `svm-predict' Usage
-- Tips on practical use
+- Tips on Practical Use
 - Examples
 - Precomputed Kernels 
 - Library Usage
@@ -36,8 +36,8 @@ Usage: easy.py training_file [testing_file]
 More information about parameter selection can be found in
 tools/README.
 
-Installation
-============
+Installation and Data Format
+============================
 
 On Unix systems, type `make' to build the `svm-train' and `svm-predict'
 programs. Run them without arguments to show the usages of them.
