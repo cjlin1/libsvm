@@ -14,7 +14,7 @@ import java.util.*;
 //
 class Cache {
 	private final int l;
-	private int size;
+	private long size;
 	private final class head_t
 	{
 		head_t prev, next;	// a cicular list
@@ -24,7 +24,7 @@ class Cache {
 	private final head_t[] head;
 	private head_t lru_head;
 
-	Cache(int l_, int size_)
+	Cache(int l_, long size_)
 	{
 		l = l_;
 		size = size_;
@@ -32,7 +32,7 @@ class Cache {
 		for(int i=0;i<l;i++) head[i] = new head_t();
 		size /= 4;
 		size -= l * (16/4);	// sizeof(head_t) == 16
-		size = Math.max(size, 2*l);  // cache must be large enough for two columns
+		size = Math.max(size, (long) 2*l);  // cache must be large enough for two columns
 		lru_head = new head_t();
 		lru_head.next = lru_head.prev = lru_head;
 	}
@@ -287,10 +287,10 @@ abstract class Kernel extends QMatrix {
 	}
 }
 
-// Generalized SMO+SVMlight algorithm
+// An SMO algorithm in Fan et al., JMLR 6(2005), p. 1889--1918
 // Solves:
 //
-//	min 0.5(\alpha^T Q \alpha) + b^T \alpha
+//	min 0.5(\alpha^T Q \alpha) + p^T \alpha
 //
 //		y^T \alpha = \delta
 //		y_i = +1 or -1
@@ -299,9 +299,9 @@ abstract class Kernel extends QMatrix {
 //
 // Given:
 //
-//	Q, b, y, Cp, Cn, and an initial feasible point \alpha
+//	Q, p, y, Cp, Cn, and an initial feasible point \alpha
 //	l is the size of vectors and matrices
-//	eps is the stopping criterion
+//	eps is the stopping tolerance
 //
 // solution will be put in \alpha, objective value will be put in obj
 //
@@ -318,7 +318,7 @@ class Solver {
 	float[] QD;
 	double eps;
 	double Cp,Cn;
-	double[] b;
+	double[] p;
 	int[] active_set;
 	double[] G_bar;		// gradient, if we treat free variables as 0
 	int l;
@@ -359,7 +359,7 @@ class Solver {
 		do {double _=G[i]; G[i]=G[j]; G[j]=_;} while(false);
 		do {byte _=alpha_status[i]; alpha_status[i]=alpha_status[j]; alpha_status[j]=_;} while(false);
 		do {double _=alpha[i]; alpha[i]=alpha[j]; alpha[j]=_;} while(false);
-		do {double _=b[i]; b[i]=b[j]; b[j]=_;} while(false);
+		do {double _=p[i]; p[i]=p[j]; p[j]=_;} while(false);
 		do {int _=active_set[i]; active_set[i]=active_set[j]; active_set[j]=_;} while(false);
 		do {double _=G_bar[i]; G_bar[i]=G_bar[j]; G_bar[j]=_;} while(false);
 	}
@@ -372,7 +372,7 @@ class Solver {
 
 		int i;
 		for(i=active_size;i<l;i++)
-			G[i] = G_bar[i] + b[i];
+			G[i] = G_bar[i] + p[i];
 
 		for(i=0;i<active_size;i++)
 			if(is_free(i))
@@ -384,13 +384,13 @@ class Solver {
 			}
 	}
 
-	void Solve(int l, QMatrix Q, double[] b_, byte[] y_,
+	void Solve(int l, QMatrix Q, double[] p_, byte[] y_,
 		   double[] alpha_, double Cp, double Cn, double eps, SolutionInfo si, int shrinking)
 	{
 		this.l = l;
 		this.Q = Q;
 		QD = Q.get_QD();
-		b = (double[])b_.clone();
+		p = (double[])p_.clone();
 		y = (byte[])y_.clone();
 		alpha = (double[])alpha_.clone();
 		this.Cp = Cp;
@@ -420,7 +420,7 @@ class Solver {
 			int i;
 			for(i=0;i<l;i++)
 			{
-				G[i] = b[i];
+				G[i] = p[i];
 				G_bar[i] = 0;
 			}
 			for(i=0;i<l;i++)
@@ -622,7 +622,7 @@ class Solver {
 			double v = 0;
 			int i;
 			for(i=0;i<l;i++)
-				v += alpha[i] * (G[i] + b[i]);
+				v += alpha[i] * (G[i] + p[i]);
 
 			si.obj = v/2;
 		}
@@ -739,137 +739,101 @@ class Solver {
 		return 0;
 	}
 
-	// return 1 if already optimal, return 0 otherwise
-	int max_violating_pair(int[] working_set)
-	{
-		// return i,j which maximize -grad(f)^T d , under constraint
-		// if alpha_i == C, d != +1
-		// if alpha_i == 0, d != -1
-
-		double Gmax1 = -INF;		// max { -y_i * grad(f)_i | i in I_up(\alpha) }
-		int Gmax1_idx = -1;
-
-		int Gmax2_idx = -1;
-		double Gmax2 = -INF;		// max { y_i * grad(f)_i | i in I_low(\alpha) }
-
-		for(int i=0;i<active_size;i++)
+	private boolean be_shrunken(int i, double Gmax1, double Gmax2)
+	{	
+		if(is_upper_bound(i))
 		{
-			if(y[i]==+1)	// y = +1
-			{
-				if(!is_upper_bound(i))	// d = +1
-				{
-					if(-G[i] >= Gmax1)
-					{
-						Gmax1 = -G[i];
-						Gmax1_idx = i;
-					}
-				}
-				if(!is_lower_bound(i))	// d = -1
-				{
-					if(G[i] >= Gmax2)
-					{
-						Gmax2 = G[i];
-						Gmax2_idx = i;
-					}
-				}
-			}
-			else		// y = -1
-			{
-				if(!is_upper_bound(i))	// d = +1
-				{
-					if(-G[i] >= Gmax2)
-					{
-						Gmax2 = -G[i];
-						Gmax2_idx = i;
-					}
-				}
-				if(!is_lower_bound(i))	// d = -1
-				{
-					if(G[i] >= Gmax1)
-					{
-						Gmax1 = G[i];
-						Gmax1_idx = i;
-					}
-				}
-			}
+			if(y[i]==+1)
+				return(-G[i] > Gmax1);
+			else
+				return(-G[i] > Gmax2);
 		}
-
-		if(Gmax1+Gmax2 < eps)
-	 		return 1;
-
-		working_set[0] = Gmax1_idx;
-		working_set[1] = Gmax2_idx;
-		return 0;
+		else if(is_lower_bound(i))
+		{
+			if(y[i]==+1)
+				return(G[i] > Gmax2);
+			else	
+				return(G[i] > Gmax1);
+		}
+		else
+			return(false);
 	}
 
 	void do_shrinking()
 	{
-		int i,j,k;
-		int[] working_set = new int[2];
-		if(max_violating_pair(working_set)!=0) return;
-		i = working_set[0];
-		j = working_set[1];
-		double Gm1 = -y[j]*G[j];
-		double Gm2 = y[i]*G[i];
+		int i;
+		double Gmax1 = -INF;		// max { -y_i * grad(f)_i | i in I_up(\alpha) }
+		double Gmax2 = -INF;		// max { y_i * grad(f)_i | i in I_low(\alpha) }
+
+		// find maximal violating pair first
+		for(i=0;i<active_size;i++)
+		{
+			if(y[i]==+1)
+			{
+				if(!is_upper_bound(i))	
+				{
+					if(-G[i] >= Gmax1)
+						Gmax1 = -G[i];
+				}
+				if(!is_lower_bound(i))
+				{
+					if(G[i] >= Gmax2)
+						Gmax2 = G[i];
+				}
+			}
+			else		
+			{
+				if(!is_upper_bound(i))	
+				{
+					if(-G[i] >= Gmax2)
+						Gmax2 = -G[i];
+				}
+				if(!is_lower_bound(i))	
+				{
+					if(G[i] >= Gmax1)
+						Gmax1 = G[i];
+				}
+			}
+		}
 
 		// shrink
-	
-		for(k=0;k<active_size;k++)
-		{
-			if(is_lower_bound(k))
-			{
-				if(y[k]==+1)
-				{
-					if(-G[k] >= Gm1) continue;
-				}
-				else	if(-G[k] >= Gm2) continue;
-			}
-			else if(is_upper_bound(k))
-			{
-				if(y[k]==+1)
-				{
-					if(G[k] >= Gm2) continue;
-				}
-				else	if(G[k] >= Gm1) continue;
-			}
-			else continue;
 
-			--active_size;
-			swap_index(k,active_size);
-			--k;	// look at the newcomer
-		}
+		for(i=0;i<active_size;i++)
+			if (be_shrunken(i, Gmax1, Gmax2))
+			{
+				active_size--;
+				while (active_size > i)
+				{
+					if (!be_shrunken(active_size, Gmax1, Gmax2))
+					{
+						swap_index(i,active_size);
+						break;
+					}
+					active_size--;
+				}
+			}
 
 		// unshrink, check all variables again before final iterations
 
-		if(unshrinked || -(Gm1 + Gm2) > eps*10) return;
+		if(unshrinked || Gmax1 + Gmax2 > eps*10) return;
 
 		unshrinked = true;
 		reconstruct_gradient();
 
-		for(k=l-1;k>=active_size;k--)
-		{
-			if(is_lower_bound(k))
+		for(i=l-1;i>=active_size;i--)
+			if (!be_shrunken(i, Gmax1, Gmax2))
 			{
-				if(y[k]==+1)
+				while (active_size < i)
 				{
-					if(-G[k] < Gm1) continue;
+					if (be_shrunken(active_size, Gmax1, Gmax2))
+					{
+						swap_index(i,active_size);
+						break;
+					}
+					active_size++;
 				}
-				else	if(-G[k] < Gm2) continue;
+				active_size++;
 			}
-			else if(is_upper_bound(k))
-			{
-				if(y[k]==+1)
-				{
-					if(G[k] < Gm2) continue;
-				}
-				else	if(G[k] < Gm1) continue;
-			}
-			else continue;
-
-			swap_index(k,active_size);
-			active_size++;
-			++k;	// look at the newcomer
-		}
 	}
 
 	double calculate_rho()
@@ -921,12 +885,12 @@ final class Solver_NU extends Solver
 {
 	private SolutionInfo si;
 
-	void Solve(int l, QMatrix Q, double[] b, byte[] y,
+	void Solve(int l, QMatrix Q, double[] p, byte[] y,
 		   double[] alpha, double Cp, double Cn, double eps,
 		   SolutionInfo si, int shrinking)
 	{
 		this.si = si;
-		super.Solve(l,Q,b,y,alpha,Cp,Cn,eps,si,shrinking);
+		super.Solve(l,Q,p,y,alpha,Cp,Cn,eps,si,shrinking);
 	}
 
 	// return 1 if already optimal, return 0 otherwise
@@ -1042,6 +1006,26 @@ final class Solver_NU extends Solver
 		return 0;
 	}
 
+	private boolean be_shrunken(int i, double Gmax1, double Gmax2, double Gmax3, double Gmax4)
+	{
+		if(is_upper_bound(i))
+		{
+			if(y[i]==+1)
+				return(-G[i] > Gmax1);
+			else	
+				return(-G[i] > Gmax4);
+		}
+		else if(is_lower_bound(i))
+		{
+			if(y[i]==+1)
+				return(G[i] > Gmax2);
+			else	
+				return(G[i] > Gmax3);
+		}
+		else
+			return(false);
+	}
+
 	void do_shrinking()
 	{
 		double Gmax1 = -INF;	// max { -y_i * grad(f)_i | y_i = +1, i in I_up(\alpha) }
@@ -1050,90 +1034,63 @@ final class Solver_NU extends Solver
 		double Gmax4 = -INF;	// max { y_i * grad(f)_i | y_i = -1, i in I_low(\alpha) }
  
 		// find maximal violating pair first
-		int k;
-		for(k=0;k<active_size;k++)
+		int i;
+		for(i=0;i<active_size;i++)
 		{
-			if(!is_upper_bound(k))
+			if(!is_upper_bound(i))
 			{
-				if(y[k]==+1)
+				if(y[i]==+1)
 				{
-					if(-G[k] > Gmax1) Gmax1 = -G[k];
+					if(-G[i] > Gmax1) Gmax1 = -G[i];
 				}
-				else	if(-G[k] > Gmax3) Gmax3 = -G[k];
+				else	if(-G[i] > Gmax4) Gmax4 = -G[i];
 			}
-			if(!is_lower_bound(k))
+			if(!is_lower_bound(i))
 			{
-				if(y[k]==+1)
+				if(y[i]==+1)
 				{	
-					if(G[k] > Gmax2) Gmax2 = G[k];
+					if(G[i] > Gmax2) Gmax2 = G[i];
 				}
-				else	if(G[k] > Gmax4) Gmax4 = G[k];
+				else	if(G[i] > Gmax3) Gmax3 = G[i];
 			}
 		}
 
 		// shrinking
 
-		double Gm1 = -Gmax2;
-		double Gm2 = -Gmax1;
-		double Gm3 = -Gmax4;
-		double Gm4 = -Gmax3;
-
-		for(k=0;k<active_size;k++)
-		{
-			if(is_lower_bound(k))
+		for(i=0;i<active_size;i++)
+			if (be_shrunken(i, Gmax1, Gmax2, Gmax3, Gmax4))
 			{
-				if(y[k]==+1)
+				active_size--;
+				while (active_size > i)
 				{
-					if(-G[k] >= Gm1) continue;
+					if (!be_shrunken(active_size, Gmax1, Gmax2, Gmax3, Gmax4))
+					{
+						swap_index(i,active_size);
+						break;
+					}
+					active_size--;
 				}
-				else	if(-G[k] >= Gm3) continue;
 			}
-			else if(is_upper_bound(k))
-			{
-				if(y[k]==+1)
-				{
-					if(G[k] >= Gm2) continue;
-				}
-				else	if(G[k] >= Gm4) continue;
-			}
-			else continue;
 
-			--active_size;
-			swap_index(k,active_size);
-			--k;	// look at the newcomer
-		}
-
-		// unshrink, check all variables again before final iterations
-
-		if(unshrinked || Math.max(-(Gm1+Gm2),-(Gm3+Gm4)) > eps*10) return;
+		if(unshrinked || Math.max(Gmax1+Gmax2,Gmax3+Gmax4) > eps*10) return;
 	
 		unshrinked = true;
 		reconstruct_gradient();
 
-		for(k=l-1;k>=active_size;k--)
-		{
-			if(is_lower_bound(k))
+		for(i=l-1;i>=active_size;i--)
+			if (!be_shrunken(i, Gmax1, Gmax2, Gmax3, Gmax4))
 			{
-				if(y[k]==+1)
+				while (active_size < i)
 				{
-					if(-G[k] < Gm1) continue;
+					if (be_shrunken(active_size, Gmax1, Gmax2, Gmax3, Gmax4))
+					{
+						swap_index(i,active_size);
+						break;
+					}
+					active_size++;
 				}
-				else	if(-G[k] < Gm3) continue;
+				active_size++;
 			}
-			else if(is_upper_bound(k))
-			{
-				if(y[k]==+1)
-				{
-					if(G[k] < Gm2) continue;
-				}
-				else	if(G[k] < Gm4) continue;
-			}
-			else continue;
-
-			swap_index(k,active_size);
-			active_size++;
-			++k;	// look at the newcomer
-		}
 	}
 	
 	double calculate_rho()
@@ -1200,7 +1157,7 @@ class SVC_Q extends Kernel
 	{
 		super(prob.l, prob.x, param);
 		y = (byte[])y_.clone();
-		cache = new Cache(prob.l,(int)(param.cache_size*(1<<20)));
+		cache = new Cache(prob.l,(long)(param.cache_size*(1<<20)));
 		QD = new float[prob.l];
 		for(int i=0;i<prob.l;i++)
 			QD[i]= (float)kernel_function(i,i);
@@ -1240,7 +1197,7 @@ class ONE_CLASS_Q extends Kernel
 	ONE_CLASS_Q(svm_problem prob, svm_parameter param)
 	{
 		super(prob.l, prob.x, param);
-		cache = new Cache(prob.l,(int)(param.cache_size*(1<<20)));
+		cache = new Cache(prob.l,(long)(param.cache_size*(1<<20)));
 		QD = new float[prob.l];
 		for(int i=0;i<prob.l;i++)
 			QD[i]= (float)kernel_function(i,i);
@@ -1285,7 +1242,7 @@ class SVR_Q extends Kernel
 	{
 		super(prob.l, prob.x, param);
 		l = prob.l;
-		cache = new Cache(l,(int)(param.cache_size*(1<<20)));
+		cache = new Cache(l,(long)(param.cache_size*(1<<20)));
 		QD = new float[2*l];
 		sign = new byte[2*l];
 		index = new int[2*l];
@@ -2335,7 +2292,6 @@ public class svm {
 				start[i] = start[i-1]+model.nSV[i-1];
 
 			int p=0;
-			int pos=0;
 			for(i=0;i<nr_class;i++)
 				for(int j=i+1;j<nr_class;j++)
 				{
@@ -2352,8 +2308,9 @@ public class svm {
 						sum += coef1[si+k] * kvalue[si+k];
 					for(k=0;k<cj;k++)
 						sum += coef2[sj+k] * kvalue[sj+k];
-					sum -= model.rho[p++];
-					dec_values[pos++] = sum;					
+					sum -= model.rho[p];
+					dec_values[p] = sum;					
+					p++;
 				}
 		}
 	}
@@ -2648,7 +2605,7 @@ public class svm {
 			}
 			else
 			{
-				System.err.print("unknown text in model file\n");
+				System.err.print("unknown text in model file: ["+cmd+"]\n");
 				return null;
 			}
 		}
