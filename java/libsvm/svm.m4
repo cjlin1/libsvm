@@ -739,7 +739,7 @@ class Solver {
 		return 0;
 	}
 
-	boolean be_shrunken(int i, double Gmax1, double Gmax2)
+	private boolean be_shrunken(int i, double Gmax1, double Gmax2)
 	{	
 		if(is_upper_bound(i))
 		{
@@ -768,14 +768,14 @@ class Solver {
 		// find maximal violating pair first
 		for(i=0;i<active_size;i++)
 		{
-			if(y[i]==+1)	// y = +1
+			if(y[i]==+1)
 			{
 				if(!is_upper_bound(i))	
 				{
 					if(-G[i] >= Gmax1)
 						Gmax1 = -G[i];
 				}
-				if(!is_lower_bound(i))	// d = -1
+				if(!is_lower_bound(i))
 				{
 					if(G[i] >= Gmax2)
 						Gmax2 = G[i];
@@ -1006,7 +1006,7 @@ final class Solver_NU extends Solver
 		return 0;
 	}
 
-	boolean be_shrunken(int i, double Gmax1, double Gmax2, double Gmax3, double Gmax4)
+	private boolean be_shrunken(int i, double Gmax1, double Gmax2, double Gmax3, double Gmax4)
 	{
 		if(is_upper_bound(i))
 		{
