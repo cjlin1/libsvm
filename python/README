@@ -40,7 +40,7 @@ created.
 
 For win32 systems, the shared library svmc.pyd is ready in the
 directory windows/python. You need to copy it to this directory.  The
-dll file depends on different versions of python, so you may have to
+.pyd file depends on different versions of python, so you may have to
 re-make it by following the instruction of building windows binaries
 in libsvm README.
 
