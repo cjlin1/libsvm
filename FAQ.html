@@ -7,7 +7,7 @@
 <a name="_TOP"><b><h1><a
 href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a>  FAQ </h1></b></a>
 <b>last modified : </b>
-Sun, 18 Mar 2007 07:01:29 GMT
+Sun,  1 Apr 2007 00:31:43 GMT
 <class="categories">
 <li><a
 href="#_TOP">All Questions</a>(57)</li>
@@ -73,7 +73,7 @@ href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(2)</li>
 <li class="headlines_item"><a href="#f427">Why the code gives NaN (not a number) results?</a></li>
 <li class="headlines_item"><a href="#f428">Why on windows sometimes grid.py fails?</a></li>
 <li class="headlines_item"><a href="#f429">Why grid.py/easy.py sometimes generates the following warning message?</a></li>
-<li class="headlines_item"><a href="#f430">Why the sign of predicted labels and decision values are sometimes reverwsed?</a></li>
+<li class="headlines_item"><a href="#f430">Why the sign of predicted labels and decision values are sometimes reversed?</a></li>
 <li class="headlines_item"><a href="#f425">Why training a probability model (i.e., -b 1) takes longer time</a></li>
 <li class="headlines_item"><a href="#f426">Why using the -b option does not give me better accuracy?</a></li>
 <li class="headlines_item"><a href="#f427">Why using svm-predict -b 0 and -b 1 gives different accuracy values?</a></li>
@@ -84,8 +84,8 @@ href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(2)</li>
 <li class="headlines_item"><a href="#f602">Is the Java version significantly slower than the C++ version?</a></li>
 <li class="headlines_item"><a href="#f603">While training I get the following error message: java.lang.OutOfMemoryError. What is wrong?</a></li>
 <li class="headlines_item"><a href="#f604">Why you have the main source file svm.m4 and then transform it to svm.java?</a></li>
-<li class="headlines_item"><a href="#f702">On MS windows, why does python fail to load the dll file?</a></li>
-<li class="headlines_item"><a href="#f703">How to modify the python interface on MS windows and rebuild the dll file ?</a></li>
+<li class="headlines_item"><a href="#f702">On MS windows, why does python fail to load the pyd file?</a></li>
+<li class="headlines_item"><a href="#f703">How to modify the python interface on MS windows and rebuild the .pyd file ?</a></li>
 <li class="headlines_item"><a href="#f704">Except the python-C++ interface provided, could I use Jython to call libsvm ?</a></li>
 <li class="headlines_item"><a href="#f705">How could I install the python interface on Mac OS? </a></li>
 <li class="headlines_item"><a href="#f706">I typed "make" on a unix system, but it says "Python.h: No such file or directory?"</a></li>
@@ -658,13 +658,13 @@ this article</a>.
 <p>
 The easiest solution is to switch to a
  64-bit machine.
-Otherwies, there are two ways to solve this. If your
+Otherwise, there are two ways to solve this. If your
 machine supports Intel's PAE (Physical Address
 Extension), you can turn on the option HIGHMEM64G
 in Linux kernel which uses 4G:4G split for
 kernel and user space. If you don't, you can
-try a software `tub' which can elimate the 2G
-boundary for dymanic allocated memory. The `tub'
+try a software `tub' which can eliminate the 2G
+boundary for dynamic allocated memory. The `tub'
 is available at 
 <a href=http://www.bitwagon.com/tub.html>http://www.bitwagon.com/tub.html</a>.
 
@@ -902,7 +902,7 @@ the contour.
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q4:_Training_and_prediction"></a>
-<a name="f430"><b>Q: Why the sign of predicted labels and decision values are sometimes reverwsed?</b></a>
+<a name="f430"><b>Q: Why the sign of predicted labels and decision values are sometimes reversed?</b></a>
 <br/>                                                                                
 <p>Nothing is wrong. Very likely you have two labels +1/-1 and the first instance in your data
 has -1.
@@ -921,7 +921,7 @@ which may not be the +1 in the input file.
 <a name="f425"><b>Q: Why training a probability model (i.e., -b 1) takes longer time</b></a>
 <br/>                                                                                
 <p>
-To construct this probability model, we internaly conduct a 
+To construct this probability model, we internally conduct a 
 cross validation, which is more time consuming than
 a regular training.
 Hence, in general you do parameter selection first without
@@ -1088,27 +1088,29 @@ However,  we need some macros (see first 3 lines of svm.m4).
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q8:_Python_interface"></a>
-<a name="f702"><b>Q: On MS windows, why does python fail to load the dll file?</b></a>
+<a name="f702"><b>Q: On MS windows, why does python fail to load the pyd file?</b></a>
 <br/>                                                                                
 <p>
-It seems the dll file is version dependent. So far we haven't
+It seems the pyd file is version dependent. So far we haven't
 found out a good solution. Please email us if you have any
 good suggestions.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q8:_Python_interface"></a>
-<a name="f703"><b>Q: How to modify the python interface on MS windows and rebuild the dll file ?</b></a>
+<a name="f703"><b>Q: How to modify the python interface on MS windows and rebuild the .pyd file ?</b></a>
 <br/>                                                                                
 <p>
 
 To modify the interface, follow the instructions given in
-<a href=http://www.swig.org/Doc1.1/HTML/Python.html#n2>
-http://www.swig.org/Doc1.1/HTML/Python.html#n2</a>
+<a href=
+http://www.swig.org/Doc1.3/Python.html#Python>
+http://www.swig.org/Doc1.3/Python.html#Python
+</a>
 
 <p>
 
-If you just want to build DLL for a different python version,
+If you just want to build .pyd for a different python version,
 after libsvm 2.5, you can easily use the file Makefile.win.
 See details in README.
 
@@ -1124,6 +1126,7 @@ Settings->C/C++->Preprocessor)
 Project->Settings->Settings For "Win32 Release", Output
 directories should be "Release"
 <li> Build the DLL.
+<li> You may have to rename .dll to .pyd 
 </ol>
 
 
