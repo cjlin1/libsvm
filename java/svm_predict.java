@@ -133,11 +133,20 @@ class svm_predict {
 			DataOutputStream output = new DataOutputStream(new FileOutputStream(argv[i+2]));
 			svm_model model = svm.svm_load_model(argv[i+1]);
 			if(predict_probability == 1)
+			{
 				if(svm.svm_check_probability_model(model)==0)
 				{
 					System.err.print("Model does not support probabiliy estimates\n");
 					System.exit(1);
 				}
+			}
+			else
+			{
+				if(svm.svm_check_probability_model(model)!=0)
+				{
+					System.out.print("Model supports probability estimates, but disabled in prediction.\n");
+				}
+			}
 			predict(input,output,model,predict_probability);
 			input.close();
 			output.close();
