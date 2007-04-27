@@ -361,7 +361,7 @@ double Kernel::k_function(const svm_node *x, const svm_node *y,
 		case PRECOMPUTED:  //x: test (validation), y: SV
 			return x[(int)(y->value)].value;
 		default:
-			return 0;	/* Unreachable */
+			return 0;  // Unreachable 
 	}
 }
 
