@@ -70,7 +70,7 @@ void predict(FILE *input, FILE *output)
 		}	
 
 out2:
-		x[i++].index = -1;
+		x[i].index = -1;
 
 		if (predict_probability && (svm_type==C_SVC || svm_type==NU_SVC))
 		{
@@ -170,11 +170,18 @@ int main(int argc, char **argv)
 	line = (char *) malloc(max_line_len*sizeof(char));
 	x = (struct svm_node *) malloc(max_nr_attr*sizeof(struct svm_node));
 	if(predict_probability)
+	{
 		if(svm_check_probability_model(model)==0)
 		{
 			fprintf(stderr,"Model does not support probabiliy estimates\n");
 			exit(1);
 		}
+	}
+	else
+	{
+		if(svm_check_probability_model(model)!=0)
+			printf("Model supports probability estimates, but disabled in prediction.\n");
+	}
 	predict(input,output);
 	svm_destroy_model(model);
 	free(line);

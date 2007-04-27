@@ -10,6 +10,7 @@ Please read the COPYRIGHT file before using libsvm.
 
 Table of Contents
 =================
+
 - Quick Start
 - Installation and Data Format
 - `svm-train' Usage
@@ -53,15 +54,16 @@ The format of training and testing data file is:
 .
 .
 
-For classification, <label> is an integer indicating the class label
-(multi-class is supported). For regression, <label> is
-the target value which can be any real number. For one-class SVM, it's
-not used so can be any number.  Except using precomputed kernels
-(explained in another section), <index>:<value> gives a feature
-(attribute) value.  <index> is an integer starting from 1 and <value>
-is a real number. Indices must be in an ASCENDING order. Labels in the
-testing file are only used to calculate accuracy or errors. If they
-are unknown, just fill the first column with any numbers.
+Each line contains an instance and is ended by a '\n' character.  For
+classification, <label> is an integer indicating the class label
+(multi-class is supported). For regression, <label> is the target
+value which can be any real number. For one-class SVM, it's not used
+so can be any number.  Except using precomputed kernels (explained in
+another section), <index>:<value> gives a feature (attribute) value.
+<index> is an integer starting from 1 and <value> is a real
+number. Indices must be in an ASCENDING order. Labels in the testing
+file are only used to calculate accuracy or errors. If they are
+unknown, just fill the first column with any numbers.
 
 A sample classification data included in this package is `heart_scale'.
 
