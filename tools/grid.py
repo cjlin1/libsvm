@@ -3,9 +3,9 @@
 import os, sys, traceback
 import Queue
 import getpass
-import re
 from threading import Thread
-from string import find, split, join, atof
+from string import find, split, join
+from subprocess import *
 
 # svmtrain and gnuplot executable
 
@@ -60,10 +60,10 @@ Usage: grid.py [-log2c begin,end,step] [-log2g begin,end,step] [-v fold]
     while i < len(argv) - 1:
         if argv[i] == "-log2c":
             i = i + 1
-            (c_begin,c_end,c_step) = map(atof,split(argv[i],","))
+            (c_begin,c_end,c_step) = map(float,split(argv[i],","))
         elif argv[i] == "-log2g":
             i = i + 1
-            (g_begin,g_end,g_step) = map(atof,split(argv[i],","))
+            (g_begin,g_end,g_step) = map(float,split(argv[i],","))
         elif argv[i] == "-v":
             i = i + 1
             fold = argv[i]
@@ -91,7 +91,7 @@ Usage: grid.py [-log2c begin,end,step] [-log2g begin,end,step] [-v fold]
     assert os.path.exists(svmtrain_exe),"svm-train executable not found"    
     assert os.path.exists(gnuplot_exe),"gnuplot executable not found"
     assert os.path.exists(dataset_pathname),"dataset not found"
-    gnuplot = os.popen(gnuplot_exe,'w')
+    gnuplot = Popen(gnuplot_exe,stdin = PIPE).stdin
 
 
 def range_f(begin,end,step):
@@ -218,10 +218,10 @@ class LocalWorker(Worker):
     def run_one(self,c,g):
         cmdline = '%s -c %s -g %s -v %s %s %s' % \
           (svmtrain_exe,c,g,fold,pass_through_string,dataset_pathname)
-        result = os.popen(cmdline,'r')
+        result = Popen(cmdline,shell=True,stdout=PIPE).stdout
         for line in result.readlines():
             if find(line,"Cross") != -1:
-                return atof(split(line)[-1][0:-1])
+                return float(split(line)[-1][0:-1])
 
 class SSHWorker(Worker):
     def __init__(self,name,job_queue,result_queue,host):
@@ -232,10 +232,10 @@ class SSHWorker(Worker):
         cmdline = 'ssh -x %s "cd %s; %s -c %s -g %s -v %s %s %s"' % \
           (self.host,self.cwd,
            svmtrain_exe,c,g,fold,pass_through_string,dataset_pathname)
-        result = os.popen(cmdline,'r')
+        result = Popen(cmdline,shell=True,stdout=PIPE).stdout
         for line in result.readlines():
             if find(line,"Cross") != -1:
-                return atof(split(line)[-1][0:-1])
+                return float(split(line)[-1][0:-1])
 
 class TelnetWorker(Worker):
     def __init__(self,name,job_queue,result_queue,host,username,password):
@@ -265,7 +265,7 @@ class TelnetWorker(Worker):
         (idx,matchm,output) = self.tn.expect(['Cross.*\n'])
         for line in split(output,'\n'):
             if find(line,"Cross") != -1:
-                return atof(split(line)[-1][0:-1])
+                return float(split(line)[-1][0:-1])
 
 def main():
 
