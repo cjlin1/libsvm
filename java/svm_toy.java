@@ -40,7 +40,7 @@ public class svm_toy extends Applet {
 		byte value;
 	}
 
-	Vector point_list = new Vector();
+ 	Vector<point> point_list = new Vector<point>();
 	byte current_value = 1;
 
 	public void init()
