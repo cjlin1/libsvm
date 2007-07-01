@@ -522,6 +522,8 @@ java -classpath libsvm.jar svm_train <arguments>
 java -classpath libsvm.jar svm_predict <arguments>
 java -classpath libsvm.jar svm_toy
 
+Note that you need Java 1.5 (5.0) or above to run it.
+
 You may need to add Java runtime library (like classes.zip) to the classpath.
 You may need to increase maximum Java heap size.
 
