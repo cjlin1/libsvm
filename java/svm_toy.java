@@ -137,7 +137,7 @@ public class svm_toy extends Applet {
 	{
 		int n = point_list.size();
 		for(int i=0;i<n;i++)
-			draw_point((point)point_list.elementAt(i));
+			draw_point(point_list.elementAt(i));
 	}
 
 	void button_change_clicked()
@@ -269,7 +269,7 @@ public class svm_toy extends Applet {
 			prob.x = new svm_node[prob.l][1];
 			for(int i=0;i<prob.l;i++)
 			{
-				point p = (point)point_list.elementAt(i);
+				point p = point_list.elementAt(i);
 				prob.x[i][0] = new svm_node();
 				prob.x[i][0].index = 1;
 				prob.x[i][0].value = p.x;
@@ -328,7 +328,7 @@ public class svm_toy extends Applet {
 			prob.x = new svm_node [prob.l][2];
 			for(int i=0;i<prob.l;i++)
 			{
-				point p = (point)point_list.elementAt(i);
+				point p = point_list.elementAt(i);
 				prob.x[i][0] = new svm_node();
 				prob.x[i][0].index = 1;
 				prob.x[i][0].value = p.x;
@@ -379,7 +379,7 @@ public class svm_toy extends Applet {
 			int n = point_list.size();
 			for(int i=0;i<n;i++)
 			{
-				point p = (point)point_list.elementAt(i);
+				point p = point_list.elementAt(i);
 				fp.writeBytes(p.value+" 1:"+p.x+" 2:"+p.y+"\n");
 			}
 			fp.close();
