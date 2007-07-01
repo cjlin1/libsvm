@@ -71,7 +71,8 @@ You can specify where the libsvm executable and gnuplot are using the
 -svmtrain and -gnuplot parameters.
 
 For windows users, please use pgnuplot.exe. If you are using gnuplot
-3.7.1, please upgrade to version 3.7.3. The version 3.7.1 has a bug.
+3.7.1, please upgrade to version 3.7.3 or higher. The version 3.7.1
+has a bug. If you use cygwin on windows, please use gunplot-x11.
 
 Example
 =======

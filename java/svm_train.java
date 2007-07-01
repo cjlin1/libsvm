@@ -243,8 +243,8 @@ class svm_train {
 	private void read_problem() throws IOException
 	{
 		BufferedReader fp = new BufferedReader(new FileReader(input_file_name));
-		Vector vy = new Vector();
-		Vector vx = new Vector();
+		Vector<Double> vy = new Vector<Double>();
+		Vector<svm_node[]> vx = new Vector<svm_node[]>();
 		int max_index = 0;
 
 		while(true)
@@ -254,7 +254,7 @@ class svm_train {
 
 			StringTokenizer st = new StringTokenizer(line," \t\n\r\f:");
 
-			vy.addElement(st.nextToken());
+			vy.addElement(atof(st.nextToken()));
 			int m = st.countTokens()/2;
 			svm_node[] x = new svm_node[m];
 			for(int j=0;j<m;j++)
@@ -271,10 +271,10 @@ class svm_train {
 		prob.l = vy.size();
 		prob.x = new svm_node[prob.l][];
 		for(int i=0;i<prob.l;i++)
-			prob.x[i] = (svm_node[])vx.elementAt(i);
+			prob.x[i] = vx.elementAt(i);
 		prob.y = new double[prob.l];
 		for(int i=0;i<prob.l;i++)
-			prob.y[i] = atof((String)vy.elementAt(i));
+			prob.y[i] = vy.elementAt(i);
 
 		if(param.gamma == 0)
 			param.gamma = 1.0/max_index;
