@@ -114,7 +114,13 @@ class svm_train {
 
 	private static double atof(String s)
 	{
-		return Double.valueOf(s).doubleValue();
+		double d = Double.valueOf(s).doubleValue();
+		if (Double.isNaN(d) || Double.isInfinite(d))
+		{
+			System.err.print("NaN or Infinity in input\n");
+			System.exit(1);
+		}
+		return(d);
 	}
 
 	private static int atoi(String s)
