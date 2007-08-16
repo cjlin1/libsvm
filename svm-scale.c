@@ -164,27 +164,27 @@ int main(int argc,char **argv)
 	
 	if(restore_filename)
 	{
-		FILE *fp = fopen(restore_filename,"r");
+		FILE *fp_restore = fopen(restore_filename,"r");
 		int idx, c;
 		double fmin, fmax;
 		
-		if(fp==NULL)
+		if(fp_restore==NULL)
 		{
 			fprintf(stderr,"can't open file %s\n", restore_filename);
 			exit(1);
 		}
-		if((c = fgetc(fp)) == 'y')
+		if((c = fgetc(fp_restore)) == 'y')
 		{
-			fscanf(fp, "%lf %lf\n", &y_lower, &y_upper);
-			fscanf(fp, "%lf %lf\n", &y_min, &y_max);
+			fscanf(fp_restore, "%lf %lf\n", &y_lower, &y_upper);
+			fscanf(fp_restore, "%lf %lf\n", &y_min, &y_max);
 			y_scaling = 1;
 		}
 		else
-			ungetc(c, fp);
+			ungetc(c, fp_restore);
 
-		if (fgetc(fp) == 'x') {
-			fscanf(fp, "%lf %lf\n", &lower, &upper);
-			while(fscanf(fp,"%d %lf %lf\n",&idx,&fmin,&fmax)==3)
+		if (fgetc(fp_restore) == 'x') {
+			fscanf(fp_restore, "%lf %lf\n", &lower, &upper);
+			while(fscanf(fp_restore,"%d %lf %lf\n",&idx,&fmin,&fmax)==3)
 			{
 				if(idx<=max_index)
 				{
@@ -193,31 +193,31 @@ int main(int argc,char **argv)
 				}
 			}
 		}
-		fclose(fp);
+		fclose(fp_restore);
 	}
 	
 	if(save_filename)
 	{
-		FILE *fp = fopen(save_filename,"w");
-		if(fp==NULL)
+		FILE *fp_save = fopen(save_filename,"w");
+		if(fp_save==NULL)
 		{
 			fprintf(stderr,"can't open file %s\n", save_filename);
 			exit(1);
 		}
 		if(y_scaling)
 		{
-			fprintf(fp, "y\n");
-			fprintf(fp, "%.16g %.16g\n", y_lower, y_upper);
-			fprintf(fp, "%.16g %.16g\n", y_min, y_max);
+			fprintf(fp_save, "y\n");
+			fprintf(fp_save, "%.16g %.16g\n", y_lower, y_upper);
+			fprintf(fp_save, "%.16g %.16g\n", y_min, y_max);
 		}
-		fprintf(fp, "x\n");
-		fprintf(fp, "%.16g %.16g\n", lower, upper);
+		fprintf(fp_save, "x\n");
+		fprintf(fp_save, "%.16g %.16g\n", lower, upper);
 		for(i=1;i<=max_index;i++)
 		{
 			if(feature_min[i]!=feature_max[i])
-				fprintf(fp,"%d %.16g %.16g\n",i,feature_min[i],feature_max[i]);
+				fprintf(fp_save,"%d %.16g %.16g\n",i,feature_min[i],feature_max[i]);
 		}
-		fclose(fp);
+		fclose(fp_save);
 	}
 	
 	/* pass 3: scale */
