@@ -132,7 +132,7 @@ Introduction
 `svm-train' conducts only a simple check of the input data. To do a
 detailed check, we provide a python script `checkdata.py.'
 
-Usage: checkdata.pt dataset 
+Usage: checkdata.py dataset 
 
 This tool is written by Rong-En Fan at National Taiwan University.
 
@@ -141,7 +141,7 @@ Example
 
 > cat bad_data
 1 3:1 2:4
-> python bad_data
+> python checkdata.py bad_data
 line 1: feature indices must be in an ascending order, previous/current features 3:1 2:4
 Found 1 lines with error.
 

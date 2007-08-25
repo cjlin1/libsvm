@@ -581,8 +581,7 @@ Another way is to build them from Visual C++ environment. See details
 in libsvm faq.
 
 - Additional Tools: Sub-sampling, Parameter Selection, Format checking, etc.
-====================================================
-========================
+============================================================================
 
 See the README file in the tools directory.
 
