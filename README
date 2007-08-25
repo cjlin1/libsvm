@@ -21,7 +21,7 @@ Table of Contents
 - Library Usage
 - Java Version
 - Building Windows Binaries
-- Additional Tools: Model Selection, Sub-sampling, etc.
+- Additional Tools: Sub-sampling, Parameter Selection, Format checking, etc.
 - Python Interface
 - Additional Information
 
@@ -35,7 +35,7 @@ everything automatic -- from data scaling to parameter selection.
 Usage: easy.py training_file [testing_file]
 
 More information about parameter selection can be found in
-tools/README.
+`tools/README.'
 
 Installation and Data Format
 ============================
@@ -65,7 +65,9 @@ number. Indices must be in an ASCENDING order. Labels in the testing
 file are only used to calculate accuracy or errors. If they are
 unknown, just fill the first column with any numbers.
 
-A sample classification data included in this package is `heart_scale'.
+A sample classification data included in this package is
+`heart_scale'. To check if your data is in a correct form, use
+`tools/checkdata.py' (details in `tools/README').
 
 Type `svm-train heart_scale', and the program will read the training
 data and output the model file `heart_scale.model'. If you have a test
@@ -578,8 +580,9 @@ and then copy windows\python\svmc.pyd to the python directory.
 Another way is to build them from Visual C++ environment. See details
 in libsvm faq.
 
-Additional Tools: Model Selection, Sub-sampling, etc.
-=====================================================
+- Additional Tools: Sub-sampling, Parameter Selection, Format checking, etc.
+====================================================
+========================
 
 See the README file in the tools directory.
 
