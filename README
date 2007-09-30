@@ -416,8 +416,8 @@ to classify new data.
     This function conducts cross validation. Data are separated to
     nr_fold folds. Under given parameters, sequentially each fold is
     validated using the model from training the remaining. Predicted
-    labels in the validation process are stored in the array called
-    target.
+    labels (of all prob's instances) in the validation process are
+    stored in the array called target.
 
     The format of svm_prob is same as that for svm_train(). 
 
