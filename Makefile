@@ -1,4 +1,4 @@
-CXX = g++
+CXX? = g++
 CFLAGS = -Wall -O3 
 
 all: svm-train svm-predict svm-scale
