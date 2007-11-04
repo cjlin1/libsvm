@@ -107,8 +107,9 @@ svm-toy:
 	You need GTK+ library to build the GTK version.
 	(available from http://www.gtk.org)
 	
-	We use Visual C++ to build the Windows version.
-	The pre-built Windows binaries are in the windows directory.
+	The pre-built Windows binaries are in the `windows'
+	directory. We use Visual C++ on a 32-bit machine, so the
+	maximal cache size is 2MB.
 
 `svm-train' Usage
 =================
@@ -562,7 +563,7 @@ environment variables of VC++ have not been set, type
 
 "C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\bin\vcvars32.bat"
 
-You may have to modify the above according which version of VC++or
+You may have to modify the above according which version of VC++ or
 where it is installed.
 
 2. Type
