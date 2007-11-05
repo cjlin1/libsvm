@@ -6,7 +6,7 @@
 PYTHON_INC = c:\python25\include
 PYTHON_LIB = c:\python25\libs\python25.lib
 ##########################################
-CXXC = cl.exe
+CXX = cl.exe
 CFLAGS = -nologo -O2 -EHsc -I. -D __WIN32__ -D _CRT_SECURE_NO_DEPRECATE
 TARGET = windows
 
@@ -15,22 +15,22 @@ all: $(TARGET)\svmtrain.exe $(TARGET)\svmpredict.exe $(TARGET)\svmscale.exe $(TA
 python: $(TARGET)\python\svmc.pyd
 
 $(TARGET)\svmpredict.exe: svm.h svm-predict.c svm.obj
-    $(CXXC) $(CFLAGS) svm-predict.c svm.obj -Fe$(TARGET)\svmpredict.exe
+    $(CXX) $(CFLAGS) svm-predict.c svm.obj -Fe$(TARGET)\svmpredict.exe
 
 $(TARGET)\svmtrain.exe: svm.h svm-train.c svm.obj
-    $(CXXC) $(CFLAGS) svm-train.c svm.obj -Fe$(TARGET)\svmtrain.exe
+    $(CXX) $(CFLAGS) svm-train.c svm.obj -Fe$(TARGET)\svmtrain.exe
 
 $(TARGET)\svmscale.exe: svm.h svm-scale.c
-    $(CXXC) $(CFLAGS) svm-scale.c -Fe$(TARGET)\svmscale.exe
+    $(CXX) $(CFLAGS) svm-scale.c -Fe$(TARGET)\svmscale.exe
 
 $(TARGET)\svmtoy.exe: svm.h svm.obj svm-toy\windows\svm-toy.cpp
-	$(CXXC) $(CFLAGS) svm-toy\windows\svm-toy.cpp svm.obj user32.lib gdi32.lib comdlg32.lib  -Fe$(TARGET)\svmtoy.exe
+	$(CXX) $(CFLAGS) svm-toy\windows\svm-toy.cpp svm.obj user32.lib gdi32.lib comdlg32.lib  -Fe$(TARGET)\svmtoy.exe
 
 svm.obj: svm.cpp svm.h
-    $(CXXC) $(CFLAGS) -c svm.cpp
+    $(CXX) $(CFLAGS) -c svm.cpp
 
 $(TARGET)\python\svmc.pyd: python\svmc_wrap.c svm.obj $(PYTHON_LIB)
-    $(CXXC) $(CFLAGS) -I$(PYTHON_INC) -ML -LD $** -Fe$(TARGET)\python\svmc.pyd
+    $(CXX) $(CFLAGS) -I$(PYTHON_INC) -ML -LD $** -Fe$(TARGET)\python\svmc.pyd
 # $** means all dependencies
 
 clean:

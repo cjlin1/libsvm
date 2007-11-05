@@ -32,7 +32,7 @@ class Cache {
 		for(int i=0;i<l;i++) head[i] = new head_t();
 		size /= SIZE_OF_QFLOAT;
 		size -= l * (16/SIZE_OF_QFLOAT);	// sizeof(head_t) == 16
-		size = Math.max(size, (long) 2*l);  // cache must be large enough for two columns
+		size = Math.max(size, 2* (long) l);  // cache must be large enough for two columns
 		lru_head = new head_t();
 		lru_head.next = lru_head.prev = lru_head;
 	}
@@ -1546,7 +1546,7 @@ public class svm {
 	
 		int max_iter=100; 	// Maximal number of iterations
 		double min_step=1e-10;	// Minimal step taken in line search
-		double sigma=1e-3;	// For numerically strict PD of Hessian
+		double sigma=1e-12;	// For numerically strict PD of Hessian
 		double eps=1e-5;
 		double hiTarget=(prior1+1.0)/(prior1+2.0);
 		double loTarget=1/(prior0+2.0);
