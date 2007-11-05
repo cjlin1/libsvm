@@ -109,7 +109,7 @@ svm-toy:
 	
 	The pre-built Windows binaries are in the `windows'
 	directory. We use Visual C++ on a 32-bit machine, so the
-	maximal cache size is 2MB.
+	maximal cache size is 2GB.
 
 `svm-train' Usage
 =================
