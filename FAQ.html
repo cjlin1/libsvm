@@ -7,19 +7,19 @@
 <a name="_TOP"><b><h1><a
 href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a>  FAQ </h1></b></a>
 <b>last modified : </b>
-Sun,  1 Apr 2007 00:31:43 GMT
+Sun, 28 Oct 2007 23:09:00 GMT
 <class="categories">
 <li><a
-href="#_TOP">All Questions</a>(57)</li>
+href="#_TOP">All Questions</a>(60)</li>
 <ul><b>
 <li><a
 href="#/Q1:_Some_courses_which_have_used_libsvm_as_a_tool">Q1:_Some_courses_which_have_used_libsvm_as_a_tool</a>(1)</li>
 <li><a
 href="#/Q2:_Installation_and_running_the_program">Q2:_Installation_and_running_the_program</a>(8)</li>
 <li><a
-href="#/Q3:_Data_preparation">Q3:_Data_preparation</a>(3)</li>
+href="#/Q3:_Data_preparation">Q3:_Data_preparation</a>(5)</li>
 <li><a
-href="#/Q4:_Training_and_prediction">Q4:_Training_and_prediction</a>(28)</li>
+href="#/Q4:_Training_and_prediction">Q4:_Training_and_prediction</a>(29)</li>
 <li><a
 href="#/Q5:_Probability_outputs">Q5:_Probability_outputs</a>(3)</li>
 <li><a
@@ -46,6 +46,9 @@ href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(2)</li>
 <li class="headlines_item"><a href="#f301">Why sometimes not all attributes of a data appear in the training/model files ?</a></li>
 <li class="headlines_item"><a href="#f302">What if my data are non-numerical ?</a></li>
 <li class="headlines_item"><a href="#f303">Why do you consider sparse format ? Will the training of dense data be much slower ?</a></li>
+<li class="headlines_item"><a href="#f304">Why sometimes the last line of my data is not read by svm-train?</a></li>
+<li class="headlines_item"><a href="#f305">Is there a program to check if my data are in the correct format?</a></li>
+<li class="headlines_item"><a href="#431">I don't know class labels of test data. What should I put in the first column of the test file?</a></li>
 <li class="headlines_item"><a href="#f401">The output of training C-SVM is like the following. What do they mean?</a></li>
 <li class="headlines_item"><a href="#f402">Can you explain more about the model file?</a></li>
 <li class="headlines_item"><a href="#f403">Should I use float or double to store numbers in the cache ?</a></li>
@@ -68,7 +71,7 @@ href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(2)</li>
 <li class="headlines_item"><a href="#f419">What method does libsvm use for multi-class SVM ? Why don't you use the "1-against-the rest" method ?</a></li>
 <li class="headlines_item"><a href="#f420">After doing cross validation, why there is no model file outputted ?</a></li>
 <li class="headlines_item"><a href="#f421">I would like to try different random partition for cross validation, how could I do it ?</a></li>
-<li class="headlines_item"><a href="#f422">I would like to solve L2-SVM (i.e., error term is quadratic). How should I modify the code ?</a></li>
+<li class="headlines_item"><a href="#f422">I would like to solve L2-loss SVM (i.e., error term is quadratic). How should I modify the code ?</a></li>
 <li class="headlines_item"><a href="#f424">How do I choose parameters for one-class svm as training data are in only one class?</a></li>
 <li class="headlines_item"><a href="#f427">Why the code gives NaN (not a number) results?</a></li>
 <li class="headlines_item"><a href="#f428">Why on windows sometimes grid.py fails?</a></li>
@@ -295,6 +298,36 @@ the sparse format only.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
+  <a name="/Q3:_Data_preparation"></a>
+<a name="f304"><b>Q: Why sometimes the last line of my data is not read by svm-train?</b></a>
+<br/>                                                                                
+
+<p>
+We assume that you have '\n' in the end of
+each line. So please press enter in the end
+of your last line.
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q3:_Data_preparation"></a>
+<a name="f305"><b>Q: Is there a program to check if my data are in the correct format?</b></a>
+<br/>                                                                                
+
+<p>
+The svm-train program in libsvm conducts only a simple check of the input data. To do a
+detailed check, after libsvm 2.85, you can use the python script tools/checkdata.py. See tools/README for details.
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q4:_Training_and_prediction"></a>
+<a name="431"><b>Q: I don't know class labels of test data. What should I put in the first column of the test file?</b></a>
+<br/>                                                                                
+<p>Any value is ok. In this situation, what you will use is the output file of svm-predict, which gives predicted class labels.
+
+
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
   <a name="/Q4:_Training_and_prediction"></a>
 <a name="f401"><b>Q: The output of training C-SVM is like the following. What do they mean?</b></a>
 <br/>                                                                                
@@ -403,17 +436,16 @@ and (>1) goes to infinity).
 
 <p>
 
-No, at this point libsvm solves linear/nonlinear SVMs by the
+No, libsvm solves linear/nonlinear SVMs by the
 same way.
-Note that there are some possible
-tricks to save training/testing time if the
-linear kernel is used.
-Hence libsvm is <b>NOT</b> particularly efficient for linear SVM,
-especially for 
-using large C on
-problems whose number of data is much larger
-than number of attributes.
-You can 
+Some tricks may save training/testing time if the
+linear kernel is used,
+so libsvm is <b>NOT</b> particularly efficient for linear SVM,
+especially when
+C is large and
+the number of data is much larger
+than the number of attributes.
+You can either
 <ul>
 <li>
 Use small C only. We have shown in the following paper
@@ -432,25 +464,21 @@ Gaussian kernel
 
 
 <li>
-Check <a href=http://www.csie.ntu.edu.tw/~cjlin/bsvm>bsvm</a>,
-which includes an efficient implementation for
-linear SVMs.
+Check <a href=http://www.csie.ntu.edu.tw/~cjlin/liblinear>liblinear</a>,
+which is designed for large-scale linear classification.
 More details can be found in the following study:
 <p>
-K.-M. Chung, W.-C. Kao, 
-T. Sun, 
-and
-C.-J. Lin.
-<A HREF="http://www.csie.ntu.edu.tw/~cjlin/papers/linear.pdf">
-Decomposition Methods for Linear Support Vector Machines.
-</A> 
-<I><A HREF="http://mitpress.mit.edu/journal-home.tcl?issn=08997667">Neural Computation</A></I>,
-16(2004), 1689-1704. 
+C.-J. Lin, R. C. Weng, and S. S. Keerthi.
+<a href=../papers/logistic.pdf>
+Trust region Newton method for large-scale logistic
+regression</a>.
+Technical report, 2007. A short version appears
+in <a href=http://oregonstate.edu/conferences/icml2007/>ICML 2007</a>.<br>
 </ul>
 
-<p> On the other hand, you do not really need to solve
-linear SVMs. See the previous question about choosing
-kernels for details.
+<p> Please also see our <a href=../papers/guide/guide.pdf>SVM guide</a>
+on the discussion of using RBF and linear
+kernels.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
@@ -800,7 +828,7 @@ srand(time(0));
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q4:_Training_and_prediction"></a>
-<a name="f422"><b>Q: I would like to solve L2-SVM (i.e., error term is quadratic). How should I modify the code ?</b></a>
+<a name="f422"><b>Q: I would like to solve L2-loss SVM (i.e., error term is quadratic). How should I modify the code ?</b></a>
 <br/>                                                                                
 <p>
 It is extremely easy. Taking c-svc for example, only two 
@@ -831,10 +859,16 @@ Than in the the subroutine get_Q, after the for loop, add
 		data[i] += 1/C;
 </pre>
 
+<p>
 For one-class svm, the modification is exactly the same. For SVR, you don't need an if statement like the above. Instead, you only need a simple assignment:
 <pre>
 	data[real_i] += 1/C;
 </pre>
+
+
+<p>
+For large linear L2-loss SVM, please use
+<a href=../liblinear>LIBLINEAR</a>.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
@@ -952,7 +986,7 @@ set as more differences will be observed.
 <a name="f427"><b>Q: Why using svm-predict -b 0 and -b 1 gives different accuracy values?</b></a>
 <br/>                                                                                
 <p>
-After probability information is obtained in training,
+Let's just consider two-class classification here. After probability information is obtained in training,
 we do not have
 <p>
 prob > = 0.5 if and only if decision value >= 0.
@@ -1114,17 +1148,22 @@ If you just want to build .pyd for a different python version,
 after libsvm 2.5, you can easily use the file Makefile.win.
 See details in README.
 
-Alternatively, you can use Visual C++:
+Alternatively, you can use Visual C++. Here is 
+the example using Visual Studio .Net 2005:
 <ol>
-<li> Create a Win32 DLL project and set (Build->Active Configuration) to "Release."
-<li> Add svm.cpp, svmc_wrap.c, python2x.lib to your project.
-<li> Add the directories containing Python.h and svm.h to
-the Additional include directories. (in Project
-Settings->C/C++->Preprocessor)
-<li> add __WIN32__ to Preprocessor definitions
-<li> Make sure that in the "General" category of
-Project->Settings->Settings For "Win32 Release", Output
-directories should be "Release"
+<li>Create a Win32 DLL project and set (in Project->$Project_Name
+Properties...->Configuration) to "Release."
+   About how to create a new dynamic link library, please refer to
+<a href=http://msdn2.microsoft.com/en-us/library/ms235636(VS.80).aspx>http://msdn2.microsoft.com/en-us/library/ms235636(VS.80).aspx</a>
+
+<li> Add svm.cpp, svmc_wrap.c, pythonXX.lib to your project.
+<li> Add the directories containing Python.h and svm.h to the Additional
+Include Directories(in Project->$Project_Name
+Properties...->C/C++->General)
+<li> Add __WIN32__ to Preprocessor definitions (in
+Project->$Project_Name Properties...->C/C++->Preprocessor)
+<li> Set Create/Use Precompiled Header to Not Using Precompiled Headers
+(in Project->$Project_Name Properties...->C/C++->Precompiled Headers)
 <li> Build the DLL.
 <li> You may have to rename .dll to .pyd 
 </ol>
