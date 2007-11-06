@@ -30,7 +30,7 @@ svm.obj: svm.cpp svm.h
     $(CXX) $(CFLAGS) -c svm.cpp
 
 $(TARGET)\python\svmc.pyd: python\svmc_wrap.c svm.obj $(PYTHON_LIB)
-    $(CXX) $(CFLAGS) -I$(PYTHON_INC) -ML -LD $** -Fe$(TARGET)\python\svmc.pyd
+    $(CXX) $(CFLAGS) -I$(PYTHON_INC) -LD $** -Fe$(TARGET)\python\svmc.pyd
 # $** means all dependencies
 
 clean:
