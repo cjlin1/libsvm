@@ -1,7 +1,7 @@
 .SUFFIXES: .class .java
 FILES =	libsvm/svm.class libsvm/svm_model.class libsvm/svm_node.class \
 	libsvm/svm_parameter.class libsvm/svm_problem.class \
-	svm_train.class svm_predict.class svm_toy.class
+	svm_train.class svm_predict.class svm_toy.class svm_scale.class
 
 #JAVAC = jikes
 JAVAC_FLAGS = -target 1.5 -source 1.5
