@@ -524,6 +524,7 @@ in the java directory. To run the programs, use
 java -classpath libsvm.jar svm_train <arguments>
 java -classpath libsvm.jar svm_predict <arguments>
 java -classpath libsvm.jar svm_toy
+java -classpath libsvm.jar svm_scale <arguments>
 
 Note that you need Java 1.5 (5.0) or above to run it.
 
