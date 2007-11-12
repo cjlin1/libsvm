@@ -252,6 +252,8 @@ int main(int argc,char **argv)
 	}
 
 	free(line);
+	free(feature_max);
+	free(feature_min);
 	fclose(fp);
 	return 0;
 }
