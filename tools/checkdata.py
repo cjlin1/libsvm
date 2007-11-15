@@ -38,7 +38,7 @@ def main():
 
 	line_no = 1
 	error_line_count = 0
-	for line in open(dataset, 'r').readlines():
+	for line in open(dataset, 'r'):
 		line_error = False
 
 		# each line must end with a newline character
