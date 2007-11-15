@@ -219,7 +219,7 @@ class LocalWorker(Worker):
         cmdline = '%s -c %s -g %s -v %s %s %s' % \
           (svmtrain_exe,c,g,fold,pass_through_string,dataset_pathname)
         result = Popen(cmdline,shell=True,stdout=PIPE).stdout
-        for line in result.readlines():
+        for line in result:
             if find(line,"Cross") != -1:
                 return float(split(line)[-1][0:-1])
 
@@ -233,7 +233,7 @@ class SSHWorker(Worker):
           (self.host,self.cwd,
            svmtrain_exe,c,g,fold,pass_through_string,dataset_pathname)
         result = Popen(cmdline,shell=True,stdout=PIPE).stdout
-        for line in result.readlines():
+        for line in result:
             if find(line,"Cross") != -1:
                 return float(split(line)[-1][0:-1])
 
