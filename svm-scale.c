@@ -1,13 +1,22 @@
-/*
-	scale attributes to [lower,upper]
-	usage: scale [-l lower] [-u upper] [-y y_lower y_upper] 
-		     [-s filename] [-r filename] filename
-*/
 #include <float.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+
+void exit_with_help()
+{
+	printf(
+	"Usage: svm-scale [options] data_filename\n"
+	"options:\n"
+	"-l lower : x scaling lower limit (default -1)\n"
+	"-u upper : x scaling upper limit (default +1)\n"
+	"-y y_lower y_upper : y scaling limits (default: no y scaling)\n"
+	"-s save_filename : save scaling parameters to save_filename\n"
+	"-r restore_filename : restore scaling parameters from restore_filename\n"
+	);
+	exit(1);
+}
 
 char *line;
 int max_line_len = 1024;
@@ -62,12 +71,7 @@ int main(int argc,char **argv)
 	}
 	
 	if(argc != i+1) 
-	{
-		fprintf(stderr,"usage: %s [-l lower] [-u upper] [-y y_lower y_upper]\n",argv[0]);
-		fprintf(stderr,"      [-s save_filename] [-r restore_filename] filename\n");
-		fprintf(stderr,"(default: lower = -1, upper = 1, no y scaling)\n");
-		exit(1);
-	}
+		exit_with_help();
 
 	fp=fopen(argv[i],"r");
 	
