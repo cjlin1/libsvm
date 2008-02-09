@@ -8,7 +8,7 @@ if len(sys.argv) <= 1:
 	print 'Usage: %s training_file [testing_file]' % sys.argv[0]
 	raise SystemExit
 
-# svm, grid, and gnuplot executable
+# svm, grid, and gnuplot executable files
 
 is_win32 = (sys.platform == 'win32')
 if not is_win32:
@@ -19,9 +19,9 @@ if not is_win32:
 	gnuplot_exe = "/usr/bin/gnuplot"
 else:
         # example for windows
-	svmscale_exe = r"..\windows\svmscale.exe"
-	svmtrain_exe = r"..\windows\svmtrain.exe"
-	svmpredict_exe = r"..\windows\svmpredict.exe"
+	svmscale_exe = r"..\windows\svm-scale.exe"
+	svmtrain_exe = r"..\windows\svm-train.exe"
+	svmpredict_exe = r"..\windows\svm-predict.exe"
 	gnuplot_exe = r"c:\tmp\gnuplot\bin\pgnuplot.exe"
 	grid_py = r".\grid.py"
 

@@ -15,7 +15,7 @@ if not is_win32:
        gnuplot_exe = "/usr/bin/gnuplot"
 else:
        # example for windows
-       svmtrain_exe = r"..\windows\svmtrain.exe"
+       svmtrain_exe = r"..\windows\svm-train.exe"
        gnuplot_exe = r"c:\tmp\gnuplot\bin\pgnuplot.exe"
 
 # global parameters and their default values
