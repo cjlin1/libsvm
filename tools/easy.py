@@ -54,7 +54,7 @@ print 'Cross validation...'
 f = Popen(cmd, shell = True, stdout = PIPE).stdout
 
 line = ''
-while 1:
+while True:
 	last_line = line
 	line = f.readline()
 	if not line: break
@@ -64,7 +64,7 @@ print 'Best c=%s, g=%s CV rate=%s' % (c,g,rate)
 
 cmd = '%s -c %s -g %s "%s" "%s"' % (svmtrain_exe,c,g,scaled_file,model_file)
 print 'Training...'
-Popen(cmd, shell = True, stdout = PIPE)
+call(cmd, shell = True, stdout = PIPE)
 
 print 'Output model: %s' % model_file
 if len(sys.argv) > 2:
