@@ -97,7 +97,7 @@ Usage: grid.py [-log2c begin,end,step] [-log2g begin,end,step] [-v fold]
 def range_f(begin,end,step):
     # like range, but works on non-integer too
     seq = []
-    while 1:
+    while True:
         if step > 0 and begin > end: break
         if step < 0 and begin < end: break
         seq.append(begin)
@@ -119,29 +119,38 @@ def permute_sequence(seq):
 
     return ret
 
-def redraw (db,tofile=0):
+def redraw(db,best_param,tofile=False):
     if len(db) == 0: return
     begin_level = round(max(map(lambda(x):x[2],db))) - 3
     step_size = 0.5
+
+    best_log2c,best_log2g,best_rate = best_param
+
     if tofile:
         gnuplot.write("set term png transparent small\n")
         gnuplot.write("set output \"%s\"\n" % png_filename.replace('\\','\\\\'))
         #gnuplot.write("set term postscript color solid\n")
         #gnuplot.write("set output \"%s.ps\"\n" % dataset_title)
+    elif is_win32:
+        gnuplot.write("set term windows\n")
     else:
-        if is_win32:
-            gnuplot.write("set term windows\n")
-        else:
-            gnuplot.write("set term x11\n")
-    gnuplot.write("set xlabel \"lg(C)\"\n")
-    gnuplot.write("set ylabel \"lg(gamma)\"\n")
+        gnuplot.write("set term x11\n")
+    gnuplot.write("set xlabel \"log2(C)\"\n")
+    gnuplot.write("set ylabel \"log2(gamma)\"\n")
     gnuplot.write("set xrange [%s:%s]\n" % (c_begin,c_end))
     gnuplot.write("set yrange [%s:%s]\n" % (g_begin,g_end))
     gnuplot.write("set contour\n")
     gnuplot.write("set cntrparam levels incremental %s,%s,100\n" % (begin_level,step_size))
-    gnuplot.write("set nosurface\n")
+    gnuplot.write("unset surface\n")
+    gnuplot.write("unset ztics\n")
     gnuplot.write("set view 0,0\n")
-    gnuplot.write("set label \"%s\" at screen 0.4,0.9\n" % dataset_title)
+    gnuplot.write("set title \"%s\"\n" % dataset_title)
+    gnuplot.write("unset label\n")
+    gnuplot.write("set label \"Best log2(C) = %s  log2(gamma) = %s  accuracy = %s%%\" \
+                  at screen 0.5,0.85 center\n" % \
+                  (best_log2c, best_log2g, best_rate))
+    gnuplot.write("set label \"C = %s  gamma = %s\""
+                  " at screen 0.5,0.8 center\n" % (2**best_log2c, 2**best_log2g))
     gnuplot.write("splot \"-\" with lines\n")
     def cmp (x,y):
         if x[0] < y[0]: return -1
@@ -196,7 +205,7 @@ class Worker(Thread):
         self.job_queue = job_queue
         self.result_queue = result_queue
     def run(self):
-        while 1:
+        while True:
             (cexp,gexp) = self.job_queue.get()
             if cexp is WorkerStopToken:
                 self.job_queue.put((cexp,gexp))
@@ -326,6 +335,7 @@ def main():
     result_file = open(out_filename,'w',0)
     db = []
     best_rate = -1
+    best_c1,best_g1 = None,None
 
     for line in jobs:
         for (c,g) in line:
@@ -343,8 +353,8 @@ def main():
                 print " (best c=%s, g=%s, rate=%s)" % \
                     (best_c, best_g, best_rate)
             db.append((c,g,done_jobs[(c,g)]))
-        redraw(db)
-        redraw(db,1)
+        redraw(db,[best_c1, best_g1, best_rate])
+        redraw(db,[best_c1, best_g1, best_rate],True)
 
     job_queue.put((WorkerStopToken,None))
     print "%s %s %s" % (best_c, best_g, best_rate)
