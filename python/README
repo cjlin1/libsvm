@@ -16,6 +16,10 @@ Taiwan University also contributed a lot of useful suggestions and help.
 
 Installation
 ============
+
+We first show the instructions for Unix and
+then those for MS Windows.
+
 The build process for the various Unix systems is as follows:
 
 Before you build the module, you need to find out the python include
