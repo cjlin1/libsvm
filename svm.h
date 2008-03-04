@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+#define LIBSVM_VERSION 286
+
 struct svm_node
 {
 	int index;
