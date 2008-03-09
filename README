@@ -147,7 +147,7 @@ The k in the -g option means the number of attributes in the input data.
 option -v randomly splits the data into n parts and calculates cross
 validation accuracy/mean squared error on them.
 
-See libsvm faq for the meaning of outputs.
+See libsvm FAQ for the meaning of outputs.
 
 `svm-predict' Usage
 ===================
@@ -574,8 +574,9 @@ Building Windows Binaries
 Windows binaries are in the directory `windows'. To build them via
 Visual C++, use the following steps:
 
-1. Open a dos command box and change to libsvm directory. If
-environment variables of VC++ have not been set, type
+1. Open a DOS command box (or Visual Studio Command Prompt) and change
+to libsvm directory. If environment variables of VC++ have not been
+set, type
 
 "C:\Program Files\Microsoft Visual Studio 8\VC\bin\vcvars32.bat"
 
@@ -595,7 +596,7 @@ nmake -f Makefile.win python
 and then copy windows\python\svmc.pyd to the python directory.
 
 Another way is to build them from Visual C++ environment. See details
-in libsvm faq.
+in libsvm FAQ.
 
 - Additional Tools: Sub-sampling, Parameter Selection, Format checking, etc.
 ============================================================================
