@@ -60,7 +60,7 @@ int main(int argc,char **argv)
 			case 'r': restore_filename = argv[i]; break;
 			default:
 				fprintf(stderr,"unknown option\n");
-				exit(1);
+				exit_with_help();
 		}
 	}
 

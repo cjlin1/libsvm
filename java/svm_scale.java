@@ -17,6 +17,19 @@ class svm_scale
 	private double y_min = Double.MAX_VALUE;
 	private int max_index;
 
+	private static void exit_with_help()
+	{
+		System.out.print(
+		 "Usage: svm-scale [options] data_filename\n"
+		+"options:\n"
+		+"-l lower : x scaling lower limit (default -1)\n"
+		+"-u upper : x scaling upper limit (default +1)\n"
+		+"-y y_lower y_upper : y scaling limits (default: no y scaling)\n"
+		+"-s save_filename : save scaling parameters to save_filename\n"
+		+"-r restore_filename : restore scaling parameters from restore_filename\n"
+		);
+		System.exit(1);
+	}
 
 	private BufferedReader rewind(BufferedReader fp, String filename) throws IOException
 	{
@@ -92,7 +105,7 @@ class svm_scale
 				case 'r': restore_filename = argv[i];	break;
 				default:
 					  System.err.println("unknown option");
-					  System.exit(1);
+					  exit_with_help();
 			}
 		}
 
@@ -103,12 +116,7 @@ class svm_scale
 		}
 
 		if(argv.length != i+1)
-		{
-			System.err.println("usage: svm_scale [-l lower] [-u upper] [-y y_lower y_upper]"); 
-			System.err.println("      [-s save_filename] [-r restore_filename] filename");
-			System.err.println("(default: lower = -1, upper = 1, no y scaling)");
-			System.exit(1);
-		}
+			exit_with_help();
 
 		data_filename = argv[i];
 		try {
