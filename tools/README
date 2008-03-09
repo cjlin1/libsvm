@@ -110,20 +110,18 @@ nr_local_worker = 2
 Example:
 
 > python grid.py heart_scale
-Password: ********
-
-login ok linux1
-login ok linux5
-login ok linux5
+[local] -1 -1 78.8889  (best c=0.5, g=0.5, rate=78.8889)
+[linux5] -1 -7 83.3333  (best c=0.5, g=0.0078125, rate=83.3333)
+[linux5] 5 -1 77.037  (best c=0.5, g=0.0078125, rate=83.3333)
+[linux1] 5 -7 83.3333  (best c=0.5, g=0.0078125, rate=83.3333)
 .
 .
 .
 
-The password is the one used for entering your system. If -log2c, -log2g, or
--v is not specified, default values are used.
+If -log2c, -log2g, or -v is not specified, default values are used.
 
 If your system uses telnet instead of ssh, you list the computer names
-in ssh_workers.
+in telnet_workers.
 
 Part III: LIBSVM format checking tools
 

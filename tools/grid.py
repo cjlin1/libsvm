@@ -166,6 +166,7 @@ def redraw(db,best_param,tofile=False):
             prevc = line[0]
         gnuplot.write("%s %s %s\n" % line)
     gnuplot.write("e\n")
+    gnuplot.write("\n") # force gnuplot back to prompt when term set failure
     gnuplot.flush()
 
 
