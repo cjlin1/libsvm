@@ -286,10 +286,11 @@ Examples:
 Library Usage
 =============
 
-These functions and structures are declared in the header file `svm.h'.
-You need to #include "svm.h" in your C/C++ source files and link your
-program with `svm.cpp'. You can see `svm-train.c' and `svm-predict.c'
-for examples showing how to use them.
+These functions and structures are declared in the header file
+`svm.h'.  You need to #include "svm.h" in your C/C++ source files and
+link your program with `svm.cpp'. You can see `svm-train.c' and
+`svm-predict.c' for examples showing how to use them. We define
+LIBSVM_VERSION in svm.h, so you can check the version number.
 
 Before you classify test data, you need to construct an SVM model
 (`svm_model') using training data. A model can also be saved in
@@ -549,6 +550,7 @@ You may need to increase maximum Java heap size.
 Library usages are similar to the C version. These functions are available:
 
 public class svm {
+	public static final int LIBSVM_VERSION=286; 
 	public static svm_model svm_train(svm_problem prob, svm_parameter param);
 	public static void svm_cross_validation(svm_problem prob, svm_parameter param, int nr_fold, double[] target);
 	public static int svm_get_svm_type(svm_model model);
