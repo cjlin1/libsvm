@@ -7,10 +7,10 @@
 <a name="_TOP"><b><h1><a
 href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a>  FAQ </h1></b></a>
 <b>last modified : </b>
-Thu,  6 Mar 2008 00:09:09 GMT
+Fri, 14 Mar 2008 23:36:32 GMT
 <class="categories">
 <li><a
-href="#_TOP">All Questions</a>(65)</li>
+href="#_TOP">All Questions</a>(66)</li>
 <ul><b>
 <li><a
 href="#/Q1:_Some_sample_uses_of_libsvm">Q1:_Some_sample_uses_of_libsvm</a>(2)</li>
@@ -29,7 +29,7 @@ href="#/Q7:_Java_version_of_libsvm">Q7:_Java_version_of_libsvm</a>(4)</li>
 <li><a
 href="#/Q8:_Python_interface">Q8:_Python_interface</a>(5)</li>
 <li><a
-href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(4)</li>
+href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(5)</li>
 </b></ul>
 </li>
 
@@ -73,7 +73,7 @@ href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(4)</li>
 <li class="headlines_item"><a href="#f419">What method does libsvm use for multi-class SVM ? Why don't you use the "1-against-the rest" method ?</a></li>
 <li class="headlines_item"><a href="#f420">After doing cross validation, why there is no model file outputted ?</a></li>
 <li class="headlines_item"><a href="#f4201">Why my cross-validation results are different from those in the Practical Guide?</a></li>
-<li class="headlines_item"><a href="#f421">But on some systems CV accuray is the same in several runs. How could I use different data partitions?</a></li>
+<li class="headlines_item"><a href="#f421">But on some systems CV accuracy is the same in several runs. How could I use different data partitions?</a></li>
 <li class="headlines_item"><a href="#f422">I would like to solve L2-loss SVM (i.e., error term is quadratic). How should I modify the code ?</a></li>
 <li class="headlines_item"><a href="#f424">How do I choose parameters for one-class svm as training data are in only one class?</a></li>
 <li class="headlines_item"><a href="#f427">Why the code gives NaN (not a number) results?</a></li>
@@ -99,6 +99,7 @@ href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(4)</li>
 <li class="headlines_item"><a href="#f802">Does the MATLAB interface provide a function to do scaling?</a></li>
 <li class="headlines_item"><a href="#f803">How could I use MATLAB interface for parameter selection?</a></li>
 <li class="headlines_item"><a href="#f804">How could I generate the primal variable w of linear SVM?</a></li>
+<li class="headlines_item"><a href="#f805">Is there an OCTAVE interface for libsvm?</a></li>
 </ul></ul>
 
 
@@ -858,7 +859,7 @@ may be different.
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q4:_Training_and_prediction"></a>
-<a name="f421"><b>Q: But on some systems CV accuray is the same in several runs. How could I use different data partitions?</b></a>
+<a name="f421"><b>Q: But on some systems CV accuracy is the same in several runs. How could I use different data partitions?</b></a>
 <br/>                                                                                
 <p>
 If you use GNU C library,
@@ -1309,7 +1310,7 @@ your system administrator.
 <br/>                                                                                
 <p>
 Your compiler version may not be supported/compatible for MATLAB.
-Please check <a href=http://www.mathworks.com/support/tech-notes/1600/1601.html>this MATLAB page</a> first and then specify the version
+Please check <a href=http://www.mathworks.com/support/compilers/current_release>this MATLAB page</a> first and then specify the version
 number. For example, if g++ 3.3 is supported, replace
 <pre>
 CXX = g++
@@ -1372,6 +1373,19 @@ if model.Label(1) == -1
   b = -b;
 end
 </pre>
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q9:_MATLAB_interface"></a>
+<a name="f805"><b>Q: Is there an OCTAVE interface for libsvm?</b></a>
+<br/>                                                                                
+<p>
+Yes, after libsvm 2.86, the matlab interface
+works on OCTAVE as well. Please type
+<pre>
+make octave
+</pre>
+for installation.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
