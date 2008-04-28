@@ -458,18 +458,17 @@ void Solver::reconstruct_gradient()
 
 	if(active_size == l) return;
 
-	int i;
+	int i,j;
 	for(i=active_size;i<l;i++)
 		G[i] = G_bar[i] + p[i];
-	
-	for(i=0;i<active_size;i++)
-		if(is_free(i))
-		{
-			const Qfloat *Q_i = Q->get_Q(i,l);
-			double alpha_i = alpha[i];
-			for(int j=active_size;j<l;j++)
-				G[j] += alpha_i * Q_i[j];
-		}
+
+	for(j=active_size;j<l;j++)
+	{
+		const Qfloat *Q_j = Q->get_Q(j,active_size);
+		for(i=0;i<active_size;i++)
+			if(is_free(i))
+				G[j] += alpha[i] * Q_j[i];
+	}
 }
 
 void Solver::Solve(int l, const QMatrix& Q, const double *p_, const schar *y_,
