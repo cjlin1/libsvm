@@ -459,15 +459,15 @@ void Solver::reconstruct_gradient()
 	if(active_size == l) return;
 
 	int i,j;
-	for(i=active_size;i<l;i++)
-		G[i] = G_bar[i] + p[i];
-
 	for(j=active_size;j<l;j++)
+		G[j] = G_bar[j] + p[j];
+
+	for(i=active_size;i<l;i++)
 	{
-		const Qfloat *Q_j = Q->get_Q(j,active_size);
-		for(i=0;i<active_size;i++)
-			if(is_free(i))
-				G[j] += alpha[i] * Q_j[i];
+		const Qfloat *Q_i = Q->get_Q(i,active_size);
+		for(j=0;j<active_size;j++)
+			if(is_free(j))
+				G[i] += alpha[j] * Q_i[j];
 	}
 }
 
