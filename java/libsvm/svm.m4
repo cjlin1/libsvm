@@ -790,7 +790,12 @@ class Solver {
 			}
 		}
 
-		// shrink
+		if(unshrinked == false && Gmax1 + Gmax2 <= eps*10) 
+		{
+			unshrinked = true;
+			reconstruct_gradient();
+			active_size = l;
+		}
 
 		for(i=0;i<active_size;i++)
 			if (be_shrunken(i, Gmax1, Gmax2))
@@ -805,28 +810,6 @@ class Solver {
 					}
 					active_size--;
 				}
-			}
-
-		// unshrink, check all variables again before final iterations
-
-		if(unshrinked || Gmax1 + Gmax2 > eps*10) return;
-
-		unshrinked = true;
-		reconstruct_gradient();
-
-		for(i=l-1;i>=active_size;i--)
-			if (!be_shrunken(i, Gmax1, Gmax2))
-			{
-				while (active_size < i)
-				{
-					if (be_shrunken(active_size, Gmax1, Gmax2))
-					{
-						swap_index(i,active_size);
-						break;
-					}
-					active_size++;
-				}
-				active_size++;
 			}
 	}
 
@@ -1049,7 +1032,12 @@ final class Solver_NU extends Solver
 			}
 		}
 
-		// shrinking
+		if(unshrinked == false && Math.max(Gmax1+Gmax2,Gmax3+Gmax4) <= eps*10) 
+		{
+			unshrinked = true;
+			reconstruct_gradient();
+			active_size = l;
+		}
 
 		for(i=0;i<active_size;i++)
 			if (be_shrunken(i, Gmax1, Gmax2, Gmax3, Gmax4))
@@ -1064,26 +1052,6 @@ final class Solver_NU extends Solver
 					}
 					active_size--;
 				}
-			}
-
-		if(unshrinked || Math.max(Gmax1+Gmax2,Gmax3+Gmax4) > eps*10) return;
-	
-		unshrinked = true;
-		reconstruct_gradient();
-
-		for(i=l-1;i>=active_size;i--)
-			if (!be_shrunken(i, Gmax1, Gmax2, Gmax3, Gmax4))
-			{
-				while (active_size < i)
-				{
-					if (be_shrunken(active_size, Gmax1, Gmax2, Gmax3, Gmax4))
-					{
-						swap_index(i,active_size);
-						break;
-					}
-					active_size++;
-				}
-				active_size++;
 			}
 	}
 	
