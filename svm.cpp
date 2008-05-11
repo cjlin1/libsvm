@@ -67,13 +67,13 @@ public:
 	// return some position p where [p,len) need to be filled
 	// (p >= len if nothing needs to be filled)
 	int get_data(const int index, Qfloat **data, int len);
-	void swap_index(int i, int j);	// future_option
+	void swap_index(int i, int j);	
 private:
 	int l;
 	long int size;
 	struct head_t
 	{
-		head_t *prev, *next;	// a cicular list
+		head_t *prev, *next;	// a circular list
 		Qfloat *data;
 		int len;		// data[0,len) is cached in this entry
 	};
