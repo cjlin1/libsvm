@@ -207,8 +207,8 @@ in the loss function.
 
 > svm-train -c 10 -w1 1 -w-1 5 data_file
 
-Train a classifier with penalty 10 for class 1 and penalty 50
-for class -1.
+Train a classifier with penalty 10 = 1 * 10 for class 1 and penalty 50
+= 5 * 50 for class -1.
 
 > svm-train -s 0 -c 100 -g 0.1 -v 5 data_file
 
