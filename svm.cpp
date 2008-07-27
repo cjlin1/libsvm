@@ -2669,7 +2669,7 @@ int svm_save_model(const char *model_file_name, const svm_model *model)
 
 svm_model *svm_load_model(const char *model_file_name)
 {
-	FILE *fp = fopen(model_file_name,"r");
+	FILE *fp = fopen(model_file_name,"rb");
 	if(fp==NULL) return NULL;
 	
 	// read parameters
