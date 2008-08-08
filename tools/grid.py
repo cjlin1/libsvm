@@ -217,7 +217,7 @@ class Worker(Thread):
                 if rate is None: raise "get no rate"
             except:
                 # we failed, let others do that and we just quit
-                traceback.print_tb(sys.exc_traceback)
+                traceback.print_exception(sys.exc_type, sys.exc_value, sys.exc_traceback)
                 self.job_queue.put((cexp,gexp))
                 print 'worker %s quit.' % self.name
                 break
