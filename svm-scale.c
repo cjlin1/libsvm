@@ -38,7 +38,7 @@ char* readline(FILE *input);
 int main(int argc,char **argv)
 {
 	int i,index;
-	FILE *fp;
+	FILE *fp, *fp_restore = NULL;
 	char *save_filename = NULL;
 	char *restore_filename = NULL;
 
@@ -70,6 +70,12 @@ int main(int argc,char **argv)
 		exit(1);
 	}
 	
+	if(restore_filename && save_filename)
+	{
+		fprintf(stderr,"cannot use -r and -s simultaneously\n");
+		exit(1);
+	}
+
 	if(argc != i+1) 
 		exit_with_help();
 
@@ -96,6 +102,32 @@ int main(int argc,char **argv)
 	/* assumption: min index of attributes is 1 */
 	/* pass 1: find out max index of attributes */
 	max_index = 0;
+
+	if(restore_filename)
+	{
+		fp_restore = fopen(restore_filename,"r");
+		int idx, c;
+		double fmin, fmax;
+		
+		if(fp_restore==NULL)
+		{
+			fprintf(stderr,"can't open file %s\n", restore_filename);
+			exit(1);
+		}
+
+		c = fgetc(fp_restore);
+		ungetc(c,fp_restore);
+		if(c == 'y')
+			readline(fp_restore);
+		readline(fp_restore);
+		readline(fp_restore);
+
+		while(fscanf(fp_restore,"%d %lf %lf\n",&idx,&fmin,&fmax) == 3)
+			max_index = max(idx,max_index);
+
+		rewind(fp_restore);
+	}
+
 	while(readline(fp)!=NULL)
 	{
 		char *p=line;
@@ -108,6 +140,7 @@ int main(int argc,char **argv)
 			SKIP_ELEMENT
 		}		
 	}
+	rewind(fp);
 	
 	feature_max = (double *)malloc((max_index+1)* sizeof(double));
 	feature_min = (double *)malloc((max_index+1)* sizeof(double));
@@ -123,8 +156,6 @@ int main(int argc,char **argv)
 		feature_max[i]=-DBL_MAX;
 		feature_min[i]=DBL_MAX;
 	}
-
-	rewind(fp);
 
 	/* pass 2: find out min/max value */
 	while(readline(fp)!=NULL)
@@ -168,15 +199,10 @@ int main(int argc,char **argv)
 	
 	if(restore_filename)
 	{
-		FILE *fp_restore = fopen(restore_filename,"r");
+		/* fp_restore rewinded in finding max_index */
 		int idx, c;
 		double fmin, fmax;
 		
-		if(fp_restore==NULL)
-		{
-			fprintf(stderr,"can't open file %s\n", restore_filename);
-			exit(1);
-		}
 		if((c = fgetc(fp_restore)) == 'y')
 		{
 			fscanf(fp_restore, "%lf %lf\n", &y_lower, &y_upper);
