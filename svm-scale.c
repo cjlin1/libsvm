@@ -107,7 +107,6 @@ int main(int argc,char **argv)
 	{
 		fp_restore = fopen(restore_filename,"r");
 		int idx, c;
-		double fmin, fmax;
 		
 		if(fp_restore==NULL)
 		{
@@ -116,13 +115,18 @@ int main(int argc,char **argv)
 		}
 
 		c = fgetc(fp_restore);
-		ungetc(c,fp_restore);
 		if(c == 'y')
+		{
 			readline(fp_restore);
+			readline(fp_restore);
+			readline(fp_restore);
+		}
+		else
+			ungetc(c,fp_restore);
 		readline(fp_restore);
 		readline(fp_restore);
 
-		while(fscanf(fp_restore,"%d %lf %lf\n",&idx,&fmin,&fmax) == 3)
+		while(fscanf(fp_restore,"%d %*f %*f\n",&idx) == 1)
 			max_index = max(idx,max_index);
 
 		rewind(fp_restore);
@@ -255,7 +259,6 @@ int main(int argc,char **argv)
 	{
 		char *p=line;
 		int next_index=1;
-		int index;
 		double target;
 		double value;
 		

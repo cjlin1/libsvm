@@ -81,7 +81,7 @@ class svm_scale
 	private void run(String []argv) throws IOException
 	{
 		int i,index;
-		BufferedReader fp = null;
+		BufferedReader fp = null, fp_restore = null;
 		String save_filename = null;
 		String restore_filename = null;
 		String data_filename = null;
@@ -114,6 +114,11 @@ class svm_scale
 			System.err.println("inconsistent lower/upper specification");
 			System.exit(1);
 		}
+		if(restore_filename != null && save_filename != null)
+		{
+			System.err.println("cannot use -r and -s simultaneously");
+			System.exit(1);
+		}
 
 		if(argv.length != i+1)
 			exit_with_help();
@@ -129,6 +134,40 @@ class svm_scale
 		/* assumption: min index of attributes is 1 */
 		/* pass 1: find out max index of attributes */
 		max_index = 0;
+
+		if(restore_filename != null)
+		{
+			try {
+				fp_restore = new BufferedReader(new FileReader(restore_filename));
+			}
+			catch (Exception e) {
+				System.err.println("can't open file " + restore_filename);
+				System.exit(1);
+			}
+			int idx, c;
+
+			fp_restore.mark(2); // for reset
+			if((c = fp_restore.read()) == 'y')
+			{
+				fp_restore.readLine();	// pass the '\n' after 'y'
+				fp_restore.readLine();		
+				fp_restore.readLine();		
+			}
+			else
+				fp_restore.reset();
+			fp_restore.readLine();
+			fp_restore.readLine();
+
+			String restore_line = null;
+			while((restore_line = fp_restore.readLine())!=null)
+			{
+				StringTokenizer st2 = new StringTokenizer(restore_line);
+				idx = Integer.parseInt(st2.nextToken());
+				max_index = Math.max(max_index, idx);
+			}
+			fp_restore = rewind(fp_restore, restore_filename);
+		}
+
 		while (readline(fp) != null)
 		{
 			StringTokenizer st = new StringTokenizer(line," \t\n\r\f:");
@@ -197,15 +236,7 @@ class svm_scale
 		/* pass 2.5: save/restore feature_min/feature_max */
 		if(restore_filename != null)
 		{
-			BufferedReader fp_restore = null;
-			try {
-				fp_restore = new BufferedReader(new FileReader(restore_filename));
-			}
-			catch (Exception e) {
-				System.err.println("can't open file " + restore_filename);
-				System.exit(1);
-			}
-
+			// fp_restore rewinded in finding max_index 
 			int idx, c;
 			double fmin, fmax;
 
