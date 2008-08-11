@@ -28,8 +28,8 @@ double y_max = -DBL_MAX;
 double y_min = DBL_MAX;
 int max_index;
 
-#define max(x,y) ((x>y)?x:y)
-#define min(x,y) ((x<y)?x:y)
+#define max(x,y) (((x)>(y))?(x):(y))
+#define min(x,y) (((x)<(y))?(x):(y))
 
 void output_target(double value);
 void output(int index, double value);
@@ -121,8 +121,6 @@ int main(int argc,char **argv)
 			readline(fp_restore);
 			readline(fp_restore);
 		}
-		else
-			ungetc(c,fp_restore);
 		readline(fp_restore);
 		readline(fp_restore);
 

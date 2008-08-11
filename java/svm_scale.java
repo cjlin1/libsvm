@@ -146,15 +146,12 @@ class svm_scale
 			}
 			int idx, c;
 
-			fp_restore.mark(2); // for reset
 			if((c = fp_restore.read()) == 'y')
 			{
-				fp_restore.readLine();	// pass the '\n' after 'y'
+				fp_restore.readLine();
 				fp_restore.readLine();		
 				fp_restore.readLine();		
 			}
-			else
-				fp_restore.reset();
 			fp_restore.readLine();
 			fp_restore.readLine();
 
