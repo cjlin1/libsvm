@@ -105,9 +105,9 @@ int main(int argc,char **argv)
 
 	if(restore_filename)
 	{
-		fp_restore = fopen(restore_filename,"r");
 		int idx, c;
-		
+
+		fp_restore = fopen(restore_filename,"r");
 		if(fp_restore==NULL)
 		{
 			fprintf(stderr,"can't open file %s\n", restore_filename);

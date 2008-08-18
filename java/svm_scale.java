@@ -137,6 +137,8 @@ class svm_scale
 
 		if(restore_filename != null)
 		{
+			int idx, c;
+
 			try {
 				fp_restore = new BufferedReader(new FileReader(restore_filename));
 			}
@@ -144,8 +146,6 @@ class svm_scale
 				System.err.println("can't open file " + restore_filename);
 				System.exit(1);
 			}
-			int idx, c;
-
 			if((c = fp_restore.read()) == 'y')
 			{
 				fp_restore.readLine();
