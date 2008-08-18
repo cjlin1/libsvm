@@ -389,7 +389,7 @@ to classify new data.
     PRECOMPUTED: kernel values in training_set_file
 
     cache_size is the size of the kernel cache, specified in megabytes.
-    C is the cost of constraints violation. (we usually use 1 to 1000)
+    C is the cost of constraints violation. 
     eps is the stopping criterion. (we usually use 0.00001 in nu-SVC,
     0.001 in others). nu is the parameter in nu-SVM, nu-SVR, and
     one-class-SVM. p is the epsilon in epsilon-insensitive loss function
