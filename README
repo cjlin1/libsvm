@@ -62,7 +62,7 @@ value which can be any real number. For one-class SVM, it's not used
 so can be any number.  Except using precomputed kernels (explained in
 another section), <index>:<value> gives a feature (attribute) value.
 <index> is an integer starting from 1 and <value> is a real
-number. Indices must be in an ASCENDING order. Labels in the testing
+number. Indices must be in ASCENDING order. Labels in the testing
 file are only used to calculate accuracy or errors. If they are
 unknown, just fill the first column with any numbers.
 
@@ -347,7 +347,8 @@ to classify new data.
 		double value;
 	};
 
-    index = -1 indicates the end of one vector.
+    index = -1 indicates the end of one vector. Note that indices must
+    be in ASCENDING order.
  
     struct svm_parameter describes the parameters of an SVM model:
 
