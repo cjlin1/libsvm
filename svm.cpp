@@ -791,7 +791,7 @@ int Solver::select_working_set(int &out_i, int &out_j)
 				if (grad_diff > 0)
 				{
 					double obj_diff; 
-					double quad_coef=Q_i[i]+QD[j]-2*y[i]*Q_i[j];
+					double quad_coef=Q_i[i]+QD[j]-2.0*y[i]*Q_i[j];
 					if (quad_coef > 0)
 						obj_diff = -(grad_diff*grad_diff)/quad_coef;
 					else
@@ -815,7 +815,7 @@ int Solver::select_working_set(int &out_i, int &out_j)
 				if (grad_diff > 0)
 				{
 					double obj_diff; 
-					double quad_coef=Q_i[i]+QD[j]+2*y[i]*Q_i[j];
+					double quad_coef=Q_i[i]+QD[j]+2.0*y[i]*Q_i[j];
 					if (quad_coef > 0)
 						obj_diff = -(grad_diff*grad_diff)/quad_coef;
 					else
@@ -1362,7 +1362,7 @@ public:
 		next_buffer = 1 - next_buffer;
 		schar si = sign[i];
 		for(int j=0;j<len;j++)
-			buf[j] = si * sign[j] * data[index[j]];
+			buf[j] = (Qfloat) si * (Qfloat) sign[j] * data[index[j]];
 		return buf;
 	}
 

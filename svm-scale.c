@@ -300,7 +300,7 @@ char* readline(FILE *input)
 	{
 		max_line_len *= 2;
 		line = (char *) realloc(line, max_line_len);
-		len = strlen(line);
+		len = (int) strlen(line);
 		if(fgets(line+len,max_line_len-len,input) == NULL)
 			break;
 	}
