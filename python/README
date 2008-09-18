@@ -48,6 +48,15 @@ directory windows/python. You need to copy it to this directory.  The
 re-make it by following the instruction of building windows binaries
 in libsvm README.
 
+To install this module into the system's Python installation, you
+should be a system administrator and type:
+
+	python setup.py install
+7
+This command will create a directory build/ containing the module and
+install it to the Python installation (i.e. the python library
+directory).
+
 Usage
 =====
 To use the module, the files svm.py and the shared library (namely svmc.so
