@@ -74,9 +74,9 @@ out2:
 		if (predict_probability && (svm_type==C_SVC || svm_type==NU_SVC))
 		{
 			v = svm_predict_probability(model,x,prob_estimates);
-			fprintf(output,"%g ",v);
+			fprintf(output,"%g",v);
 			for(j=0;j<nr_class;j++)
-				fprintf(output,"%g ",prob_estimates[j]);
+				fprintf(output," %g",prob_estimates[j]);
 			fprintf(output,"\n");
 		}
 		else
