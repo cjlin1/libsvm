@@ -205,7 +205,7 @@ void parse_command_line(int argc, char **argv, char *input_file_name, char *mode
 				param.weight[param.nr_weight-1] = atof(argv[i]);
 				break;
 			default:
-				fprintf(stderr,"unknown option\n");
+				fprintf(stderr,"unknown option: -%c\n", argv[i-1][1]);
 				exit_with_help();
 		}
 	}
