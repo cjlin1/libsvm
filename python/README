@@ -52,7 +52,7 @@ To install this module into the system's Python installation, you
 should be a system administrator and type:
 
 	python setup.py install
-7
+
 This command will create a directory build/ containing the module and
 install it to the Python installation (i.e. the python library
 directory).
