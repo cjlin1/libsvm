@@ -7,19 +7,19 @@
 <a name="_TOP"><b><h1><a
 href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a>  FAQ </h1></b></a>
 <b>last modified : </b>
-Fri, 14 Mar 2008 23:36:32 GMT
+Thu, 18 Sep 2008 14:35:56 GMT
 <class="categories">
 <li><a
-href="#_TOP">All Questions</a>(66)</li>
+href="#_TOP">All Questions</a>(69)</li>
 <ul><b>
 <li><a
 href="#/Q1:_Some_sample_uses_of_libsvm">Q1:_Some_sample_uses_of_libsvm</a>(2)</li>
 <li><a
-href="#/Q2:_Installation_and_running_the_program">Q2:_Installation_and_running_the_program</a>(8)</li>
+href="#/Q2:_Installation_and_running_the_program">Q2:_Installation_and_running_the_program</a>(9)</li>
 <li><a
 href="#/Q3:_Data_preparation">Q3:_Data_preparation</a>(6)</li>
 <li><a
-href="#/Q4:_Training_and_prediction">Q4:_Training_and_prediction</a>(30)</li>
+href="#/Q4:_Training_and_prediction">Q4:_Training_and_prediction</a>(32)</li>
 <li><a
 href="#/Q5:_Probability_outputs">Q5:_Probability_outputs</a>(3)</li>
 <li><a
@@ -37,20 +37,20 @@ href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(5)</li>
 <li class="headlines_item"><a href="#faq101">Some courses which have used libsvm as a tool</a></li>
 <li class="headlines_item"><a href="#faq102">Some applications which have used libsvm </a></li>
 <li class="headlines_item"><a href="#f201">Where can I find documents of libsvm ?</a></li>
-<li class="headlines_item"><a href="#f202">What are changes in previous versions?</a></li>
+<li class="headlines_item"><a href="#f202">Where are change log and earlier versions?</a></li>
 <li class="headlines_item"><a href="#f203">I would like to cite libsvm. Which paper should I cite ?   </a></li>
 <li class="headlines_item"><a href="#f204">I would like to use libsvm in my software. Is there any license problem?</a></li>
 <li class="headlines_item"><a href="#f205">Is there a repository of additional tools based on libsvm?</a></li>
 <li class="headlines_item"><a href="#f206">On unix machines, I got "error in loading shared libraries" or "cannot open shared object file." What happened ? </a></li>
 <li class="headlines_item"><a href="#f207">I have modified the source and would like to build the graphic interface "svm-toy" on MS windows. How should I do it ?</a></li>
 <li class="headlines_item"><a href="#f208">I am an MS windows user but why only one (svm-toy) of those precompiled .exe actually runs ?  </a></li>
+<li class="headlines_item"><a href="#f209">What is the difference beween "." and "*" outputed during training? </a></li>
 <li class="headlines_item"><a href="#f301">Why sometimes not all attributes of a data appear in the training/model files ?</a></li>
 <li class="headlines_item"><a href="#f302">What if my data are non-numerical ?</a></li>
 <li class="headlines_item"><a href="#f303">Why do you consider sparse format ? Will the training of dense data be much slower ?</a></li>
 <li class="headlines_item"><a href="#f304">Why sometimes the last line of my data is not read by svm-train?</a></li>
 <li class="headlines_item"><a href="#f305">Is there a program to check if my data are in the correct format?</a></li>
 <li class="headlines_item"><a href="#f306">May I put comments in data files?</a></li>
-<li class="headlines_item"><a href="#431">I don't know class labels of test data. What should I put in the first column of the test file?</a></li>
 <li class="headlines_item"><a href="#f401">The output of training C-SVM is like the following. What do they mean?</a></li>
 <li class="headlines_item"><a href="#f402">Can you explain more about the model file?</a></li>
 <li class="headlines_item"><a href="#f403">Should I use float or double to store numbers in the cache ?</a></li>
@@ -80,6 +80,9 @@ href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(5)</li>
 <li class="headlines_item"><a href="#f428">Why on windows sometimes grid.py fails?</a></li>
 <li class="headlines_item"><a href="#f429">Why grid.py/easy.py sometimes generates the following warning message?</a></li>
 <li class="headlines_item"><a href="#f430">Why the sign of predicted labels and decision values are sometimes reversed?</a></li>
+<li class="headlines_item"><a href="#f431">I don't know class labels of test data. What should I put in the first column of the test file?</a></li>
+<li class="headlines_item"><a href="#f432">How can I use OpenMP to parallelize LIBSVM on a multicore/shared-memory computer?</a></li>
+<li class="headlines_item"><a href="#f433">How could I know which training instances are support vectors?</a></li>
 <li class="headlines_item"><a href="#f425">Why training a probability model (i.e., -b 1) takes longer time</a></li>
 <li class="headlines_item"><a href="#f426">Why using the -b option does not give me better accuracy?</a></li>
 <li class="headlines_item"><a href="#f427">Why using svm-predict -b 0 and -b 1 gives different accuracy values?</a></li>
@@ -173,7 +176,7 @@ libsvm in detail.
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q2:_Installation_and_running_the_program"></a>
-<a name="f202"><b>Q: What are changes in previous versions?</b></a>
+<a name="f202"><b>Q: Where are change log and earlier versions?</b></a>
 <br/>                                                                                
 <p>See <a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm/log">the change log</a>.
 
@@ -271,6 +274,20 @@ Some examples are in README file.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
+  <a name="/Q2:_Installation_and_running_the_program"></a>
+<a name="f209"><b>Q: What is the difference beween "." and "*" outputed during training? </b></a>
+<br/>                                                                                
+
+<p>
+"." means every 1,000 iterations (or every #data 
+iterations is your #data is less than 1,000).
+"*" means that the shrunken problem has
+satisfied the stopping condition, and
+we reset to use the whole set. See the 
+<a href=../papers/libsvm.pdf>implementation document</a> for details.
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
   <a name="/Q3:_Data_preparation"></a>
 <a name="f301"><b>Q: Why sometimes not all attributes of a data appear in the training/model files ?</b></a>
 <br/>                                                                                
@@ -355,15 +372,6 @@ cut -d '#' -f 2 < test.txt > test.comments
 svm-predict test.feature train.model test.predicts
 paste -d '#' test.predicts test.comments | sed 's/#/ #/' > test.results
 </pre>
-<p align="right">
-<a href="#_TOP">[Go Top]</a>  
-<hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
-<a name="431"><b>Q: I don't know class labels of test data. What should I put in the first column of the test file?</b></a>
-<br/>                                                                                
-<p>Any value is ok. In this situation, what you will use is the output file of svm-predict, which gives predicted class labels.
-
-
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
@@ -505,14 +513,6 @@ Gaussian kernel
 <li>
 Check <a href=http://www.csie.ntu.edu.tw/~cjlin/liblinear>liblinear</a>,
 which is designed for large-scale linear classification.
-More details can be found in the following study:
-<p>
-C.-J. Lin, R. C. Weng, and S. S. Keerthi.
-<a href=../papers/logistic.pdf>
-Trust region Newton method for large-scale logistic
-regression</a>.
-Technical report, 2007. A short version appears
-in <a href=http://oregonstate.edu/conferences/icml2007/>ICML 2007</a>.<br>
 </ul>
 
 <p> Please also see our <a href=../papers/guide/guide.pdf>SVM guide</a>
@@ -881,7 +881,11 @@ srand(time(0));
 <a name="f422"><b>Q: I would like to solve L2-loss SVM (i.e., error term is quadratic). How should I modify the code ?</b></a>
 <br/>                                                                                
 <p>
-It is extremely easy. Taking c-svc for example, only two 
+It is extremely easy. Taking c-svc for example, to solve
+<p>
+min_w w^Tw/2 + C \sum max(0, 1- (y_i w^Tx_i+b))^2,
+<p>
+only two 
 places of svm.cpp have to be changed. 
 First, modify the following line of 
 solve_c_svc from 
@@ -906,13 +910,13 @@ In the constructor we assign it to param.C:
 Then in the subroutine get_Q, after the for loop, add
 <pre>
         if(i >= start && i < len) 
-		data[i] += 1/C;
+		data[i] += 0.5/C;
 </pre>
 
 <p>
 For one-class svm, the modification is exactly the same. For SVR, you don't need an if statement like the above. Instead, you only need a simple assignment:
 <pre>
-	data[real_i] += 1/C;
+	data[real_i] += 0.5/C;
 </pre>
 
 
@@ -1004,6 +1008,88 @@ label appears first.
 Hence a positive decision value implies
 that we should predict the "internal" +1,
 which may not be the +1 in the input file.
+
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q4:_Training_and_prediction"></a>
+<a name="f431"><b>Q: I don't know class labels of test data. What should I put in the first column of the test file?</b></a>
+<br/>                                                                                
+<p>Any value is ok. In this situation, what you will use is the output file of svm-predict, which gives predicted class labels.
+
+
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q4:_Training_and_prediction"></a>
+<a name="f432"><b>Q: How can I use OpenMP to parallelize LIBSVM on a multicore/shared-memory computer?</b></a>
+<br/>                                                                                
+
+<p>It is very easy if you are using GCC 4.2
+or after. 
+
+<p> In Makefile, add -fopenmp  to CFLAGS.
+
+<p> In class SVC_Q of svm.cpp, modify the for loop
+of get_Q to:
+<pre>
+#pragma omp parallel for private(j) 
+			for(j=start;j&lt;len;j++)
+</pre>
+Note that j must be declared outside the for loop.
+<p> In the subroutine svm_predict_values of svm.cpp, add one line to the for loop:
+<pre>
+#pragma omp parallel for private(i) 
+		for(i=0;i&lt;l;i++)
+			kvalue[i] = Kernel::k_function(x,model-&gt;SV[i],model-&gt;param);
+</pre>
+
+<p> Then rebuild the package. Kernel evaluations in training/testing will be parallelized. An example of running this modification on
+an 8-core machine using the data set
+<a href=../libsvmtools/datasets/binary/ijcnn1.bz2>ijcnn1</a>:
+
+<p> 8 cores:
+<pre>
+%setenv OMP_NUM_THREADS 8
+%time svm-train -c 16 -g 4 -m 400 ijcnn1
+27.1sec
+</pre>
+1 core:
+<pre>
+%setenv OMP_NUM_THREADS 1
+%time svm-train -c 16 -g 4 -m 400 ijcnn1
+79.8sec
+</pre>
+For this data, kernel evaluations take 80% of training time.
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q4:_Training_and_prediction"></a>
+<a name="f433"><b>Q: How could I know which training instances are support vectors?</b></a>
+<br/>                                                                                
+
+<p>
+It's very simple. Please replace 
+<pre>
+			if(nonzero[i]) model->SV[p++] = x[i];
+</pre>
+in svm_train() of svm.cpp with
+<pre>
+			if(nonzero[i]) 
+			{
+				model->SV[p++] = x[i];
+				info("%d\n", perm[i]);
+			}
+</pre>
+If there are many requests, we may
+provide a function to return indices
+of support vectors. In the mean time,
+if you need such information in your code,
+you can add the array nonzero to the model
+structure. This array has the same size as
+the number of data, so alternatively you can
+store only indices of support vectors.
+
 
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
