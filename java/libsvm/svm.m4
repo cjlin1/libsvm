@@ -685,7 +685,7 @@ class Solver {
 					if (grad_diff > 0)
 					{
 						double obj_diff; 
-						double quad_coef=Q_i[i]+QD[j]-2*y[i]*Q_i[j];
+						double quad_coef=Q_i[i]+QD[j]-2.0*y[i]*Q_i[j];
 						if (quad_coef > 0)
 							obj_diff = -(grad_diff*grad_diff)/quad_coef;
 						else
@@ -709,7 +709,7 @@ class Solver {
 					if (grad_diff > 0)
 					{
 						double obj_diff; 
-						double quad_coef=Q_i[i]+QD[j]+2*y[i]*Q_i[j];
+						double quad_coef=Q_i[i]+QD[j]+2.0*y[i]*Q_i[j];
 						if (quad_coef > 0)
 							obj_diff = -(grad_diff*grad_diff)/quad_coef;
 						else
