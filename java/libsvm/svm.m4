@@ -364,18 +364,17 @@ class Solver {
 
 		if(active_size == l) return;
 
-		int i;
-		for(i=active_size;i<l;i++)
-			G[i] = G_bar[i] + p[i];
+		int i,j;
+		for(j=active_size;j<l;j++)
+			G[j] = G_bar[j] + p[j];
 
-		for(i=0;i<active_size;i++)
-			if(is_free(i))
-			{
-				Qfloat[] Q_i = Q.get_Q(i,l);
-				double alpha_i = alpha[i];
-				for(int j=active_size;j<l;j++)
-					G[j] += alpha_i * Q_i[j];
-			}
+		for(i=active_size;i<l;i++)
+		{
+			Qfloat[] Q_i = Q.get_Q(i,active_size);
+			for(j=0;j<active_size;j++)
+				if(is_free(j))
+					G[i] += alpha[j] * Q_i[j];
+		}
 	}
 
 	void Solve(int l, QMatrix Q, double[] p_, byte[] y_,
@@ -1243,7 +1242,7 @@ class SVR_Q extends Kernel
 		next_buffer = 1 - next_buffer;
 		byte si = sign[i];
 		for(int j=0;j<len;j++)
-			buf[j] = si * sign[j] * data[0][index[j]];
+			buf[j] = (Qfloat) si * sign[j] * data[0][index[j]];
 		return buf;
 	}
 
