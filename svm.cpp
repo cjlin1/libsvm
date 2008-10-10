@@ -414,7 +414,7 @@ protected:
 	int *active_set;
 	double *G_bar;		// gradient, if we treat free variables as 0
 	int l;
-	bool unshrinked;	// XXX
+	bool unshrink;	// XXX
 
 	double get_C(int i)
 	{
@@ -437,7 +437,7 @@ protected:
 	virtual double calculate_rho();
 	virtual void do_shrinking();
 private:
-	bool be_shrunken(int i, double Gmax1, double Gmax2);	
+	bool be_shrunk(int i, double Gmax1, double Gmax2);	
 };
 
 void Solver::swap_index(int i, int j)
@@ -484,7 +484,7 @@ void Solver::Solve(int l, const QMatrix& Q, const double *p_, const schar *y_,
 	this->Cp = Cp;
 	this->Cn = Cn;
 	this->eps = eps;
-	unshrinked = false;
+	unshrink = false;
 
 	// initialize alpha_status
 	{
@@ -839,7 +839,7 @@ int Solver::select_working_set(int &out_i, int &out_j)
 	return 0;
 }
 
-bool Solver::be_shrunken(int i, double Gmax1, double Gmax2)
+bool Solver::be_shrunk(int i, double Gmax1, double Gmax2)
 {
 	if(is_upper_bound(i))
 	{
@@ -896,20 +896,20 @@ void Solver::do_shrinking()
 		}
 	}
 
-	if(unshrinked == false && Gmax1 + Gmax2 <= eps*10) 
+	if(unshrink == false && Gmax1 + Gmax2 <= eps*10) 
 	{
-		unshrinked = true;
+		unshrink = true;
 		reconstruct_gradient();
 		active_size = l;
 	}
 
 	for(i=0;i<active_size;i++)
-		if (be_shrunken(i, Gmax1, Gmax2))
+		if (be_shrunk(i, Gmax1, Gmax2))
 		{
 			active_size--;
 			while (active_size > i)
 			{
-				if (!be_shrunken(active_size, Gmax1, Gmax2))
+				if (!be_shrunk(active_size, Gmax1, Gmax2))
 				{
 					swap_index(i,active_size);
 					break;
@@ -977,7 +977,7 @@ private:
 	SolutionInfo *si;
 	int select_working_set(int &i, int &j);
 	double calculate_rho();
-	bool be_shrunken(int i, double Gmax1, double Gmax2, double Gmax3, double Gmax4);
+	bool be_shrunk(int i, double Gmax1, double Gmax2, double Gmax3, double Gmax4);
 	void do_shrinking();
 };
 
@@ -1094,7 +1094,7 @@ int Solver_NU::select_working_set(int &out_i, int &out_j)
 	return 0;
 }
 
-bool Solver_NU::be_shrunken(int i, double Gmax1, double Gmax2, double Gmax3, double Gmax4)
+bool Solver_NU::be_shrunk(int i, double Gmax1, double Gmax2, double Gmax3, double Gmax4)
 {
 	if(is_upper_bound(i))
 	{
@@ -1143,20 +1143,20 @@ void Solver_NU::do_shrinking()
 		}
 	}
 
-	if(unshrinked == false && max(Gmax1+Gmax2,Gmax3+Gmax4) <= eps*10) 
+	if(unshrink == false && max(Gmax1+Gmax2,Gmax3+Gmax4) <= eps*10) 
 	{
-		unshrinked = true;
+		unshrink = true;
 		reconstruct_gradient();
 		active_size = l;
 	}
 
 	for(i=0;i<active_size;i++)
-		if (be_shrunken(i, Gmax1, Gmax2, Gmax3, Gmax4))
+		if (be_shrunk(i, Gmax1, Gmax2, Gmax3, Gmax4))
 		{
 			active_size--;
 			while (active_size > i)
 			{
-				if (!be_shrunken(active_size, Gmax1, Gmax2, Gmax3, Gmax4))
+				if (!be_shrunk(active_size, Gmax1, Gmax2, Gmax3, Gmax4))
 				{
 					swap_index(i,active_size);
 					break;

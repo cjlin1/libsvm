@@ -316,7 +316,7 @@ class Solver {
 	int[] active_set;
 	double[] G_bar;		// gradient, if we treat free variables as 0
 	int l;
-	boolean unshrinked;	// XXX
+	boolean unshrink;	// XXX
 	
 	static final double INF = java.lang.Double.POSITIVE_INFINITY;
 
@@ -389,7 +389,7 @@ class Solver {
 		this.Cp = Cp;
 		this.Cn = Cn;
 		this.eps = eps;
-		this.unshrinked = false;
+		this.unshrink = false;
 
 		// initialize alpha_status
 		{
@@ -732,7 +732,7 @@ class Solver {
 		return 0;
 	}
 
-	private boolean be_shrunken(int i, double Gmax1, double Gmax2)
+	private boolean be_shrunk(int i, double Gmax1, double Gmax2)
 	{	
 		if(is_upper_bound(i))
 		{
@@ -789,20 +789,20 @@ class Solver {
 			}
 		}
 
-		if(unshrinked == false && Gmax1 + Gmax2 <= eps*10) 
+		if(unshrink == false && Gmax1 + Gmax2 <= eps*10) 
 		{
-			unshrinked = true;
+			unshrink = true;
 			reconstruct_gradient();
 			active_size = l;
 		}
 
 		for(i=0;i<active_size;i++)
-			if (be_shrunken(i, Gmax1, Gmax2))
+			if (be_shrunk(i, Gmax1, Gmax2))
 			{
 				active_size--;
 				while (active_size > i)
 				{
-					if (!be_shrunken(active_size, Gmax1, Gmax2))
+					if (!be_shrunk(active_size, Gmax1, Gmax2))
 					{
 						swap_index(i,active_size);
 						break;
@@ -982,7 +982,7 @@ final class Solver_NU extends Solver
 		return 0;
 	}
 
-	private boolean be_shrunken(int i, double Gmax1, double Gmax2, double Gmax3, double Gmax4)
+	private boolean be_shrunk(int i, double Gmax1, double Gmax2, double Gmax3, double Gmax4)
 	{
 		if(is_upper_bound(i))
 		{
@@ -1031,20 +1031,20 @@ final class Solver_NU extends Solver
 			}
 		}
 
-		if(unshrinked == false && Math.max(Gmax1+Gmax2,Gmax3+Gmax4) <= eps*10) 
+		if(unshrink == false && Math.max(Gmax1+Gmax2,Gmax3+Gmax4) <= eps*10) 
 		{
-			unshrinked = true;
+			unshrink = true;
 			reconstruct_gradient();
 			active_size = l;
 		}
 
 		for(i=0;i<active_size;i++)
-			if (be_shrunken(i, Gmax1, Gmax2, Gmax3, Gmax4))
+			if (be_shrunk(i, Gmax1, Gmax2, Gmax3, Gmax4))
 			{
 				active_size--;
 				while (active_size > i)
 				{
-					if (!be_shrunken(active_size, Gmax1, Gmax2, Gmax3, Gmax4))
+					if (!be_shrunk(active_size, Gmax1, Gmax2, Gmax3, Gmax4))
 					{
 						swap_index(i,active_size);
 						break;
