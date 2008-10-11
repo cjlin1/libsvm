@@ -222,7 +222,7 @@ class svm_train {
 					param.weight[param.nr_weight-1] = atof(argv[i]);
 					break;
 				default:
-					System.err.print("unknown option\n");
+					System.err.print("Unknown option: " + argv[i-1] + "\n");
 					exit_with_help();
 			}
 		}
