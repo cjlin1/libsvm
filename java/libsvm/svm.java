@@ -316,7 +316,7 @@ class Solver {
 	int[] active_set;
 	double[] G_bar;		// gradient, if we treat free variables as 0
 	int l;
-	boolean unshrinked;	// XXX
+	boolean unshrink;	// XXX
 	
 	static final double INF = java.lang.Double.POSITIVE_INFINITY;
 
@@ -364,18 +364,17 @@ class Solver {
 
 		if(active_size == l) return;
 
-		int i;
-		for(i=active_size;i<l;i++)
-			G[i] = G_bar[i] + p[i];
+		int i,j;
+		for(j=active_size;j<l;j++)
+			G[j] = G_bar[j] + p[j];
 
-		for(i=0;i<active_size;i++)
-			if(is_free(i))
-			{
-				float[] Q_i = Q.get_Q(i,l);
-				double alpha_i = alpha[i];
-				for(int j=active_size;j<l;j++)
-					G[j] += alpha_i * Q_i[j];
-			}
+		for(i=active_size;i<l;i++)
+		{
+			float[] Q_i = Q.get_Q(i,active_size);
+			for(j=0;j<active_size;j++)
+				if(is_free(j))
+					G[i] += alpha[j] * Q_i[j];
+		}
 	}
 
 	void Solve(int l, QMatrix Q, double[] p_, byte[] y_,
@@ -390,7 +389,7 @@ class Solver {
 		this.Cp = Cp;
 		this.Cn = Cn;
 		this.eps = eps;
-		this.unshrinked = false;
+		this.unshrink = false;
 
 		// initialize alpha_status
 		{
@@ -685,7 +684,7 @@ class Solver {
 					if (grad_diff > 0)
 					{
 						double obj_diff; 
-						double quad_coef=Q_i[i]+QD[j]-2*y[i]*Q_i[j];
+						double quad_coef=Q_i[i]+QD[j]-2.0*y[i]*Q_i[j];
 						if (quad_coef > 0)
 							obj_diff = -(grad_diff*grad_diff)/quad_coef;
 						else
@@ -709,7 +708,7 @@ class Solver {
 					if (grad_diff > 0)
 					{
 						double obj_diff; 
-						double quad_coef=Q_i[i]+QD[j]+2*y[i]*Q_i[j];
+						double quad_coef=Q_i[i]+QD[j]+2.0*y[i]*Q_i[j];
 						if (quad_coef > 0)
 							obj_diff = -(grad_diff*grad_diff)/quad_coef;
 						else
@@ -733,7 +732,7 @@ class Solver {
 		return 0;
 	}
 
-	private boolean be_shrunken(int i, double Gmax1, double Gmax2)
+	private boolean be_shrunk(int i, double Gmax1, double Gmax2)
 	{	
 		if(is_upper_bound(i))
 		{
@@ -790,43 +789,26 @@ class Solver {
 			}
 		}
 
-		// shrink
+		if(unshrink == false && Gmax1 + Gmax2 <= eps*10) 
+		{
+			unshrink = true;
+			reconstruct_gradient();
+			active_size = l;
+		}
 
 		for(i=0;i<active_size;i++)
-			if (be_shrunken(i, Gmax1, Gmax2))
+			if (be_shrunk(i, Gmax1, Gmax2))
 			{
 				active_size--;
 				while (active_size > i)
 				{
-					if (!be_shrunken(active_size, Gmax1, Gmax2))
+					if (!be_shrunk(active_size, Gmax1, Gmax2))
 					{
 						swap_index(i,active_size);
 						break;
 					}
 					active_size--;
 				}
-			}
-
-		// unshrink, check all variables again before final iterations
-
-		if(unshrinked || Gmax1 + Gmax2 > eps*10) return;
-
-		unshrinked = true;
-		reconstruct_gradient();
-
-		for(i=l-1;i>=active_size;i--)
-			if (!be_shrunken(i, Gmax1, Gmax2))
-			{
-				while (active_size < i)
-				{
-					if (be_shrunken(active_size, Gmax1, Gmax2))
-					{
-						swap_index(i,active_size);
-						break;
-					}
-					active_size++;
-				}
-				active_size++;
 			}
 	}
 
@@ -1000,7 +982,7 @@ final class Solver_NU extends Solver
 		return 0;
 	}
 
-	private boolean be_shrunken(int i, double Gmax1, double Gmax2, double Gmax3, double Gmax4)
+	private boolean be_shrunk(int i, double Gmax1, double Gmax2, double Gmax3, double Gmax4)
 	{
 		if(is_upper_bound(i))
 		{
@@ -1049,41 +1031,26 @@ final class Solver_NU extends Solver
 			}
 		}
 
-		// shrinking
+		if(unshrink == false && Math.max(Gmax1+Gmax2,Gmax3+Gmax4) <= eps*10) 
+		{
+			unshrink = true;
+			reconstruct_gradient();
+			active_size = l;
+		}
 
 		for(i=0;i<active_size;i++)
-			if (be_shrunken(i, Gmax1, Gmax2, Gmax3, Gmax4))
+			if (be_shrunk(i, Gmax1, Gmax2, Gmax3, Gmax4))
 			{
 				active_size--;
 				while (active_size > i)
 				{
-					if (!be_shrunken(active_size, Gmax1, Gmax2, Gmax3, Gmax4))
+					if (!be_shrunk(active_size, Gmax1, Gmax2, Gmax3, Gmax4))
 					{
 						swap_index(i,active_size);
 						break;
 					}
 					active_size--;
 				}
-			}
-
-		if(unshrinked || Math.max(Gmax1+Gmax2,Gmax3+Gmax4) > eps*10) return;
-	
-		unshrinked = true;
-		reconstruct_gradient();
-
-		for(i=l-1;i>=active_size;i--)
-			if (!be_shrunken(i, Gmax1, Gmax2, Gmax3, Gmax4))
-			{
-				while (active_size < i)
-				{
-					if (be_shrunken(active_size, Gmax1, Gmax2, Gmax3, Gmax4))
-					{
-						swap_index(i,active_size);
-						break;
-					}
-					active_size++;
-				}
-				active_size++;
 			}
 	}
 	
@@ -1275,7 +1242,7 @@ class SVR_Q extends Kernel
 		next_buffer = 1 - next_buffer;
 		byte si = sign[i];
 		for(int j=0;j<len;j++)
-			buf[j] = si * sign[j] * data[0][index[j]];
+			buf[j] = (float) si * sign[j] * data[0][index[j]];
 		return buf;
 	}
 
@@ -1289,7 +1256,7 @@ public class svm {
 	//
 	// construct and solve various formulations
 	//
-	public static final int LIBSVM_VERSION=286; 
+	public static final int LIBSVM_VERSION=287; 
 	private static void solve_c_svc(svm_problem prob, svm_parameter param,
 					double[] alpha, Solver.SolutionInfo si,
 					double Cp, double Cn)
