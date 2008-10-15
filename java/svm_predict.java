@@ -121,7 +121,7 @@ class svm_predict {
 					predict_probability = atoi(argv[i]);
 					break;
 				default:
-					System.err.print("unknown option\n");
+					System.err.print("Unknown option: " + argv[i-1] + "\n");
 					exit_with_help();
 			}
 		}

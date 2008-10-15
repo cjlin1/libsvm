@@ -1235,10 +1235,10 @@ public:
 	Qfloat *get_Q(int i, int len) const
 	{
 		Qfloat *data;
-		int start;
+		int start, j;
 		if((start = cache->get_data(i,&data,len)) < len)
 		{
-			for(int j=start;j<len;j++)
+			for(j=start;j<len;j++)
 				data[j] = (Qfloat)(y[i]*y[j]*(this->*kernel_function)(i,j));
 		}
 		return data;
@@ -1284,10 +1284,10 @@ public:
 	Qfloat *get_Q(int i, int len) const
 	{
 		Qfloat *data;
-		int start;
+		int start, j;
 		if((start = cache->get_data(i,&data,len)) < len)
 		{
-			for(int j=start;j<len;j++)
+			for(j=start;j<len;j++)
 				data[j] = (Qfloat)(this->*kernel_function)(i,j);
 		}
 		return data;
@@ -1350,10 +1350,10 @@ public:
 	Qfloat *get_Q(int i, int len) const
 	{
 		Qfloat *data;
-		int real_i = index[i];
+		int j, real_i = index[i];
 		if(cache->get_data(real_i,&data,l) < l)
 		{
-			for(int j=0;j<l;j++)
+			for(j=0;j<l;j++)
 				data[j] = (Qfloat)(this->*kernel_function)(real_i,j);
 		}
 
