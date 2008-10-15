@@ -1241,7 +1241,7 @@ class SVR_Q extends Kernel
 		Qfloat buf[] = buffer[next_buffer];
 		next_buffer = 1 - next_buffer;
 		byte si = sign[i];
-		for(int j=0;j<len;j++)
+		for(j=0;j<len;j++)
 			buf[j] = (Qfloat) si * sign[j] * data[0][index[j]];
 		return buf;
 	}
