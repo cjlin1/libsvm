@@ -1127,10 +1127,10 @@ class SVC_Q extends Kernel
 	Qfloat[] get_Q(int i, int len)
 	{
 		Qfloat[][] data = new Qfloat[1][];
-		int start;
+		int start, j;
 		if((start = cache.get_data(i,data,len)) < len)
 		{
-			for(int j=start;j<len;j++)
+			for(j=start;j<len;j++)
 				data[0][j] = (Qfloat)(y[i]*y[j]*kernel_function(i,j));
 		}
 		return data[0];
@@ -1167,10 +1167,10 @@ class ONE_CLASS_Q extends Kernel
 	Qfloat[] get_Q(int i, int len)
 	{
 		Qfloat[][] data = new Qfloat[1][];
-		int start;
+		int start, j;
 		if((start = cache.get_data(i,data,len)) < len)
 		{
-			for(int j=start;j<len;j++)
+			for(j=start;j<len;j++)
 				data[0][j] = (Qfloat)kernel_function(i,j);
 		}
 		return data[0];
@@ -1230,10 +1230,10 @@ class SVR_Q extends Kernel
 	Qfloat[] get_Q(int i, int len)
 	{
 		Qfloat[][] data = new Qfloat[1][];
-		int real_i = index[i];
+		int j, real_i = index[i];
 		if(cache.get_data(real_i,data,l) < l)
 		{
-			for(int j=0;j<l;j++)
+			for(j=0;j<l;j++)
 				data[0][j] = (Qfloat)kernel_function(real_i,j);
 		}
 
@@ -1256,7 +1256,7 @@ public class svm {
 	//
 	// construct and solve various formulations
 	//
-	public static final int LIBSVM_VERSION=287; 
+	public static final int LIBSVM_VERSION=288; 
 	private static void solve_c_svc(svm_problem prob, svm_parameter param,
 					double[] alpha, Solver.SolutionInfo si,
 					double Cp, double Cn)

@@ -3,7 +3,7 @@
 from distutils.core import setup, Extension
 
 setup(name = "LIBSVM",
-      version = "2.87",
+      version = "2.88",
       author="Chih-Chung Chang and Chih-Jen Lin",
       maintainer="Chih-Jen Lin",
       maintainer_email="cjlin@csie.ntu.edu.tw",

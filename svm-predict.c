@@ -136,7 +136,7 @@ int main(int argc, char **argv)
 				predict_probability = atoi(argv[i]);
 				break;
 			default:
-				fprintf(stderr,"unknown option: -%c\n", argv[i-1][1]);
+				fprintf(stderr,"Unknown option: -%c\n", argv[i-1][1]);
 				exit_with_help();
 		}
 	}
