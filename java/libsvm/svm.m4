@@ -375,7 +375,7 @@ class Solver {
 				nr_free++;
 
 		if(2*nr_free < active_size)
-			System.out.print("Warning: using -h 0 may be faster\n");
+			System.out.print("\nWarning: using -h 0 may be faster\n");
 
 		if (nr_free*l > 2*active_size*(l-active_size))
 		{
