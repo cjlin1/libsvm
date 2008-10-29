@@ -7,10 +7,10 @@
 <a name="_TOP"><b><h1><a
 href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a>  FAQ </h1></b></a>
 <b>last modified : </b>
-Thu, 18 Sep 2008 14:35:56 GMT
+Wed, 29 Oct 2008 23:37:19 GMT
 <class="categories">
 <li><a
-href="#_TOP">All Questions</a>(69)</li>
+href="#_TOP">All Questions</a>(70)</li>
 <ul><b>
 <li><a
 href="#/Q1:_Some_sample_uses_of_libsvm">Q1:_Some_sample_uses_of_libsvm</a>(2)</li>
@@ -19,7 +19,7 @@ href="#/Q2:_Installation_and_running_the_program">Q2:_Installation_and_running_t
 <li><a
 href="#/Q3:_Data_preparation">Q3:_Data_preparation</a>(6)</li>
 <li><a
-href="#/Q4:_Training_and_prediction">Q4:_Training_and_prediction</a>(32)</li>
+href="#/Q4:_Training_and_prediction">Q4:_Training_and_prediction</a>(33)</li>
 <li><a
 href="#/Q5:_Probability_outputs">Q5:_Probability_outputs</a>(3)</li>
 <li><a
@@ -44,7 +44,7 @@ href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(5)</li>
 <li class="headlines_item"><a href="#f206">On unix machines, I got "error in loading shared libraries" or "cannot open shared object file." What happened ? </a></li>
 <li class="headlines_item"><a href="#f207">I have modified the source and would like to build the graphic interface "svm-toy" on MS windows. How should I do it ?</a></li>
 <li class="headlines_item"><a href="#f208">I am an MS windows user but why only one (svm-toy) of those precompiled .exe actually runs ?  </a></li>
-<li class="headlines_item"><a href="#f209">What is the difference beween "." and "*" outputed during training? </a></li>
+<li class="headlines_item"><a href="#f209">What is the difference between "." and "*" outputed during training? </a></li>
 <li class="headlines_item"><a href="#f301">Why sometimes not all attributes of a data appear in the training/model files ?</a></li>
 <li class="headlines_item"><a href="#f302">What if my data are non-numerical ?</a></li>
 <li class="headlines_item"><a href="#f303">Why do you consider sparse format ? Will the training of dense data be much slower ?</a></li>
@@ -65,6 +65,7 @@ href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(5)</li>
 <li class="headlines_item"><a href="#f412">The program keeps running (without showing any output). What should I do?</a></li>
 <li class="headlines_item"><a href="#f413">The program keeps running (with output, i.e. many dots). What should I do?</a></li>
 <li class="headlines_item"><a href="#f414">The training time is too long. What should I do?</a></li>
+<li class="headlines_item"><a href="#f4141">Does shrinking always help?</a></li>
 <li class="headlines_item"><a href="#f415">How do I get the decision value(s)?</a></li>
 <li class="headlines_item"><a href="#f4151">How do I get the distance between a point and the hyperplane?</a></li>
 <li class="headlines_item"><a href="#f416">On 32-bit machines, if I use a large cache (i.e. large -m) on a linux machine, why sometimes I get "segmentation fault ?"</a></li>
@@ -83,7 +84,7 @@ href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(5)</li>
 <li class="headlines_item"><a href="#f431">I don't know class labels of test data. What should I put in the first column of the test file?</a></li>
 <li class="headlines_item"><a href="#f432">How can I use OpenMP to parallelize LIBSVM on a multicore/shared-memory computer?</a></li>
 <li class="headlines_item"><a href="#f433">How could I know which training instances are support vectors?</a></li>
-<li class="headlines_item"><a href="#f425">Why training a probability model (i.e., -b 1) takes longer time</a></li>
+<li class="headlines_item"><a href="#f425">Why training a probability model (i.e., -b 1) takes a longer time?</a></li>
 <li class="headlines_item"><a href="#f426">Why using the -b option does not give me better accuracy?</a></li>
 <li class="headlines_item"><a href="#f427">Why using svm-predict -b 0 and -b 1 gives different accuracy values?</a></li>
 <li class="headlines_item"><a href="#f501">How can I save images drawn by svm-toy?</a></li>
@@ -275,14 +276,14 @@ Some examples are in README file.
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q2:_Installation_and_running_the_program"></a>
-<a name="f209"><b>Q: What is the difference beween "." and "*" outputed during training? </b></a>
+<a name="f209"><b>Q: What is the difference between "." and "*" outputed during training? </b></a>
 <br/>                                                                                
 
 <p>
 "." means every 1,000 iterations (or every #data 
 iterations is your #data is less than 1,000).
-"*" means that the shrunken problem has
-satisfied the stopping condition, and
+"*" means that after iterations of using
+a smaller shrunk problem, 
 we reset to use the whole set. See the 
 <a href=../papers/libsvm.pdf>implementation document</a> for details.
 <p align="right">
@@ -654,8 +655,25 @@ If that still doesn't work, you may want to train only a subset of the data.
 You can use the program subset.py in the directory "tools" 
 to obtain a random subset.
 
+<p> When using large -e, you may want to check if -h 0 (no shrinking) or -h 1 (shrinking) is faster.
+See the next question below.
+
 <p>
 If you are using polynomial kernels, please check the question on the pow() function.
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q4:_Training_and_prediction"></a>
+<a name="f4141"><b>Q: Does shrinking always help?</b></a>
+<br/>                                                                                
+<p>
+If the number of iterations is high, then shrinking
+often helps.
+However, if the number of iterations is small
+(e.g., you specify a large -e), then
+probably using -h 0 (no shrinking) is better.
+See the 
+<a href=../papers/libsvm.pdf>implementation document</a> for details.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
@@ -1095,7 +1113,7 @@ store only indices of support vectors.
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q5:_Probability_outputs"></a>
-<a name="f425"><b>Q: Why training a probability model (i.e., -b 1) takes longer time</b></a>
+<a name="f425"><b>Q: Why training a probability model (i.e., -b 1) takes a longer time?</b></a>
 <br/>                                                                                
 <p>
 To construct this probability model, we internally conduct a 
