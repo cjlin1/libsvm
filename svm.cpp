@@ -488,7 +488,7 @@ void Solver::reconstruct_gradient()
 			{
 				const Qfloat *Q_i = Q->get_Q(i,l);
 				double alpha_i = alpha[i];
-				for(int j=active_size;j<l;j++)
+				for(j=active_size;j<l;j++)
 					G[j] += alpha_i * Q_i[j];
 			}
 	}

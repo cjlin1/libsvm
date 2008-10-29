@@ -365,15 +365,38 @@ class Solver {
 		if(active_size == l) return;
 
 		int i,j;
+		int nr_free = 0;
+
 		for(j=active_size;j<l;j++)
 			G[j] = G_bar[j] + p[j];
 
-		for(i=active_size;i<l;i++)
+		for(j=0;j<active_size;j++)
+			if(is_free(j))
+				nr_free++;
+
+		if(2*nr_free < active_size)
+			System.out.print("Warning: using -h 0 may be faster\n");
+
+		if (nr_free*l > 2*active_size*(l-active_size))
 		{
-			Qfloat[] Q_i = Q.get_Q(i,active_size);
-			for(j=0;j<active_size;j++)
-				if(is_free(j))
-					G[i] += alpha[j] * Q_i[j];
+			for(i=active_size;i<l;i++)
+			{
+				Qfloat[] Q_i = Q.get_Q(i,active_size);
+				for(j=0;j<active_size;j++)
+					if(is_free(j))
+						G[i] += alpha[j] * Q_i[j];
+			}	
+		}
+		else
+		{
+			for(i=0;i<active_size;i++)
+				if(is_free(i))
+				{
+					Qfloat[] Q_i = Q.get_Q(i,l);
+					double alpha_i = alpha[i];
+					for(j=active_size;j<l;j++)
+						G[j] += alpha_i * Q_i[j];
+				}
 		}
 	}
 
