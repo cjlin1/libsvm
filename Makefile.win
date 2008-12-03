@@ -3,8 +3,8 @@
 #Under dosbox prompt
 #nmake -f Makefile.win
 
-PYTHON_INC = c:\python25\include
-PYTHON_LIB = c:\python25\libs\python25.lib
+PYTHON_INC = c:\python26\include
+PYTHON_LIB = c:\python26\libs\python26.lib
 ##########################################
 CXX = cl.exe
 CFLAGS = -nologo -O2 -EHsc -I. -D __WIN32__ -D _CRT_SECURE_NO_DEPRECATE
