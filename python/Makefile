@@ -2,7 +2,7 @@ CXX? = g++
 SWIG ?= swig
 
 #Windows: see ../README ../Makefile.win
-PYTHON_INCLUDEDIR ?= /usr/include/python2.4
+PYTHON_INCLUDEDIR ?= /usr/include/python2.5
 
 CFLAGS = -O3 -I$(PYTHON_INCLUDEDIR) -I..
 LDFLAGS = -shared
