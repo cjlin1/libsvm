@@ -2387,7 +2387,7 @@ public class svm {
 
 	public static void svm_save_model(String model_file_name, svm_model model) throws IOException
 	{
-		DataOutputStream fp = new DataOutputStream(new FileOutputStream(model_file_name));
+		DataOutputStream fp = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(model_file_name)));
 
 		svm_parameter param = model.param;
 
