@@ -130,7 +130,7 @@ class svm_predict {
 		try 
 		{
 			BufferedReader input = new BufferedReader(new FileReader(argv[i]));
-			DataOutputStream output = new DataOutputStream(new FileOutputStream(argv[i+2]));
+			DataOutputStream output = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(argv[i+2])));
 			svm_model model = svm.svm_load_model(argv[i+1]);
 			if(predict_probability == 1)
 			{
