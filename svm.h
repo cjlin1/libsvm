@@ -7,6 +7,8 @@
 extern "C" {
 #endif
 
+extern int libsvm_version;
+
 struct svm_node
 {
 	int index;
