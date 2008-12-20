@@ -290,7 +290,8 @@ These functions and structures are declared in the header file
 `svm.h'.  You need to #include "svm.h" in your C/C++ source files and
 link your program with `svm.cpp'. You can see `svm-train.c' and
 `svm-predict.c' for examples showing how to use them. We define
-LIBSVM_VERSION in svm.h, so you can check the version number.
+LIBSVM_VERSION and declare `extern int libsvm_version; ' in svm.h, so
+you can check the version number.
 
 Before you classify test data, you need to construct an SVM model
 (`svm_model') using training data. A model can also be saved in
@@ -531,6 +532,11 @@ to classify new data.
 - Function: void svm_destroy_param(struct svm_parameter *param);
 
     This function frees the memory used by a parameter set.
+
+- Function: extern void (*svm_print_string) (char *);
+
+    Users can specify their output format by
+	svm_print_string = &your_print_function;
 
 Java Version
 ============
