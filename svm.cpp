@@ -36,7 +36,7 @@ inline double powi(double base, int times)
 #define TAU 1e-12
 #define Malloc(type,n) (type *)malloc((n)*sizeof(type))
 
-static void print_string_stdout(char *s)
+static void print_string_stdout(const char *s)
 {
 	fputs(s,stdout);
 	fflush(stdout);

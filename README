@@ -533,7 +533,7 @@ to classify new data.
 
     This function frees the memory used by a parameter set.
 
-- Function: extern void (*svm_print_string) (char *);
+- Variable: extern void (*svm_print_string) (const char *);
 
     Users can specify their output format by
 	svm_print_string = &your_print_function;
