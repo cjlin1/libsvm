@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <errno.h>
+#include <time.h>
 #include "svm.h"
 #define Malloc(type,n) (type *)malloc((n)*sizeof(type))
 
@@ -38,6 +40,12 @@ void exit_with_help()
 	exit(1);
 }
 
+void exit_input_error(int line_num)
+{
+	fprintf(stderr,"Wrong input format at line %d\n", line_num);
+	exit(1);
+}
+
 void parse_command_line(int argc, char **argv, char *input_file_name, char *model_file_name);
 void read_problem(const char *filename);
 void do_cross_validation();
@@ -48,6 +56,27 @@ struct svm_model *model;
 struct svm_node *x_space;
 int cross_validation;
 int nr_fold;
+
+static char *line;
+static int max_line_len;
+
+static char* readline(FILE *input)
+{
+	int len;
+	
+	if(fgets(line,max_line_len,input) == NULL)
+		return NULL;
+
+	while(strrchr(line,'\n') == NULL)
+	{
+		max_line_len *= 2;
+		line = (char *) realloc(line,max_line_len);
+		len = (int) strlen(line);
+		if(fgets(line+len,max_line_len-len,input) == NULL)
+			break;
+	}
+	return line;
+}
 
 int main(int argc, char **argv)
 {
@@ -236,7 +265,9 @@ void read_problem(const char *filename)
 {
 	int elements, max_index, i, j;
 	FILE *fp = fopen(filename,"r");
-	
+	char *endptr;
+	char *idx, *val, *label;
+
 	if(fp == NULL)
 	{
 		fprintf(stderr,"can't open input file %s\n",filename);
@@ -245,25 +276,24 @@ void read_problem(const char *filename)
 
 	prob.l = 0;
 	elements = 0;
-	while(1)
+
+	max_line_len = 1024;
+	line = Malloc(char,max_line_len);
+	while(readline(fp)!=NULL)
 	{
-		int c = fgetc(fp);
-		switch(c)
+		char *p = strtok(line," \t"); // label
+
+		// features
+		while(1)
 		{
-			case '\n':
-				++prob.l;
-				// fall through,
-				// count the '-1' element
-			case ':':
-				++elements;
+			p = strtok(NULL," \t");
+			if(p == NULL || *p == '\n')
 				break;
-			case EOF:
-				goto out;
-			default:
-				;
+			++elements;
 		}
+		++elements;
+		++prob.l;
 	}
-out:
 	rewind(fp);
 
 	prob.y = Malloc(double,prob.l);
@@ -274,27 +304,34 @@ out:
 	j=0;
 	for(i=0;i<prob.l;i++)
 	{
-		double label;
+		readline(fp);
 		prob.x[i] = &x_space[j];
-		fscanf(fp,"%lf",&label);
-		prob.y[i] = label;
+		label = strtok(line," \t");
+		prob.y[i] = strtod(label,&endptr);
+		if(endptr == label)
+			exit_input_error(i+1);
 
 		while(1)
 		{
-			int c;
-			do {
-				c = getc(fp);
-				if(c=='\n') goto out2;
-			} while(isspace(c));
-			ungetc(c,fp);
-			if (fscanf(fp,"%d:%lf",&(x_space[j].index),&(x_space[j].value)) < 2)
-			{
-				fprintf(stderr,"Wrong input format at line %d\n", i+1);
-				exit(1);
-			}
+			idx = strtok(NULL,":");
+			val = strtok(NULL," \t");
+
+			if(val == NULL)
+				break;
+
+			errno = 0;
+			x_space[j].index = (int) strtol(idx,&endptr,10);
+			if(endptr == idx || errno != 0 || *endptr != '\0' || x_space[j].index <= 0)
+				exit_input_error(i+1);
+
+			errno = 0;
+			x_space[j].value = strtod(val,&endptr);
+			if(endptr == val || errno != 0 || (*endptr != '\0' && !isspace(*endptr)))
+				exit_input_error(i+1);
+
 			++j;
-		}	
-out2:
+		}
+
 		if(j>=1 && x_space[j-1].index > max_index)
 			max_index = x_space[j-1].index;
 		x_space[j++].index = -1;

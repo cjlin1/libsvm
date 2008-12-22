@@ -2,6 +2,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include "svm.h"
 
 struct svm_node *x;
@@ -10,12 +11,39 @@ int max_nr_attr = 64;
 struct svm_model* model;
 int predict_probability=0;
 
+static char *line;
+static int max_line_len;
+
+static char* readline(FILE *input)
+{
+	int len;
+	
+	if(fgets(line,max_line_len,input) == NULL)
+		return NULL;
+
+	while(strrchr(line,'\n') == NULL)
+	{
+		max_line_len *= 2;
+		line = (char *) realloc(line,max_line_len);
+		len = (int) strlen(line);
+		if(fgets(line+len,max_line_len-len,input) == NULL)
+			break;
+	}
+	return line;
+}
+
+void exit_input_error(int line_num)
+{
+	fprintf(stderr,"Wrong input format at line %d\n", line_num);
+	exit(1);
+}
+
 void predict(FILE *input, FILE *output)
 {
 	int correct = 0;
 	int total = 0;
 	double error = 0;
-	double sumv = 0, sumy = 0, sumvv = 0, sumyy = 0, sumvy = 0;
+	double sump = 0, sumt = 0, sumpp = 0, sumtt = 0, sumpt = 0;
 
 	int svm_type=svm_get_svm_type(model);
 	int nr_class=svm_get_nr_class(model);
@@ -38,14 +66,19 @@ void predict(FILE *input, FILE *output)
 			free(labels);
 		}
 	}
-	while(1)
+
+	max_line_len = 1024;
+	line = (char *)malloc(max_line_len*sizeof(char));
+	while(readline(input) != NULL)
 	{
 		int i = 0;
-		int c;
-		double target,v;
+		double target_label, predict_label;
+		char *idx, *val, *label, *endptr;
 
-		if (fscanf(input,"%lf",&target)==EOF)
-			break;
+		label = strtok(line," \t");
+		target_label = strtod(label,&endptr);
+		if(endptr == label)
+			exit_input_error(total+1);
 
 		while(1)
 		{
@@ -55,52 +88,55 @@ void predict(FILE *input, FILE *output)
 				x = (struct svm_node *) realloc(x,max_nr_attr*sizeof(struct svm_node));
 			}
 
-			do {
-				c = getc(input);
-				if(c=='\n' || c==EOF) goto out2;
-			} while(isspace(c));
-			ungetc(c,input);
-			if (fscanf(input,"%d:%lf",&x[i].index,&x[i].value) < 2)
-			{
-				fprintf(stderr,"Wrong input format at line %d\n", total+1);
-				exit(1);
-			}
-			++i;
-		}	
+			idx = strtok(NULL,":");
+			val = strtok(NULL," \t");
 
-out2:
+			if(val == NULL)
+				break;
+			errno = 0;
+			x[i].index = (int) strtol(idx,&endptr,10);
+			if(endptr == idx || errno != 0 || *endptr != '\0' || x[i].index <= 0)
+				exit_input_error(total+1);
+
+			errno = 0;
+			x[i].value = strtod(val,&endptr);
+			if(endptr == val || errno != 0 || (*endptr != '\0' && !isspace(*endptr)))
+				exit_input_error(total+1);
+
+			++i;
+		}
 		x[i].index = -1;
 
 		if (predict_probability && (svm_type==C_SVC || svm_type==NU_SVC))
 		{
-			v = svm_predict_probability(model,x,prob_estimates);
-			fprintf(output,"%g",v);
+			predict_label = svm_predict_probability(model,x,prob_estimates);
+			fprintf(output,"%g",predict_label);
 			for(j=0;j<nr_class;j++)
 				fprintf(output," %g",prob_estimates[j]);
 			fprintf(output,"\n");
 		}
 		else
 		{
-			v = svm_predict(model,x);
-			fprintf(output,"%g\n",v);
+			predict_label = svm_predict(model,x);
+			fprintf(output,"%g\n",predict_label);
 		}
 
-		if(v == target)
+		if(predict_label == target_label)
 			++correct;
-		error += (v-target)*(v-target);
-		sumv += v;
-		sumy += target;
-		sumvv += v*v;
-		sumyy += target*target;
-		sumvy += v*target;
+		error += (predict_label-target_label)*(predict_label-target_label);
+		sump += predict_label;
+		sumt += target_label;
+		sumpp += predict_label*predict_label;
+		sumtt += target_label*target_label;
+		sumpt += predict_label*target_label;
 		++total;
 	}
 	if (svm_type==NU_SVR || svm_type==EPSILON_SVR)
 	{
 		printf("Mean squared error = %g (regression)\n",error/total);
 		printf("Squared correlation coefficient = %g (regression)\n",
-		       ((total*sumvy-sumv*sumy)*(total*sumvy-sumv*sumy))/
-		       ((total*sumvv-sumv*sumv)*(total*sumyy-sumy*sumy))
+		       ((total*sumpt-sump*sumt)*(total*sumpt-sump*sumt))/
+		       ((total*sumpp-sump*sump)*(total*sumtt-sumt*sumt))
 		       );
 	}
 	else
@@ -162,7 +198,7 @@ int main(int argc, char **argv)
 		fprintf(stderr,"can't open model file %s\n",argv[i+1]);
 		exit(1);
 	}
-	
+
 	x = (struct svm_node *) malloc(max_nr_attr*sizeof(struct svm_node));
 	if(predict_probability)
 	{
