@@ -3,7 +3,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
-#include <time.h>
 #include "svm.h"
 #define Malloc(type,n) (type *)malloc((n)*sizeof(type))
 
@@ -263,7 +262,7 @@ void parse_command_line(int argc, char **argv, char *input_file_name, char *mode
 
 void read_problem(const char *filename)
 {
-	int elements, max_index, i, j;
+	int elements, max_index, inst_max_index, i, j;
 	FILE *fp = fopen(filename,"r");
 	char *endptr;
 	char *idx, *val, *label;
@@ -287,7 +286,7 @@ void read_problem(const char *filename)
 		while(1)
 		{
 			p = strtok(NULL," \t");
-			if(p == NULL || *p == '\n')
+			if(p == NULL || *p == '\n') // check '\n' as ' ' may be after the last feature
 				break;
 			++elements;
 		}
@@ -304,6 +303,7 @@ void read_problem(const char *filename)
 	j=0;
 	for(i=0;i<prob.l;i++)
 	{
+		inst_max_index = 0; // strtol gives 0 if wrong format
 		readline(fp);
 		prob.x[i] = &x_space[j];
 		label = strtok(line," \t");
@@ -321,8 +321,10 @@ void read_problem(const char *filename)
 
 			errno = 0;
 			x_space[j].index = (int) strtol(idx,&endptr,10);
-			if(endptr == idx || errno != 0 || *endptr != '\0' || x_space[j].index <= 0)
+			if(endptr == idx || errno != 0 || *endptr != '\0' || x_space[j].index <= inst_max_index)
 				exit_input_error(i+1);
+			else
+				inst_max_index = x_space[j].index;
 
 			errno = 0;
 			x_space[j].value = strtod(val,&endptr);

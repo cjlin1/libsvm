@@ -74,6 +74,7 @@ void predict(FILE *input, FILE *output)
 		int i = 0;
 		double target_label, predict_label;
 		char *idx, *val, *label, *endptr;
+		int inst_max_index = 0; // strtol gives 0 if wrong format
 
 		label = strtok(line," \t");
 		target_label = strtod(label,&endptr);
@@ -95,8 +96,10 @@ void predict(FILE *input, FILE *output)
 				break;
 			errno = 0;
 			x[i].index = (int) strtol(idx,&endptr,10);
-			if(endptr == idx || errno != 0 || *endptr != '\0' || x[i].index <= 0)
+			if(endptr == idx || errno != 0 || *endptr != '\0' || x[i].index <= inst_max_index)
 				exit_input_error(total+1);
+			else
+				inst_max_index = x[i].index;
 
 			errno = 0;
 			x[i].value = strtod(val,&endptr);
