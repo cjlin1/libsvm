@@ -2857,10 +2857,10 @@ svm_model *svm_load_model(const char *model_file_name)
 
 	while(readline(fp)!=NULL)
 	{
-		p=strtok(line,":");
+		p = strtok(line,":");
  		while(1)
 		{
-			p=strtok(NULL,":");
+			p = strtok(NULL,":");
 			if(p == NULL)
 				break;
 			++elements;
@@ -2877,7 +2877,7 @@ svm_model *svm_load_model(const char *model_file_name)
 	for(i=0;i<m;i++)
 		model->sv_coef[i] = Malloc(double,l);
 	model->SV = Malloc(svm_node*,l);
-	svm_node *x_space=NULL;
+	svm_node *x_space = NULL;
 	if(l>0) x_space = Malloc(svm_node,elements);
 
 	int j=0;
@@ -2886,12 +2886,12 @@ svm_model *svm_load_model(const char *model_file_name)
 		readline(fp);
 		model->SV[i] = &x_space[j];
 
-		p=strtok(line, " \t");
-		model->sv_coef[0][i]=strtod(p,&endptr);
+		p = strtok(line, " \t");
+		model->sv_coef[0][i] = strtod(p,&endptr);
 		for(int k=1;k<m;k++)
 		{
-			p=strtok(NULL, " \t");
-			model->sv_coef[k][i]=strtod(p,&endptr);
+			p = strtok(NULL, " \t");
+			model->sv_coef[k][i] = strtod(p,&endptr);
 		}
 
 		while(1)
@@ -2899,16 +2899,17 @@ svm_model *svm_load_model(const char *model_file_name)
 			idx = strtok(NULL, ":");
 			val = strtok(NULL, " \t");
 
-			if(val==NULL)
+			if(val == NULL)
 				break;
-			x_space[j].index=(int)strtol(idx,&endptr,10);
-			x_space[j].value=strtod(val,&endptr);
+			x_space[j].index = (int) strtol(idx,&endptr,10);
+			x_space[j].value = strtod(val,&endptr);
 
 			++j;
 		}
 		x_space[j++].index = -1;
 	}
-	if (ferror(fp) != 0 || fclose(fp) != 0) return NULL;
+	if (ferror(fp) != 0 || fclose(fp) != 0)
+		return NULL;
 
 	model->free_sv = 1;	// XXX
 	return model;
