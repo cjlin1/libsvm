@@ -2696,6 +2696,27 @@ int svm_save_model(const char *model_file_name, const svm_model *model)
 	else return 0;
 }
 
+static char *line;
+static int max_line_len;
+
+static char* readline(FILE *input)
+{
+        int len;
+
+        if(fgets(line,max_line_len,input) == NULL)
+                return NULL;
+
+        while(strrchr(line,'\n') == NULL)
+        {
+                max_line_len *= 2;
+                line = (char *) realloc(line,max_line_len);
+                len = (int) strlen(line);
+                if(fgets(line+len,max_line_len-len,input) == NULL)
+                        break;
+        }
+        return line;
+}
+
 svm_model *svm_load_model(const char *model_file_name)
 {
 	FILE *fp = fopen(model_file_name,"rb");
@@ -2830,23 +2851,23 @@ svm_model *svm_load_model(const char *model_file_name)
 	int elements = 0;
 	long pos = ftell(fp);
 
-	while(1)
+	max_line_len = 1024;
+	line = Malloc(char,max_line_len);
+	char *p,*endptr,*idx,*val;
+
+	while(readline(fp)!=NULL)
 	{
-		int c = fgetc(fp);
-		switch(c)
+		p=strtok(line,":");
+ 		while(1)
 		{
-			case '\n':
-				// count the '-1' element
-			case ':':
-				++elements;
+			p=strtok(NULL,":");
+			if(p == NULL)
 				break;
-			case EOF:
-				goto out;
-			default:
-				;
+			++elements;
 		}
 	}
-out:
+	elements += model->l;
+
 	fseek(fp,pos,SEEK_SET);
 
 	int m = model->nr_class - 1;
@@ -2862,21 +2883,29 @@ out:
 	int j=0;
 	for(i=0;i<l;i++)
 	{
+		readline(fp);
 		model->SV[i] = &x_space[j];
-		for(int k=0;k<m;k++)
-			fscanf(fp,"%lf",&model->sv_coef[k][i]);
+
+		p=strtok(line, " \t");
+		model->sv_coef[0][i]=strtod(p,&endptr);
+		for(int k=1;k<m;k++)
+		{
+			p=strtok(NULL, " \t");
+			model->sv_coef[k][i]=strtod(p,&endptr);
+		}
+
 		while(1)
 		{
-			int c;
-			do {
-				c = getc(fp);
-				if(c=='\n') goto out2;
-			} while(isspace(c));
-			ungetc(c,fp);
-			fscanf(fp,"%d:%lf",&(x_space[j].index),&(x_space[j].value));
+			idx = strtok(NULL, ":");
+			val = strtok(NULL, " \t");
+
+			if(val==NULL)
+				break;
+			x_space[j].index=(int)strtol(idx,&endptr,10);
+			x_space[j].value=strtod(val,&endptr);
+
 			++j;
-		}	
-out2:
+		}
 		x_space[j++].index = -1;
 	}
 	if (ferror(fp) != 0 || fclose(fp) != 0) return NULL;
