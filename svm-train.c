@@ -303,7 +303,7 @@ void read_problem(const char *filename)
 	j=0;
 	for(i=0;i<prob.l;i++)
 	{
-		inst_max_index = 0; // strtol gives 0 if wrong format
+		inst_max_index = -1; // strtol gives 0 if wrong format, and precomputed kernel has <index> start from 0
 		readline(fp);
 		prob.x[i] = &x_space[j];
 		label = strtok(line," \t");
@@ -334,8 +334,8 @@ void read_problem(const char *filename)
 			++j;
 		}
 
-		if(j>=1 && x_space[j-1].index > max_index)
-			max_index = x_space[j-1].index;
+		if(inst_max_index > max_index)
+			max_index = inst_max_index;
 		x_space[j++].index = -1;
 	}
 
