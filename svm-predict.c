@@ -74,7 +74,7 @@ void predict(FILE *input, FILE *output)
 		int i = 0;
 		double target_label, predict_label;
 		char *idx, *val, *label, *endptr;
-		int inst_max_index = 0; // strtol gives 0 if wrong format
+		int inst_max_index = -1; // strtol gives 0 if wrong format, and precomputed kernel has <index> start from 0
 
 		label = strtok(line," \t");
 		target_label = strtod(label,&endptr);
