@@ -64,7 +64,7 @@ print 'Best c=%s, g=%s CV rate=%s' % (c,g,rate)
 
 cmd = '%s -c %s -g %s "%s" "%s"' % (svmtrain_exe,c,g,scaled_file,model_file)
 print 'Training...'
-call(cmd, shell = True, stdout = PIPE)
+Popen(cmd, shell = True, stdout = PIPE)
 
 print 'Output model: %s' % model_file
 if len(sys.argv) > 2:
