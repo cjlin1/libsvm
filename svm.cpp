@@ -23,14 +23,14 @@ template <class S, class T> inline void clone(T*& dst, S* src, int n)
 }
 inline double powi(double base, int times)
 {
-        double tmp = base, ret = 1.0;
+	double tmp = base, ret = 1.0;
 
-        for(int t=times; t>0; t/=2)
+	for(int t=times; t>0; t/=2)
 	{
-                if(t%2==1) ret*=tmp;
-                tmp = tmp * tmp;
-        }
-        return ret;
+		if(t%2==1) ret*=tmp;
+		tmp = tmp * tmp;
+	}
+	return ret;
 }
 #define INF HUGE_VAL
 #define TAU 1e-12
@@ -50,7 +50,7 @@ static void info(const char *fmt,...)
 	va_start(ap,fmt);
 	vsprintf(buf,fmt,ap);
 	va_end(ap);
-        (*svm_print_string)(buf);
+	(*svm_print_string)(buf);
 }
 #else
 static void info(char *fmt,...) {}
@@ -1112,7 +1112,7 @@ int Solver_NU::select_working_set(int &out_i, int &out_j)
 	}
 
 	if(max(Gmaxp+Gmaxp2,Gmaxn+Gmaxn2) < eps)
- 		return 1;
+		return 1;
 
 	if (y[Gmin_idx] == +1)
 		out_i = Gmaxp_idx;
@@ -1697,7 +1697,7 @@ struct svm_model
 	svm_node **SV;		// SVs (SV[l])
 	double **sv_coef;	// coefficients for SVs in decision functions (sv_coef[k-1][l])
 	double *rho;		// constants in decision functions (rho[k*(k-1)/2])
-	double *probA;          // pariwise probability information
+	double *probA;		// pariwise probability information
 	double *probB;
 
 	// for classification only
@@ -1722,7 +1722,7 @@ void sigmoid_train(
 		if (labels[i] > 0) prior1+=1;
 		else prior0+=1;
 	
-	int max_iter=100; 	// Maximal number of iterations
+	int max_iter=100;	// Maximal number of iterations
 	double min_step=1e-10;	// Minimal step taken in line search
 	double sigma=1e-12;	// For numerically strict PD of Hessian
 	double eps=1e-5;
@@ -1786,7 +1786,7 @@ void sigmoid_train(
 		gd=g1*dA+g2*dB;
 
 
-		stepsize = 1; 		// Line Search
+		stepsize = 1;		// Line Search
 		while (stepsize >= min_step)
 		{
 			newA = A + stepsize * dA;
@@ -2006,10 +2006,10 @@ double svm_svr_probability(
 	int count=0;
 	mae=0;
 	for(i=0;i<prob->l;i++)
-	        if (fabs(ymv[i]) > 5*std) 
-                        count=count+1;
+		if (fabs(ymv[i]) > 5*std) 
+			count=count+1;
 		else 
-		        mae+=fabs(ymv[i]);
+			mae+=fabs(ymv[i]);
 	mae /= (prob->l-count);
 	info("Prob. model for test data: target value = predicted value + z,\nz: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma= %g\n",mae);
 	free(ymv);
@@ -2592,7 +2592,7 @@ double svm_predict_probability(
 		for(i=0;i<nr_class;i++)
 			free(pairwise_prob[i]);
 		free(dec_values);
-                free(pairwise_prob);	     
+		free(pairwise_prob);	     
 		return model->label[prob_max_idx];
 	}
 	else 
@@ -2701,20 +2701,20 @@ static int max_line_len;
 
 static char* readline(FILE *input)
 {
-        int len;
+	int len;
 
-        if(fgets(line,max_line_len,input) == NULL)
-                return NULL;
+	if(fgets(line,max_line_len,input) == NULL)
+		return NULL;
 
-        while(strrchr(line,'\n') == NULL)
-        {
-                max_line_len *= 2;
-                line = (char *) realloc(line,max_line_len);
-                len = (int) strlen(line);
-                if(fgets(line+len,max_line_len-len,input) == NULL)
-                        break;
-        }
-        return line;
+	while(strrchr(line,'\n') == NULL)
+	{
+		max_line_len *= 2;
+		line = (char *) realloc(line,max_line_len);
+		len = (int) strlen(line);
+		if(fgets(line+len,max_line_len-len,input) == NULL)
+			break;
+	}
+	return line;
 }
 
 svm_model *svm_load_model(const char *model_file_name)
@@ -2858,7 +2858,7 @@ svm_model *svm_load_model(const char *model_file_name)
 	while(readline(fp)!=NULL)
 	{
 		p = strtok(line,":");
- 		while(1)
+		while(1)
 		{
 			p = strtok(NULL,":");
 			if(p == NULL)
