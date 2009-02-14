@@ -153,14 +153,14 @@ abstract class Kernel extends QMatrix {
 
 	private static double powi(double base, int times)
 	{
-	        double tmp = base, ret = 1.0;
+		double tmp = base, ret = 1.0;
 
-        	for(int t=times; t>0; t/=2)
+		for(int t=times; t>0; t/=2)
 		{
-                	if(t%2==1) ret*=tmp;
-	                tmp = tmp * tmp;
-        	}
-	        return ret;
+			if(t%2==1) ret*=tmp;
+			tmp = tmp * tmp;
+		}
+		return ret;
 	}
 
 	double kernel_function(int i, int j)
@@ -274,7 +274,7 @@ abstract class Kernel extends QMatrix {
 			case svm_parameter.SIGMOID:
 				return Math.tanh(param.gamma*dot(x,y)+param.coef0);
 			case svm_parameter.PRECOMPUTED:
-				return 	x[(int)(y[0].value)].value;
+				return	x[(int)(y[0].value)].value;
 			default:
 				return 0;	// java
 		}
@@ -994,7 +994,7 @@ final class Solver_NU extends Solver
 		}
 
 		if(Math.max(Gmaxp+Gmaxp2,Gmaxn+Gmaxn2) < eps)
- 			return 1;
+			return 1;
 	
 		if(y[Gmin_idx] == +1)
 			working_set[0] = Gmaxp_idx;
@@ -1313,7 +1313,7 @@ public class svm {
 	}
 
 	private static void solve_nu_svc(svm_problem prob, svm_parameter param,
-				 	double[] alpha, Solver.SolutionInfo si)
+					double[] alpha, Solver.SolutionInfo si)
 	{
 		int i;
 		int l = prob.l;
@@ -1364,7 +1364,7 @@ public class svm {
 	}
 
 	private static void solve_one_class(svm_problem prob, svm_parameter param,
-				    	double[] alpha, Solver.SolutionInfo si)
+					double[] alpha, Solver.SolutionInfo si)
 	{
 		int l = prob.l;
 		double[] zeros = new double[l];
@@ -1535,7 +1535,7 @@ public class svm {
 			if (labels[i] > 0) prior1+=1;
 			else prior0+=1;
 	
-		int max_iter=100; 	// Maximal number of iterations
+		int max_iter=100;	// Maximal number of iterations
 		double min_step=1e-10;	// Minimal step taken in line search
 		double sigma=1e-12;	// For numerically strict PD of Hessian
 		double eps=1e-5;
@@ -1599,7 +1599,7 @@ public class svm {
 			gd=g1*dA+g2*dB;
 
 
-			stepsize = 1; 		// Line Search
+			stepsize = 1;		// Line Search
 			while (stepsize >= min_step)
 			{
 				newA = A + stepsize * dA;
@@ -2130,7 +2130,7 @@ public class svm {
 			int nr_class = tmp_nr_class[0];
 			int[] label = tmp_label[0];
 			int[] start = tmp_start[0];
-			int[] count = tmp_count[0]; 		
+			int[] count = tmp_count[0];		
 
 			// random shuffle and then data grouped by fold using the array perm
 			int[] fold_count = new int[nr_fold];
