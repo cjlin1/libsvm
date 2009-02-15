@@ -12,7 +12,7 @@ The original idea and the SWIG interface file was provided by Carl Staelin
 (staelin@hpl.hp.com) from HP Labs. The interface was integrated into the
 libsvm package by Li-lun Wang (llwang@infor.org) from National Taiwan
 University. Chih-Chung Chang (b4506055@csie.ntu.edu.tw) from National
-Taiwan University also contributed a lot of useful suggestions and help.
+Taiwan University also contributed many useful suggestions.
 
 Installation
 ============
@@ -23,7 +23,7 @@ then those for MS Windows.
 The build process for the various Unix systems is as follows:
 
 Before you build the module, you need to find out the python include
-directory, which is typically located at /usr/local/include/python2.4 or
+directory, which is typically located at /usr/local/include/python2.5 or
 /usr/include/python. You can set the variable PYTHON_INCLUDEDIR in
 Makefile manually or use something like the following:
 
@@ -93,6 +93,15 @@ and the other is the list of samples. For example
 or equivalently
 
 	prob = svm_problem([1,-1],[{1:1,3:1},{1:-1,3:-1}])
+
+Warning: due to supporting the precomputed kernels (described below),
+a sample [1,0,1] is internally represented as {0:1, 2:1}. Thus, you
+should use only one format in your entire code (for both
+training/testing). For example, using
+
+	prob = svm_problem([1,-1],[[1, 0, 1],{1:-1,3:-1}])
+
+will result in a different model from the above example.
 
 For precomputed kernels, the first element of each instance must be
 the ID. For example,
