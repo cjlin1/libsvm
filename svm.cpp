@@ -2456,7 +2456,7 @@ double svm_get_svr_probability(const svm_model *model)
 		return model->probA[0];
 	else
 	{
-		info("Model doesn't contain information for SVR probability inference\n");
+		fprintf(stderr,"Model doesn't contain information for SVR probability inference\n");
 		return 0;
 	}
 }
