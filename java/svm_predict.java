@@ -89,7 +89,7 @@ class svm_predict {
 		{
 			System.out.print("Mean squared error = "+error/total+" (regression)\n");
 			System.out.print("Squared correlation coefficient = "+
-			         ((total*sumvy-sumv*sumy)*(total*sumvy-sumv*sumy))/
+				 ((total*sumvy-sumv*sumy)*(total*sumvy-sumv*sumy))/
 				 ((total*sumvv-sumv*sumv)*(total*sumyy-sumy*sumy))+
 				 " (regression)\n");
 		}
@@ -101,8 +101,8 @@ class svm_predict {
 	private static void exit_with_help()
 	{
 		System.err.print("usage: svm_predict [options] test_file model_file output_file\n"
-	        +"options:\n"
-                +"-b probability_estimates: whether to predict probability estimates, 0 or 1 (default 0); one-class SVM not supported yet\n");
+		+"options:\n"
+		+"-b probability_estimates: whether to predict probability estimates, 0 or 1 (default 0); one-class SVM not supported yet\n");
 		System.exit(1);
 	}
 
@@ -117,7 +117,7 @@ class svm_predict {
 			++i;
 			switch(argv[i-1].charAt(1))
 			{
-			        case 'b':
+				case 'b':
 					predict_probability = atoi(argv[i]);
 					break;
 				default:
