@@ -6,6 +6,8 @@
 #include "svm.h"
 #define Malloc(type,n) (type *)malloc((n)*sizeof(type))
 
+void print_null(const char *s) {}
+
 void exit_with_help()
 {
 	printf(
@@ -31,10 +33,11 @@ void exit_with_help()
 	"-p epsilon : set the epsilon in loss function of epsilon-SVR (default 0.1)\n"
 	"-m cachesize : set cache memory size in MB (default 100)\n"
 	"-e epsilon : set tolerance of termination criterion (default 0.001)\n"
-	"-h shrinking: whether to use the shrinking heuristics, 0 or 1 (default 1)\n"
-	"-b probability_estimates: whether to train a SVC or SVR model for probability estimates, 0 or 1 (default 0)\n"
-	"-wi weight: set the parameter C of class i to weight*C, for C-SVC (default 1)\n"
+	"-h shrinking : whether to use the shrinking heuristics, 0 or 1 (default 1)\n"
+	"-b probability_estimates : whether to train a SVC or SVR model for probability estimates, 0 or 1 (default 0)\n"
+	"-wi weight : set the parameter C of class i to weight*C, for C-SVC (default 1)\n"
 	"-v n: n-fold cross validation mode\n"
+	"-q : quiet mode (no outputs)\n"
 	);
 	exit(1);
 }
@@ -215,6 +218,10 @@ void parse_command_line(int argc, char **argv, char *input_file_name, char *mode
 				break;
 			case 'b':
 				param.probability = atoi(argv[i]);
+				break;
+			case 'q':
+				svm_print_string = &print_null;
+				i--;
 				break;
 			case 'v':
 				cross_validation = 1;

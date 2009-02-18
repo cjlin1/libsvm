@@ -137,10 +137,12 @@ options:
 -p epsilon : set the epsilon in loss function of epsilon-SVR (default 0.1)
 -m cachesize : set cache memory size in MB (default 100)
 -e epsilon : set tolerance of termination criterion (default 0.001)
--h shrinking: whether to use the shrinking heuristics, 0 or 1 (default 1)
--b probability_estimates: whether to train an SVC or SVR model for probability estimates, 0 or 1 (default 0)
--wi weight: set the parameter C of class i to weight*C in C-SVC (default 1)
+-h shrinking : whether to use the shrinking heuristics, 0 or 1 (default 1)
+-b probability_estimates : whether to train a SVC or SVR model for probability estimates, 0 or 1 (default 0)
+-wi weight : set the parameter C of class i to weight*C, for C-SVC (default 1)
 -v n: n-fold cross validation mode
+-q : quiet mode (no outputs)
+
 
 The k in the -g option means the number of attributes in the input data.
 
@@ -558,6 +560,7 @@ Library usages are similar to the C version. These functions are available:
 
 public class svm {
 	public static final int LIBSVM_VERSION=289; 
+	public static svm_print_interface svm_print_string;
 	public static svm_model svm_train(svm_problem prob, svm_parameter param);
 	public static void svm_cross_validation(svm_problem prob, svm_parameter param, int nr_fold, double[] target);
 	public static int svm_get_svm_type(svm_model model);
@@ -576,6 +579,15 @@ public class svm {
 The library is in the "libsvm" package.
 Note that in Java version, svm_node[] is not ended with a node whose index = -1.
 
+Users can specify their output format by
+
+	svm.svm_print_string = new svm_print_interface()
+	{ 
+		public void print(String s)
+		{
+			// your own format
+		}
+	};
 
 Building Windows Binaries
 =========================
