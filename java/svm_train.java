@@ -37,10 +37,11 @@ class svm_train {
 		+"-p epsilon : set the epsilon in loss function of epsilon-SVR (default 0.1)\n"
 		+"-m cachesize : set cache memory size in MB (default 100)\n"
 		+"-e epsilon : set tolerance of termination criterion (default 0.001)\n"
-		+"-h shrinking: whether to use the shrinking heuristics, 0 or 1 (default 1)\n"
-		+"-b probability_estimates: whether to train a SVC or SVR model for probability estimates, 0 or 1 (default 0)\n"
-		+"-wi weight: set the parameter C of class i to weight*C, for C-SVC (default 1)\n"
-		+"-v n: n-fold cross validation mode\n"
+		+"-h shrinking : whether to use the shrinking heuristics, 0 or 1 (default 1)\n"
+		+"-b probability_estimates : whether to train a SVC or SVR model for probability estimates, 0 or 1 (default 0)\n"
+		+"-wi weight : set the parameter C of class i to weight*C, for C-SVC (default 1)\n"
+		+"-v n : n-fold cross validation mode\n"
+		+"-q : quiet mode (no outputs)\n"
 		);
 		System.exit(1);
 	}
@@ -192,8 +193,15 @@ class svm_train {
 				case 'h':
 					param.shrinking = atoi(argv[i]);
 					break;
-			        case 'b':
+				case 'b':
 					param.probability = atoi(argv[i]);
+					break;
+				case 'q':
+					svm.svm_print_string = new svm_print_interface()
+					{ 
+						public void print(String s){}
+					};
+					i--;
 					break;
 				case 'v':
 					cross_validation = 1;
