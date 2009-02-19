@@ -16,6 +16,8 @@ class svm_scale
 	private double y_max = -Double.MAX_VALUE;
 	private double y_min = Double.MAX_VALUE;
 	private int max_index;
+	private long num_nonzeros = 0;
+	private long new_num_nonzeros = 0;
 
 	private static void exit_with_help()
 	{
@@ -69,7 +71,10 @@ class svm_scale
 				(feature_max[index]-feature_min[index]);
 
 		if(value != 0)
+		{
 			System.out.print(index + ":" + value + " ");
+			new_num_nonzeros++;
+		}
 	}
 
 	private String readline(BufferedReader fp) throws IOException
@@ -174,6 +179,7 @@ class svm_scale
 				index = Integer.parseInt(st.nextToken());
 				max_index = Math.max(max_index, index);
 				st.nextToken();
+				num_nonzeros++;
 			}
 		}
 
@@ -327,6 +333,12 @@ class svm_scale
 				output(i, 0);
 			System.out.print("\n");
 		}
+		if (new_num_nonzeros > num_nonzeros)
+			System.err.print(
+			 "Warning: original #nonzeros " + num_nonzeros+"\n"
+			+"         new      #nonzeros " + new_num_nonzeros+"\n"
+			+"Use -l 0 if many original feature values are zeros\n");
+
 		fp.close();
 	}
 

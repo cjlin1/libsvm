@@ -27,6 +27,8 @@ double *feature_min;
 double y_max = -DBL_MAX;
 double y_min = DBL_MAX;
 int max_index;
+long int num_nonzeros = 0;
+long int new_num_nonzeros = 0;
 
 #define max(x,y) (((x)>(y))?(x):(y))
 #define min(x,y) (((x)<(y))?(x):(y))
@@ -126,7 +128,6 @@ int main(int argc,char **argv)
 
 		while(fscanf(fp_restore,"%d %*f %*f\n",&idx) == 1)
 			max_index = max(idx,max_index);
-
 		rewind(fp_restore);
 	}
 
@@ -140,6 +141,7 @@ int main(int argc,char **argv)
 		{
 			max_index = max(max_index, index);
 			SKIP_ELEMENT
+			num_nonzeros++;
 		}		
 	}
 	rewind(fp);
@@ -282,6 +284,13 @@ int main(int argc,char **argv)
 		printf("\n");
 	}
 
+	if (new_num_nonzeros > num_nonzeros)
+		fprintf(stderr, 
+			"Warning: original #nonzeros %ld\n"
+			"         new      #nonzeros %ld\n"
+			"Use -l 0 if many original feature values are zeros\n",
+			num_nonzeros, new_num_nonzeros);
+
 	free(line);
 	free(feature_max);
 	free(feature_min);
@@ -337,5 +346,8 @@ void output(int index, double value)
 			(feature_max[index]-feature_min[index]);
 
 	if(value != 0)
+	{
 		printf("%d:%g ",index, value);
+		new_num_nonzeros++;
+	}
 }
