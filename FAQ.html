@@ -7,10 +7,10 @@
 <a name="_TOP"><b><h1><a
 href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a>  FAQ </h1></b></a>
 <b>last modified : </b>
-Thu, 27 Nov 2008 02:43:31 GMT
+Fri,  6 Mar 2009 00:07:45 GMT
 <class="categories">
 <li><a
-href="#_TOP">All Questions</a>(71)</li>
+href="#_TOP">All Questions</a>(72)</li>
 <ul><b>
 <li><a
 href="#/Q1:_Some_sample_uses_of_libsvm">Q1:_Some_sample_uses_of_libsvm</a>(2)</li>
@@ -29,7 +29,7 @@ href="#/Q7:_Java_version_of_libsvm">Q7:_Java_version_of_libsvm</a>(4)</li>
 <li><a
 href="#/Q8:_Python_interface">Q8:_Python_interface</a>(5)</li>
 <li><a
-href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(6)</li>
+href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(7)</li>
 </b></ul>
 </li>
 
@@ -100,6 +100,7 @@ href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(6)</li>
 <li class="headlines_item"><a href="#f705">How could I install the python interface on Mac OS? </a></li>
 <li class="headlines_item"><a href="#f706">I typed "make" on a unix system, but it says "Python.h: No such file or directory?"</a></li>
 <li class="headlines_item"><a href="#f801">I compile the MATLAB interface without problem, but why errors occur while running it?</a></li>
+<li class="headlines_item"><a href="#f8011">On 64bit Windows I compile the MATLAB interface without problem, but why errors occur while running it?</a></li>
 <li class="headlines_item"><a href="#f802">Does the MATLAB interface provide a function to do scaling?</a></li>
 <li class="headlines_item"><a href="#f803">How could I use MATLAB interface for parameter selection?</a></li>
 <li class="headlines_item"><a href="#f8031">I use MATLAB parallel programming toolbox on a multi-core environment for parameter selection. Why the program is even slower?</a></li>
@@ -1416,14 +1417,26 @@ your system administrator.
 <p>
 Your compiler version may not be supported/compatible for MATLAB.
 Please check <a href=http://www.mathworks.com/support/compilers/current_release>this MATLAB page</a> first and then specify the version
-number. For example, if g++ 3.3 is supported, replace
+number. For example, if g++ ?.? is supported, replace
 <pre>
 CXX = g++
 </pre>
 in the Makefile with
 <pre>
-CXX = g++-3.3
+CXX = g++-?.?
 </pre>
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q9:_MATLAB_interface"></a>
+<a name="f8011"><b>Q: On 64bit Windows I compile the MATLAB interface without problem, but why errors occur while running it?</b></a>
+<br/>                                                                                
+<p>
+
+If you use Microsoft Visual Studio, 
+probabally it is not properly installed. 
+See the explanation 
+<a href=http://www.mathworks.com/support/compilers/current_release/win64.html#n7>here</a>.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
