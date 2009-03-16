@@ -11,7 +11,7 @@ int max_nr_attr = 64;
 struct svm_model* model;
 int predict_probability=0;
 
-static char *line;
+static char *line = NULL;
 static int max_line_len;
 
 static char* readline(FILE *input)
@@ -219,6 +219,7 @@ int main(int argc, char **argv)
 	predict(input,output);
 	svm_destroy_model(model);
 	free(x);
+	free(line);
 	fclose(input);
 	fclose(output);
 	return 0;

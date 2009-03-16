@@ -2696,7 +2696,7 @@ int svm_save_model(const char *model_file_name, const svm_model *model)
 	else return 0;
 }
 
-static char *line;
+static char *line = NULL;
 static int max_line_len;
 
 static char* readline(FILE *input)
@@ -2911,6 +2911,7 @@ svm_model *svm_load_model(const char *model_file_name)
 	if (ferror(fp) != 0 || fclose(fp) != 0)
 		return NULL;
 
+	free(line);
 	model->free_sv = 1;	// XXX
 	return model;
 }
