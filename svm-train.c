@@ -59,7 +59,7 @@ struct svm_node *x_space;
 int cross_validation;
 int nr_fold;
 
-static char *line;
+static char *line = NULL;
 static int max_line_len;
 
 static char* readline(FILE *input)
@@ -110,6 +110,7 @@ int main(int argc, char **argv)
 	free(prob.y);
 	free(prob.x);
 	free(x_space);
+	free(line);
 
 	return 0;
 }

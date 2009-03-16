@@ -18,7 +18,7 @@ void exit_with_help()
 	exit(1);
 }
 
-char *line;
+char *line = NULL;
 int max_line_len = 1024;
 double lower=-1.0,upper=1.0,y_lower,y_upper;
 int y_scaling = 0;
