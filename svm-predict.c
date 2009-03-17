@@ -179,7 +179,7 @@ int main(int argc, char **argv)
 				exit_with_help();
 		}
 	}
-	if(i>=argc)
+	if(i>=argc-2)
 		exit_with_help();
 	
 	input = fopen(argv[i],"r");

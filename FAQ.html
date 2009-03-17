@@ -7,7 +7,7 @@
 <a name="_TOP"><b><h1><a
 href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a>  FAQ </h1></b></a>
 <b>last modified : </b>
-Fri,  6 Mar 2009 00:07:45 GMT
+Mon, 16 Mar 2009 14:55:39 GMT
 <class="categories">
 <li><a
 href="#_TOP">All Questions</a>(72)</li>
@@ -1417,13 +1417,13 @@ your system administrator.
 <p>
 Your compiler version may not be supported/compatible for MATLAB.
 Please check <a href=http://www.mathworks.com/support/compilers/current_release>this MATLAB page</a> first and then specify the version
-number. For example, if g++ ?.? is supported, replace
+number. For example, if g++ X.Y is supported, replace
 <pre>
 CXX = g++
 </pre>
 in the Makefile with
 <pre>
-CXX = g++-?.?
+CXX = g++-X.Y
 </pre>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
@@ -1448,7 +1448,7 @@ It is extremely easy to do scaling under MATLAB.
 The following one-line code scale each feature to the range
 of [0.1]:
 <pre>
-(data - repmat(min(data,[],1),size(data,1),1))./(repmat(max(data,[],1)-min(data,[],1),size(data,1),1))
+(data - repmat(min(data,[],1),size(data,1),1))*spdiags(1./(max(data,[],1)-min(data,[],1))',0,size(data,2),size(data,2))
 </pre>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  

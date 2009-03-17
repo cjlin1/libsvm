@@ -125,7 +125,7 @@ class svm_predict {
 					exit_with_help();
 			}
 		}
-		if(i>=argv.length)
+		if(i>=argv.length-2)
 			exit_with_help();
 		try 
 		{
