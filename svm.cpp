@@ -2908,10 +2908,11 @@ svm_model *svm_load_model(const char *model_file_name)
 		}
 		x_space[j++].index = -1;
 	}
+	free(line);
+
 	if (ferror(fp) != 0 || fclose(fp) != 0)
 		return NULL;
 
-	free(line);
 	model->free_sv = 1;	// XXX
 	return model;
 }
