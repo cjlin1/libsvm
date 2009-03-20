@@ -53,7 +53,7 @@ static void info(const char *fmt,...)
 	(*svm_print_string)(buf);
 }
 #else
-static void info(char *fmt,...) {}
+static void info(const char *fmt,...) {}
 #endif
 
 //
