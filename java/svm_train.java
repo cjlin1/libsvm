@@ -290,7 +290,7 @@ class svm_train {
 		for(int i=0;i<prob.l;i++)
 			prob.y[i] = vy.elementAt(i);
 
-		if(param.gamma == 0)
+		if(param.gamma == 0 && max_index > 0)
 			param.gamma = 1.0/max_index;
 
 		if(param.kernel_type == svm_parameter.PRECOMPUTED)

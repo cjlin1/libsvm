@@ -347,7 +347,7 @@ void read_problem(const char *filename)
 		x_space[j++].index = -1;
 	}
 
-	if(param.gamma == 0)
+	if(param.gamma == 0 && max_index > 0)
 		param.gamma = 1.0/max_index;
 
 	if(param.kernel_type == PRECOMPUTED)
