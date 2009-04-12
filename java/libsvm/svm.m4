@@ -1279,7 +1279,7 @@ public class svm {
 	//
 	// construct and solve various formulations
 	//
-	public static final int LIBSVM_VERSION=289; 
+	public static final int LIBSVM_VERSION=290; 
 
 	public static svm_print_interface svm_print_string = new svm_print_interface()
 	{
