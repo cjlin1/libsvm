@@ -56,7 +56,7 @@ def main():
 				# multi-label format
 				try:
 					for l in label.split(','):
-						label = my_float(label)
+						l = my_float(l)
 				except:
 					err(line_no, "label %s is not a valid multi-label form" % label)
 					line_error = True
