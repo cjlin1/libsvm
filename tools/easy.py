@@ -5,7 +5,7 @@ import os
 from subprocess import *
 
 if len(sys.argv) <= 1:
-	print 'Usage: %s training_file [testing_file]' % sys.argv[0]
+	print('Usage: %s training_file [testing_file]' % sys.argv[0])
 	raise SystemExit
 
 # svm, grid, and gnuplot executable files
@@ -46,11 +46,11 @@ if len(sys.argv) > 2:
 	predict_test_file = file_name + ".predict"
 
 cmd = '%s -s "%s" "%s" > "%s"' % (svmscale_exe, range_file, train_pathname, scaled_file)
-print 'Scaling training data...'
+print('Scaling training data...')
 Popen(cmd, shell = True, stdout = PIPE).communicate()	
 
 cmd = '%s -svmtrain "%s" -gnuplot "%s" "%s"' % (grid_py, svmtrain_exe, gnuplot_exe, scaled_file)
-print 'Cross validation...'
+print('Cross validation...')
 f = Popen(cmd, shell = True, stdout = PIPE).stdout
 
 line = ''
@@ -60,20 +60,20 @@ while True:
 	if not line: break
 c,g,rate = map(float,last_line.split())
 
-print 'Best c=%s, g=%s CV rate=%s' % (c,g,rate)
+print('Best c=%s, g=%s CV rate=%s' % (c,g,rate))
 
 cmd = '%s -c %s -g %s "%s" "%s"' % (svmtrain_exe,c,g,scaled_file,model_file)
-print 'Training...'
+print('Training...')
 Popen(cmd, shell = True, stdout = PIPE).communicate()
 
-print 'Output model: %s' % model_file
+print('Output model: %s' % model_file)
 if len(sys.argv) > 2:
 	cmd = '%s -r "%s" "%s" > "%s"' % (svmscale_exe, range_file, test_pathname, scaled_test_file)
-	print 'Scaling testing data...'
+	print('Scaling testing data...')
 	Popen(cmd, shell = True, stdout = PIPE).communicate()	
 
 	cmd = '%s "%s" "%s" "%s"' % (svmpredict_exe, scaled_test_file, model_file, predict_test_file)
-	print 'Testing...'
+	print('Testing...')
 	Popen(cmd, shell = True).communicate()	
 
-	print 'Output prediction: %s' % predict_test_file
+	print('Output prediction: %s' % predict_test_file)
