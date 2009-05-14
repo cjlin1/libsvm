@@ -9,7 +9,7 @@ subset_filename = ""
 rest_filename = ""
 
 def exit_with_help():
-	print """\
+	print("""\
 Usage: %s [options] dataset number [output1] [output2]
 
 This script selects a subset of the given dataset.
@@ -21,7 +21,7 @@ options:
 
 output1 : the subset (optional)
 output2 : rest of the data (optional)
-If output1 is omitted, the subset will be printed on the screen.""" % argv[0]
+If output1 is omitted, the subset will be printed on the screen.""" % argv[0])
 	exit(1)
 
 def process_options():
@@ -40,7 +40,7 @@ def process_options():
 			i = i + 1
 			method = int(argv[i])
 			if method < 0 or method > 1:
-				print "Unknown selection method %d" % (method)
+				print("Unknown selection method %d" % (method))
 				exit_with_help()
 		i = i + 1
 
@@ -57,8 +57,6 @@ def main():
 			self.label = label
 			self.index = index
 			self.selected = selected
-		def __cmp__(self, other):
-			return cmp(self.label, other.label)
 
 	process_options()
 	
@@ -85,7 +83,8 @@ def main():
 	# select the subset
 	warning = 0
 	if method == 0: # stratified
-		labels.sort()
+		labels.sort(key = lambda x: x.label)
+		
 		label_end = labels[l-1].label + 1
 		labels.append(Label(label_end, l, 0))
 
@@ -95,7 +94,7 @@ def main():
 			new_label = labels[i].label
 			if new_label != label:
 				nr_class = i - begin
-				k = i*n/l - begin*n/l
+				k = i*n//l - begin*n//l
 				# at least one instance per class
 				if k == 0:
 					k = 1
@@ -117,7 +116,8 @@ def main():
 	# output
 	i = 0
 	if method == 0:
-		labels.sort(lambda x, y: cmp(int(x.index), int(y.index)))
+		labels.sort(key = lambda x: int(x.index))
+	
 	f = open(dataset_filename, 'r')
 	for line in f:
 		if labels[i].selected == 1:
@@ -137,7 +137,9 @@ Warning:
 
 	# cleanup
 	f.close()
+	
 	file1.close()
+	
 	if split == 1:
 		file2.close()
 

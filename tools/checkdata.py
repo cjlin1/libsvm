@@ -16,7 +16,7 @@ from sys import argv, exit
 import os.path
 
 def err(line_no, msg):
-	print "line %d: %s" % (line_no, msg)
+	print("line %d: %s" % (line_no, msg))
 
 # works like float() but does not accept nan and inf
 def my_float(x):
@@ -27,13 +27,13 @@ def my_float(x):
 
 def main():
 	if len(argv) != 2:
-		print "Usage: %s dataset" % (argv[0])
+		print("Usage: %s dataset" % (argv[0]))
 		exit(1)
 
 	dataset = argv[1]
 
 	if not os.path.exists(dataset):
-		print "dataset %s not found" % (dataset)
+		print("dataset %s not found" % (dataset))
 		exit(1)
 
 	line_no = 1
@@ -98,9 +98,9 @@ def main():
 			error_line_count += 1
 	
 	if error_line_count > 0:
-		print "Found %d lines with error." % (error_line_count)
+		print("Found %d lines with error." % (error_line_count))
 	else:
-		print "No error."
+		print("No error.")
 
 main()
 
