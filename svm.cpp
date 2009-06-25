@@ -2961,6 +2961,9 @@ const char *svm_check_parameter(const svm_problem *prob, const svm_parameter *pa
 	   kernel_type != PRECOMPUTED)
 		return "unknown kernel type";
 
+	if(param->gamma < 0)
+		return "gamma < 0";
+
 	if(param->degree < 0)
 		return "degree of polynomial kernel < 0";
 
