@@ -2658,6 +2658,9 @@ public class svm {
 		   kernel_type != svm_parameter.PRECOMPUTED)
 			return "unknown kernel type";
 
+		if(param.gamma < 0)
+			return "gamma < 0";
+
 		if(param.degree < 0)
 			return "degree of polynomial kernel < 0";
 
