@@ -26,7 +26,7 @@ void exit_with_help()
 	"	3 -- sigmoid: tanh(gamma*u'*v + coef0)\n"
 	"	4 -- precomputed kernel (kernel values in training_set_file)\n"
 	"-d degree : set degree in kernel function (default 3)\n"
-	"-g gamma : set gamma in kernel function (default 1/k)\n"
+	"-g gamma : set gamma in kernel function (default 1/num_features)\n"
 	"-r coef0 : set coef0 in kernel function (default 0)\n"
 	"-c cost : set the parameter C of C-SVC, epsilon-SVR, and nu-SVR (default 1)\n"
 	"-n nu : set the parameter nu of nu-SVC, one-class SVM, and nu-SVR (default 0.5)\n"
@@ -162,7 +162,7 @@ void parse_command_line(int argc, char **argv, char *input_file_name, char *mode
 	param.svm_type = C_SVC;
 	param.kernel_type = RBF;
 	param.degree = 3;
-	param.gamma = 0;	// 1/k
+	param.gamma = 0;	// 1/num_features
 	param.coef0 = 0;
 	param.nu = 0.5;
 	param.cache_size = 100;
