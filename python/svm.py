@@ -42,7 +42,7 @@ class svm_parameter:
 	'svm_type' : C_SVC,
 	'kernel_type' : RBF,
 	'degree' : 3,
-	'gamma' : 0,		# 1/k
+	'gamma' : 0,		# 1/num_features
 	'coef0' : 0,
 	'nu' : 0.5,
 	'cache_size' : 100,

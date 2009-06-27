@@ -130,7 +130,7 @@ options:
 	3 -- sigmoid: tanh(gamma*u'*v + coef0)
 	4 -- precomputed kernel (kernel values in training_set_file)
 -d degree : set degree in kernel function (default 3)
--g gamma : set gamma in kernel function (default 1/k)
+-g gamma : set gamma in kernel function (default 1/num_features)
 -r coef0 : set coef0 in kernel function (default 0)
 -c cost : set the parameter C of C-SVC, epsilon-SVR, and nu-SVR (default 1)
 -n nu : set the parameter nu of nu-SVC, one-class SVM, and nu-SVR (default 0.5)
