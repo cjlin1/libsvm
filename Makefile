@@ -1,4 +1,4 @@
-CXX? = g++
+CXX ?= g++
 CFLAGS = -Wall -Wconversion -O3 -fPIC
 SHVER = 1
 

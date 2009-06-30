@@ -1,4 +1,4 @@
-CXX? = g++
+CXX ?= g++
 SWIG ?= swig
 
 #Windows: see ../README ../Makefile.win
