@@ -10,18 +10,18 @@ int libsvm_version = LIBSVM_VERSION;
 typedef float Qfloat;
 typedef signed char schar;
 #ifndef min
-template <class T> inline T min(T x,T y) { return (x<y)?x:y; }
+template <class T> static inline T min(T x,T y) { return (x<y)?x:y; }
 #endif
 #ifndef max
-template <class T> inline T max(T x,T y) { return (x>y)?x:y; }
+template <class T> static inline T max(T x,T y) { return (x>y)?x:y; }
 #endif
-template <class T> inline void swap(T& x, T& y) { T t=x; x=y; y=t; }
-template <class S, class T> inline void clone(T*& dst, S* src, int n)
+template <class T> static inline void swap(T& x, T& y) { T t=x; x=y; y=t; }
+template <class S, class T> static inline void clone(T*& dst, S* src, int n)
 {
 	dst = new T[n];
 	memcpy((void *)dst,(void *)src,sizeof(T)*n);
 }
-inline double powi(double base, int times)
+static inline double powi(double base, int times)
 {
 	double tmp = base, ret = 1.0;
 
@@ -1629,7 +1629,7 @@ struct decision_function
 	double rho;	
 };
 
-decision_function svm_train_one(
+static decision_function svm_train_one(
 	const svm_problem *prob, const svm_parameter *param,
 	double Cp, double Cn)
 {
@@ -1711,7 +1711,7 @@ struct svm_model
 };
 
 // Platt's binary SVM Probablistic Output: an improvement from Lin et al.
-void sigmoid_train(
+static void sigmoid_train(
 	int l, const double *dec_values, const double *labels, 
 	double& A, double& B)
 {
@@ -1824,7 +1824,7 @@ void sigmoid_train(
 	free(t);
 }
 
-double sigmoid_predict(double decision_value, double A, double B)
+static double sigmoid_predict(double decision_value, double A, double B)
 {
 	double fApB = decision_value*A+B;
 	if (fApB >= 0)
@@ -1834,7 +1834,7 @@ double sigmoid_predict(double decision_value, double A, double B)
 }
 
 // Method 2 from the multiclass_prob paper by Wu, Lin, and Weng
-void multiclass_probability(int k, double **r, double *p)
+static void multiclass_probability(int k, double **r, double *p)
 {
 	int t,j;
 	int iter = 0, max_iter=max(100,k);
@@ -1898,7 +1898,7 @@ void multiclass_probability(int k, double **r, double *p)
 }
 
 // Cross-validation decision values for probability estimates
-void svm_binary_svc_probability(
+static void svm_binary_svc_probability(
 	const svm_problem *prob, const svm_parameter *param,
 	double Cp, double Cn, double& probA, double& probB)
 {
@@ -1985,7 +1985,7 @@ void svm_binary_svc_probability(
 }
 
 // Return parameter of a Laplace distribution 
-double svm_svr_probability(
+static double svm_svr_probability(
 	const svm_problem *prob, const svm_parameter *param)
 {
 	int i;
@@ -2019,7 +2019,7 @@ double svm_svr_probability(
 
 // label: label name, start: begin of each class, count: #data of classes, perm: indices to the original data
 // perm, length l, must be allocated before calling this subroutine
-void svm_group_classes(const svm_problem *prob, int *nr_class_ret, int **label_ret, int **start_ret, int **count_ret, int *perm)
+static void svm_group_classes(const svm_problem *prob, int *nr_class_ret, int **label_ret, int **start_ret, int **count_ret, int *perm)
 {
 	int l = prob->l;
 	int max_nr_class = 16;
@@ -2599,12 +2599,12 @@ double svm_predict_probability(
 		return svm_predict(model, x);
 }
 
-const char *svm_type_table[] =
+static const char *svm_type_table[] =
 {
 	"c_svc","nu_svc","one_class","epsilon_svr","nu_svr",NULL
 };
 
-const char *kernel_type_table[]=
+static const char *kernel_type_table[]=
 {
 	"linear","polynomial","rbf","sigmoid","precomputed",NULL
 };
