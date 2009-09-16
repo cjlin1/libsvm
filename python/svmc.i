@@ -96,4 +96,16 @@ void svm_node_matrix_destroy(struct svm_node **matrix)
 	free(matrix);
 }
 
+void print_null(const char *s) {}
+
+void svm_set_quiet()
+{
+	svm_print_string = &print_null;
+}
+
 %}
+
+
+
+
+

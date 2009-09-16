@@ -3094,6 +3094,13 @@ void svm_node_matrix_destroy(struct svm_node **matrix)
 	free(matrix);
 }
 
+void print_null(const char *s) {}
+
+void svm_set_quiet()
+{
+	svm_print_string = &print_null;
+}
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -4940,6 +4947,42 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_print_null(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  char *arg1 = (char *) 0 ;
+  int res1 ;
+  char *buf1 = 0 ;
+  int alloc1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:print_null",&obj0)) SWIG_fail;
+  res1 = SWIG_AsCharPtrAndSize(obj0, &buf1, NULL, &alloc1);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "print_null" "', argument " "1"" of type '" "char const *""'");
+  }
+  arg1 = (char *)(buf1);
+  print_null((char const *)arg1);
+  resultobj = SWIG_Py_Void();
+  if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
+  return resultobj;
+fail:
+  if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_svm_set_quiet(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  
+  if (!PyArg_ParseTuple(args,(char *)":svm_set_quiet")) SWIG_fail;
+  svm_set_quiet();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 static PyMethodDef SwigMethods[] = {
 	 { (char *)"SWIG_PyInstanceMethod_New", (PyCFunction)SWIG_PyInstanceMethod_New, METH_O, NULL},
 	 { (char *)"svm_parameter_svm_type_set", _wrap_svm_parameter_svm_type_set, METH_VARARGS, NULL},
@@ -5010,6 +5053,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"svm_node_matrix", _wrap_svm_node_matrix, METH_VARARGS, NULL},
 	 { (char *)"svm_node_matrix_set", _wrap_svm_node_matrix_set, METH_VARARGS, NULL},
 	 { (char *)"svm_node_matrix_destroy", _wrap_svm_node_matrix_destroy, METH_VARARGS, NULL},
+	 { (char *)"print_null", _wrap_print_null, METH_VARARGS, NULL},
+	 { (char *)"svm_set_quiet", _wrap_svm_set_quiet, METH_VARARGS, NULL},
 	 { NULL, NULL, 0, NULL }
 };
 
