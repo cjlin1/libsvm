@@ -43,7 +43,7 @@ this package (It was generated using SWIG 1.3.39). If you prefer
 generating the interface with SWIG on your own, you can simply remove
 the generated files with
 
-	make moreclean
+	make cleaner
 
 before building the module. Note that SWIG version > 1.3.7 should be used.
 
@@ -163,6 +163,13 @@ and to load the model from a file:
 
 	m = svm_model('test.model')
 
+To disable the screen output, add
+
+	svmc.svm_set_quiet()
+
+in your python code. However, you cannot change the setting back to
+have the screen output.
+	
 Examples
 ========
 
