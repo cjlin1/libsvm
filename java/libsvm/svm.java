@@ -1279,7 +1279,7 @@ public class svm {
 	//
 	// construct and solve various formulations
 	//
-	public static final int LIBSVM_VERSION=289; 
+	public static final int LIBSVM_VERSION=290; 
 
 	public static svm_print_interface svm_print_string = new svm_print_interface()
 	{
@@ -2142,7 +2142,6 @@ public class svm {
 			svm_group_classes(prob,tmp_nr_class,tmp_label,tmp_start,tmp_count,perm);
 
 			int nr_class = tmp_nr_class[0];
-			int[] label = tmp_label[0];
 			int[] start = tmp_start[0];
 			int[] count = tmp_count[0];		
 
@@ -2658,6 +2657,9 @@ public class svm {
 		   kernel_type != svm_parameter.SIGMOID &&
 		   kernel_type != svm_parameter.PRECOMPUTED)
 			return "unknown kernel type";
+
+		if(param.gamma < 0)
+			return "gamma < 0";
 
 		if(param.degree < 0)
 			return "degree of polynomial kernel < 0";

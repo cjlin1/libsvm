@@ -7,17 +7,17 @@
 <a name="_TOP"><b><h1><a
 href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a>  FAQ </h1></b></a>
 <b>last modified : </b>
-Thu, 19 Mar 2009 12:30:41 GMT
+Tue, 20 Oct 2009 12:34:49 GMT
 <class="categories">
 <li><a
-href="#_TOP">All Questions</a>(72)</li>
+href="#_TOP">All Questions</a>(76)</li>
 <ul><b>
 <li><a
 href="#/Q1:_Some_sample_uses_of_libsvm">Q1:_Some_sample_uses_of_libsvm</a>(2)</li>
 <li><a
-href="#/Q2:_Installation_and_running_the_program">Q2:_Installation_and_running_the_program</a>(9)</li>
+href="#/Q2:_Installation_and_running_the_program">Q2:_Installation_and_running_the_program</a>(10)</li>
 <li><a
-href="#/Q3:_Data_preparation">Q3:_Data_preparation</a>(6)</li>
+href="#/Q3:_Data_preparation">Q3:_Data_preparation</a>(7)</li>
 <li><a
 href="#/Q4:_Training_and_prediction">Q4:_Training_and_prediction</a>(33)</li>
 <li><a
@@ -29,7 +29,7 @@ href="#/Q7:_Java_version_of_libsvm">Q7:_Java_version_of_libsvm</a>(4)</li>
 <li><a
 href="#/Q8:_Python_interface">Q8:_Python_interface</a>(5)</li>
 <li><a
-href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(7)</li>
+href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(9)</li>
 </b></ul>
 </li>
 
@@ -45,12 +45,14 @@ href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(7)</li>
 <li class="headlines_item"><a href="#f207">I have modified the source and would like to build the graphic interface "svm-toy" on MS windows. How should I do it ?</a></li>
 <li class="headlines_item"><a href="#f208">I am an MS windows user but why only one (svm-toy) of those precompiled .exe actually runs ?  </a></li>
 <li class="headlines_item"><a href="#f209">What is the difference between "." and "*" outputed during training? </a></li>
+<li class="headlines_item"><a href="#f210">Why occasionally the program (including MATLAB or other interfaces) crashes and gives a segmentation fault?</a></li>
 <li class="headlines_item"><a href="#f301">Why sometimes not all attributes of a data appear in the training/model files ?</a></li>
 <li class="headlines_item"><a href="#f302">What if my data are non-numerical ?</a></li>
 <li class="headlines_item"><a href="#f303">Why do you consider sparse format ? Will the training of dense data be much slower ?</a></li>
 <li class="headlines_item"><a href="#f304">Why sometimes the last line of my data is not read by svm-train?</a></li>
 <li class="headlines_item"><a href="#f305">Is there a program to check if my data are in the correct format?</a></li>
 <li class="headlines_item"><a href="#f306">May I put comments in data files?</a></li>
+<li class="headlines_item"><a href="#f307">How to convert other data formats to LIBSVM format?</a></li>
 <li class="headlines_item"><a href="#f401">The output of training C-SVM is like the following. What do they mean?</a></li>
 <li class="headlines_item"><a href="#f402">Can you explain more about the model file?</a></li>
 <li class="headlines_item"><a href="#f403">Should I use float or double to store numbers in the cache ?</a></li>
@@ -104,8 +106,10 @@ href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(7)</li>
 <li class="headlines_item"><a href="#f802">Does the MATLAB interface provide a function to do scaling?</a></li>
 <li class="headlines_item"><a href="#f803">How could I use MATLAB interface for parameter selection?</a></li>
 <li class="headlines_item"><a href="#f8031">I use MATLAB parallel programming toolbox on a multi-core environment for parameter selection. Why the program is even slower?</a></li>
+<li class="headlines_item"><a href="#f8032">How do I use LIBSVM with OpenMP under MATLAB?</a></li>
 <li class="headlines_item"><a href="#f804">How could I generate the primal variable w of linear SVM?</a></li>
 <li class="headlines_item"><a href="#f805">Is there an OCTAVE interface for libsvm?</a></li>
+<li class="headlines_item"><a href="#f806">How to handle the name conflict between svmtrain in the libsvm matlab interface and that in MATLAB bioinformatics toolbox?</a></li>
 </ul></ul>
 
 
@@ -291,6 +295,17 @@ we reset to use the whole set. See the
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
+  <a name="/Q2:_Installation_and_running_the_program"></a>
+<a name="f210"><b>Q: Why occasionally the program (including MATLAB or other interfaces) crashes and gives a segmentation fault?</b></a>
+<br/>                                                                                
+
+<p>
+Very likely the program consumes too much memory than what the 
+operating system can provide. Try a smaller data and see if the 
+program still crashes.
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
   <a name="/Q3:_Data_preparation"></a>
 <a name="f301"><b>Q: Why sometimes not all attributes of a data appear in the training/model files ?</b></a>
 <br/>                                                                                
@@ -378,6 +393,36 @@ paste -d '#' test.predicts test.comments | sed 's/#/ #/' > test.results
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
+  <a name="/Q3:_Data_preparation"></a>
+<a name="f307"><b>Q: How to convert other data formats to LIBSVM format?</b></a>
+<br/>                                                                                
+
+<p>
+It depends on your data format.
+We have a simple C code to transfer space/colon
+separated format to libsvm format. Please contact
+us if needed.
+
+<p>
+Alternatively, a simple way is to use
+libsvmwrite in the libsvm matlab/octave interface.
+
+Take a CSV (colon separated format) file
+in UCI machine learning repository as an example.
+We download <a href=http://archive.ics.uci.edu/ml/machine-learning-databases/spect/SPECTF.train>SPECTF.train</a>. 
+Labels are in the first column. The following steps produce
+a file in the libsvm format.
+<pre>
+matlab> SPECTF = csvread('SPECTF.train'); % read a csv file
+matlab> labels = SPECTF(:, 1); % labels from the 1st column
+matlab> features = SPECTF(:, 2:end); 
+matlab> features_sparse = sparse(features); % features must be in a sparse matrix
+matlab> libsvmwrite('SPECTFlibsvm.train', labels, features_sparse);
+</pre>
+The tranformed data are stored in SPECTFlibsvm.train.
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
   <a name="/Q4:_Training_and_prediction"></a>
 <a name="f401"><b>Q: The output of training C-SVM is like the following. What do they mean?</b></a>
 <br/>                                                                                
@@ -409,7 +454,7 @@ Support vectors are listed in the order of "labels" listed earlier.
 (i.e., those from the first class in the "labels" list are
 grouped first, and so on.) 
 If k is the total number of classes,
-in front of each support vector, there are
+in front of a support vector in class j, there are
 k-1 coefficients 
 y*alpha where alpha are dual solution of the
 following two class problems:
@@ -440,6 +485,9 @@ For example, if there are 4 classes, the file looks like:
 |4|4|4|                    |
 +-+-+-+--------------------+
 </pre>
+See also
+<a href="#f804"> an illustration using
+MATLAB/OCTAVE.</a>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
@@ -464,7 +512,7 @@ enough using only float.
 <p>
 In general we suggest you to try the RBF kernel first.
 A recent result by Keerthi and Lin
-(<a href=http://www.csie.ntu.edu.tw/~cjlin/papers/limit.ps.gz>
+(<a href=http://www.csie.ntu.edu.tw/~cjlin/papers/limit.pdf>
 download paper here</a>)
 shows that if RBF is used with model selection,
 then there is no need to consider the linear kernel.
@@ -505,7 +553,7 @@ the decision function is the same.
 <a href="http://guppy.mpe.nus.edu.sg/~mpessk/">S. S. Keerthi</a>
 and
 <B>C.-J. Lin</B>.
-<A HREF="papers/limit.ps.gz">
+<A HREF="papers/limit.pdf">
 Asymptotic behaviors of support vector machines with 
 Gaussian kernel
 </A>
@@ -542,8 +590,10 @@ in libsvm.
 <br/>                                                                                
 <p>
 Yes, you can do the following:
-<br> svm-scale -s scaling_parameters train_data > scaled_train_data
-<br> svm-scale -r scaling_parameters test_data > scaled_test_data
+<pre>
+> svm-scale -s scaling_parameters train_data > scaled_train_data
+> svm-scale -r scaling_parameters test_data > scaled_test_data
+</pre>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
@@ -599,8 +649,9 @@ classification
 <br/>                                                                                
 <p>
 Yes, there is a -wi options. For example, if you use
-<p>
- svm-train -s 0 -c 10 -w1 1 -w-1 5 data_file
+<pre>
+> svm-train -s 0 -c 10 -w1 1 -w-1 5 data_file
+</pre>
 <p>
 the penalty for class "-1" is larger.
 Note that this -w option is for C-SVC only.
@@ -634,10 +685,7 @@ In addition, you have to remove empty lines.
 <a name="f413"><b>Q: The program keeps running (with output, i.e. many dots). What should I do?</b></a>
 <br/>                                                                                
 <p>
-In theory libsvm guarantees to converge if the kernel
-matrix is positive semidefinite. 
-After version 2.4 it can also handle non-PSD
-kernels such as the sigmoid (tanh).
+In theory libsvm guarantees to converge.
 Therefore, this means you are
 handling ill-conditioned situations
 (e.g. too large/small parameters) so numerical
@@ -802,15 +850,40 @@ $ info libc "Malloc Tunable Parameters"
 <a name="f417"><b>Q: How do I disable screen output of svm-train and svm-predict ?</b></a>
 <br/>                                                                                
 <p>
-Simply update svm.cpp:
+For commend-line users, use the -q option:
+<pre>
+> ./svm-train -q heart_scale
+</pre>
+<p>
+For library users, set the global variable
+<pre>
+extern void (*svm_print_string) (const char *);
+</pre>
+to specify the output format. You can disable the output by the following steps:
+<ol>
+<li>
+Declare a function to output nothing:
+<pre>
+void print_null(const char *s) {}
+</pre>
+</li>
+<li>
+Assign the output function of libsvm by
+<pre>
+svm_print_string = &print_null;
+</pre>
+</li>
+</ol>
+Finally, a way used in earlier libsvm
+is by updating svm.cpp from
 <pre>
 #if 1
-void info(char *fmt,...)
+void info(const char *fmt,...)
 </pre>
 to
 <pre>
 #if 0
-void info(char *fmt,...)
+void info(const char *fmt,...)
 </pre>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
@@ -1054,7 +1127,6 @@ of get_Q to:
 #pragma omp parallel for private(j) 
 			for(j=start;j&lt;len;j++)
 </pre>
-Note that j must be declared outside the for loop.
 <p> In the subroutine svm_predict_values of svm.cpp, add one line to the for loop:
 <pre>
 #pragma omp parallel for private(i) 
@@ -1108,7 +1180,12 @@ structure. This array has the same size as
 the number of data, so alternatively you can
 store only indices of support vectors.
 
-
+<p> If you use matlab interface, you can easily
+compare support vectors and training data to know
+the indices:
+<pre>
+[tmp index]=ismember(model.SVs, training_data,'rows');
+</pre>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
@@ -1486,10 +1563,32 @@ may be solved.
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q9:_MATLAB_interface"></a>
+<a name="f8032"><b>Q: How do I use LIBSVM with OpenMP under MATLAB?</b></a>
+<br/>                                                                                
+<p>
+In Makefile,
+you need to add -fopenmp to CFLAGS and -lgomp to MEX_OPTION. For Octave, you need the same modification.
+
+<p> However, a minor problem is that
+the number of threads cannot
+be specified in MATLAB. We tried Version 7.7 (R2008b) and gcc-4.3.3.
+
+<pre>
+% export OMP_NUM_THREADS=4; matlab
+>> setenv('OMP_NUM_THREADS', '1');
+</pre>
+
+Then OMP_NUM_THREADS is still 4 while running the program. Please contact us if you 
+see how to solve this problem.
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q9:_MATLAB_interface"></a>
 <a name="f804"><b>Q: How could I generate the primal variable w of linear SVM?</b></a>
 <br/>                                                                                
 <p>
-Assume you have two labels -1 and +1.
+Let's start from the binary class and
+assume you have two labels -1 and +1.
 After obtaining the model from calling svmtrain,
 do the following to have w and b:
 <pre>
@@ -1501,6 +1600,83 @@ if model.Label(1) == -1
   b = -b;
 end
 </pre>
+If you do regression or one-class SVM, then the if statement is not needed.
+
+<p> For multi-class SVM, we illustrate the setting
+in the following example of running the iris
+data, which have 3 classes
+<pre>  
+> [y, x] = libsvmread('../../htdocs/libsvmtools/datasets/multiclass/iris.scale');
+> m = svmtrain(y, x, '-t 0')
+
+m = 
+
+    Parameters: [5x1 double]
+      nr_class: 3
+       totalSV: 42
+           rho: [3x1 double]
+         Label: [3x1 double]
+         ProbA: []
+         ProbB: []
+           nSV: [3x1 double]
+       sv_coef: [42x2 double]
+           SVs: [42x4 double]
+</pre>
+sv_coef is like:
+<pre>
++-+-+--------------------+
+|1|1|                    |
+|v|v|  SVs from class 1  |
+|2|3|                    |
++-+-+--------------------+
+|1|2|                    |
+|v|v|  SVs from class 2  |
+|2|3|                    |
++-+-+--------------------+
+|1|2|                    |
+|v|v|  SVs from class 3  |
+|3|3|                    |
++-+-+--------------------+
+</pre>
+so we need to see nSV of each classes.
+<pre>  
+> m.nSV
+
+ans =
+
+     3
+    21
+    18
+</pre>
+Suppose the goal is to find the vector w of classes 
+1 vs 3. Then
+y_i alpha_i of training 1 vs 3 are
+<pre>  
+> coef = [m.sv_coef(1:3,2); m.sv_coef(25:42,1)];
+</pre>
+and SVs are:
+<pre>  
+> SVs = [m.SVs(1:3,:); m.SVs(25:42,:)];
+</pre>
+Hence, w is
+<pre>
+> w = SVs'*coef;
+</pre>  
+For rho,
+<pre>
+> m.rho
+
+ans =
+
+    1.1465
+    0.3682
+   -1.9969
+> b = -m.rho(2);
+</pre>
+because rho is arranged by 1vs2 1vs3 2vs3.
+
+
+  
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
@@ -1514,6 +1690,17 @@ works on OCTAVE as well. Please type
 make octave
 </pre>
 for installation.
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q9:_MATLAB_interface"></a>
+<a name="f806"><b>Q: How to handle the name conflict between svmtrain in the libsvm matlab interface and that in MATLAB bioinformatics toolbox?</b></a>
+<br/>                                                                                
+<p>
+The easiest way is to rename the svmtrain binary 
+file (e.g., svmtrain.mexw32 on 32-bit windows) 
+to a different
+name (e.g., svmtrain2.mexw32).
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
