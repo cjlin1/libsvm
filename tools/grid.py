@@ -66,10 +66,10 @@ Usage: grid.py [-log2c begin,end,step] [-log2g begin,end,step] [-v fold]
     while i < len(argv) - 1:
         if argv[i] == "-log2c":
             i = i + 1
-            (c_begin,c_end,c_step) = map(float,split(argv[i],","))
+            (c_begin,c_end,c_step) = map(float,argv[i].split(","))
         elif argv[i] == "-log2g":
             i = i + 1
-            (g_begin,g_end,g_step) = map(float,split(argv[i],","))
+            (g_begin,g_end,g_step) = map(float,argv[i].split(","))
         elif argv[i] == "-v":
             i = i + 1
             fold = argv[i]
