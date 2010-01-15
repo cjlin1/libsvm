@@ -105,7 +105,7 @@ def _convert_to_svm_node_array(x):
 
 	# Find non zero elements
 	iter_range = []
-	if type(x) == dict:
+	if isinstance(x, dict):
 		for k, v in x.iteritems():
 # all zeros kept due to the precomputed kernel; no good solution yet
 #			if v != 0:
