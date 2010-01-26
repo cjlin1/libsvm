@@ -157,6 +157,7 @@ void do_cross_validation()
 void parse_command_line(int argc, char **argv, char *input_file_name, char *model_file_name)
 {
 	int i;
+	void (*print_func)(const char*) = NULL;
 
 	// default values
 	param.svm_type = C_SVC;
@@ -221,7 +222,7 @@ void parse_command_line(int argc, char **argv, char *input_file_name, char *mode
 				param.probability = atoi(argv[i]);
 				break;
 			case 'q':
-				svm_print_string = &print_null;
+				print_func = &print_null;
 				i--;
 				break;
 			case 'v':
@@ -245,6 +246,8 @@ void parse_command_line(int argc, char **argv, char *input_file_name, char *mode
 				exit_with_help();
 		}
 	}
+
+	svm_set_print_string_function(print_func);
 
 	// determine filenames
 

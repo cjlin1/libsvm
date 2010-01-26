@@ -1281,13 +1281,16 @@ public class svm {
 	//
 	public static final int LIBSVM_VERSION=290; 
 
-	public static svm_print_interface svm_print_string = new svm_print_interface()
+	private static svm_print_interface svm_print_stdout = new svm_print_interface()
 	{
 		public void print(String s)
 		{
 			System.out.print(s);
+			System.out.flush();
 		}
 	};
+
+	private static svm_print_interface svm_print_string = svm_print_stdout;
 
 	static void info(String s) 
 	{
@@ -2765,5 +2768,13 @@ public class svm {
 			return 1;
 		else
 			return 0;
+	}
+
+	public static void svm_set_print_string_function(svm_print_interface print_func)
+	{
+		if (print_func == null)
+			svm_print_string = svm_print_stdout;
+		else 
+			svm_print_string = print_func;
 	}
 }

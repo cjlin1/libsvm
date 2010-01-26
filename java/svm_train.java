@@ -12,6 +12,11 @@ class svm_train {
 	private int cross_validation;
 	private int nr_fold;
 
+	private static svm_print_interface svm_print_null = new svm_print_interface()
+	{
+		public void print(String s) {}
+	};
+
 	private static void exit_with_help()
 	{
 		System.out.print(
@@ -132,6 +137,7 @@ class svm_train {
 	private void parse_command_line(String argv[])
 	{
 		int i;
+		svm_print_interface print_func = null;
 
 		param = new svm_parameter();
 		// default values
@@ -197,10 +203,7 @@ class svm_train {
 					param.probability = atoi(argv[i]);
 					break;
 				case 'q':
-					svm.svm_print_string = new svm_print_interface()
-					{ 
-						public void print(String s){}
-					};
+					print_func = svm_print_null;
 					i--;
 					break;
 				case 'v':
@@ -234,6 +237,8 @@ class svm_train {
 					exit_with_help();
 			}
 		}
+
+		svm.svm_set_print_string_function(print_func);
 
 		// determine filenames
 

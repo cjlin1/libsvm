@@ -50,6 +50,7 @@ void svm_predict_values(const struct svm_model *model, const struct svm_node *x,
 double svm_predict(const struct svm_model *model, const struct svm_node *x);
 double svm_predict_probability(const struct svm_model *model, const struct svm_node *x, double* prob_estimates);
 
+
 void svm_destroy_model(struct svm_model *model);
 /* Not necessary: the weight vector is (de)allocated at python-part
    void svm_destroy_param(struct svm_parameter *param); */
@@ -57,7 +58,7 @@ void svm_destroy_model(struct svm_model *model);
 const char *svm_check_parameter(const struct svm_problem *prob, const struct svm_parameter *param);
 int svm_check_probability_model(const struct svm_model *model);
 
-extern void (*svm_print_string) (const char *);
+void svm_set_print_string_function(void (*print_func)(const char*));
 
 %include carrays.i		
 %array_functions(int,int)
@@ -100,7 +101,7 @@ void print_null(const char *s) {}
 
 void svm_set_quiet()
 {
-	svm_print_string = &print_null;
+	svm_set_print_string_function(&print_null);
 }
 
 %}
