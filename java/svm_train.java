@@ -137,7 +137,7 @@ class svm_train {
 	private void parse_command_line(String argv[])
 	{
 		int i;
-		svm_print_interface print_func = null;
+		svm_print_interface print_func = null;	// default printing to stdout
 
 		param = new svm_parameter();
 		// default values
