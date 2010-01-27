@@ -538,8 +538,8 @@ to classify new data.
 - Function: void svm_set_print_string_function(void (*print_func)(const char *));
 
     Users can specify their output format by a function. Use
-	svm_set_print_string_function(NULL); 
-	for default printing to stdout.
+        svm_set_print_string_function(NULL); 
+    for default printing to stdout.
 
 Java Version
 ============
@@ -560,7 +560,7 @@ You may need to increase maximum Java heap size.
 Library usages are similar to the C version. These functions are available:
 
 public class svm {
-	public static final int LIBSVM_VERSION=290; 
+	public static final int LIBSVM_VERSION=291; 
 	public static svm_model svm_train(svm_problem prob, svm_parameter param);
 	public static void svm_cross_validation(svm_problem prob, svm_parameter param, int nr_fold, double[] target);
 	public static int svm_get_svm_type(svm_model model);
