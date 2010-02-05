@@ -46,6 +46,27 @@ struct svm_parameter
 	int probability; /* do probability estimates */
 };
 
+struct svm_model
+{
+	struct svm_parameter param;	/* parameter */
+	int nr_class;		/* number of classes, = 2 in regression/one class svm */
+	int l;			/* total #SV */
+	struct svm_node **SV;		/* SVs (SV[l]) */
+	double **sv_coef;	/* coefficients for SVs in decision functions (sv_coef[k-1][l]) */
+	double *rho;		/* constants in decision functions (rho[k*(k-1)/2]) */
+	double *probA;		/* pariwise probability information */
+	double *probB;
+
+	/* for classification only */
+
+	int *label;		/* label of each class (label[k]) */
+	int *nSV;		/* number of SVs for each class (nSV[k]) */
+				/* nSV[0] + nSV[1] + ... + nSV[k-1] = l */
+	/* XXX */
+	int free_sv;		/* 1 if svm_model is created by svm_load_model*/
+				/* 0 if svm_model is created by svm_train */
+};
+
 struct svm_model *svm_train(const struct svm_problem *prob, const struct svm_parameter *param);
 void svm_cross_validation(const struct svm_problem *prob, const struct svm_parameter *param, int nr_fold, double *target);
 
