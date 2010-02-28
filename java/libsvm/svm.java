@@ -2498,8 +2498,11 @@ public class svm {
 
 	public static svm_model svm_load_model(String model_file_name) throws IOException
 	{
-		BufferedReader fp = new BufferedReader(new FileReader(model_file_name));
+		return svm_load_model(new BufferedReader(new FileReader(model_file_name)));
+	}
 
+	public static svm_model svm_load_model(BufferedReader fp) throws IOException
+	{
 		// read parameters
 
 		svm_model model = new svm_model();
