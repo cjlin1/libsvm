@@ -468,11 +468,12 @@ to classify new data.
     If the model is not for svr or does not contain required
     information, 0 is returned.
 
-- Function: void svm_predict_values(const svm_model *model, 
+- Function: double svm_predict_values(const svm_model *model, 
 				    const svm_node *x, double* dec_values)
 
     This function gives decision values on a test vector x given a
-    model.
+    model, and return the predicted label (classification) or
+    the function value (regression).
 
     For a classification model with nr_class classes, this function
     gives nr_class*(nr_class-1)/2 decision values in the array
@@ -480,11 +481,13 @@ to classify new data.
     svm_get_nr_class. The order is label[0] vs. label[1], ...,
     label[0] vs. label[nr_class-1], label[1] vs. label[2], ...,
     label[nr_class-2] vs. label[nr_class-1], where label can be
-    obtained from the function svm_get_labels.
+    obtained from the function svm_get_labels. The returned value is
+    the predicted class for x.
 
-    For a regression model, label[0] is the function value of x
-    calculated using the model. For one-class model, label[0] is +1 or
-    -1.
+    For a regression model, dec_values[0] and the returned value are
+    both the function value of x calculated using the model. For a
+    one-class model, dec_values[0] is the decision value of x, while
+    the returned value is +1/-1.
 
 - Function: double svm_predict_probability(const struct svm_model *model, 
 	    const struct svm_node *x, double* prob_estimates);
