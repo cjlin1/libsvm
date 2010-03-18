@@ -2437,7 +2437,7 @@ double svm_get_svr_probability(const svm_model *model)
 	}
 }
 
-void svm_predict_values(const svm_model *model, const svm_node *x, double* dec_values)
+double svm_predict_values(const svm_model *model, const svm_node *x, double* dec_values)
 {
 	if(model->param.svm_type == ONE_CLASS ||
 	   model->param.svm_type == EPSILON_SVR ||
@@ -2449,6 +2449,11 @@ void svm_predict_values(const svm_model *model, const svm_node *x, double* dec_v
 			sum += sv_coef[i] * Kernel::k_function(x,model->SV[i],model->param);
 		sum -= model->rho[0];
 		*dec_values = sum;
+
+		if(model->param.svm_type == ONE_CLASS)
+			return (sum>0)?1:-1;
+		else
+			return sum;
 	}
 	else
 	{
@@ -2464,6 +2469,10 @@ void svm_predict_values(const svm_model *model, const svm_node *x, double* dec_v
 		start[0] = 0;
 		for(i=1;i<nr_class;i++)
 			start[i] = start[i-1]+model->nSV[i-1];
+
+		int *vote = Malloc(int,nr_class);
+		for(i=0;i<nr_class;i++)
+			vote[i] = 0;
 
 		int p=0;
 		for(i=0;i<nr_class;i++)
@@ -2484,56 +2493,39 @@ void svm_predict_values(const svm_model *model, const svm_node *x, double* dec_v
 					sum += coef2[sj+k] * kvalue[sj+k];
 				sum -= model->rho[p];
 				dec_values[p] = sum;
-				p++;
-			}
 
-		free(kvalue);
-		free(start);
-	}
-}
-
-double svm_predict(const svm_model *model, const svm_node *x)
-{
-	if(model->param.svm_type == ONE_CLASS ||
-	   model->param.svm_type == EPSILON_SVR ||
-	   model->param.svm_type == NU_SVR)
-	{
-		double res;
-		svm_predict_values(model, x, &res);
-		
-		if(model->param.svm_type == ONE_CLASS)
-			return (res>0)?1:-1;
-		else
-			return res;
-	}
-	else
-	{
-		int i;
-		int nr_class = model->nr_class;
-		double *dec_values = Malloc(double, nr_class*(nr_class-1)/2);
-		svm_predict_values(model, x, dec_values);
-
-		int *vote = Malloc(int,nr_class);
-		for(i=0;i<nr_class;i++)
-			vote[i] = 0;
-		int pos=0;
-		for(i=0;i<nr_class;i++)
-			for(int j=i+1;j<nr_class;j++)
-			{
-				if(dec_values[pos++] > 0)
+				if(dec_values[p] > 0)
 					++vote[i];
 				else
 					++vote[j];
+				p++;
 			}
 
 		int vote_max_idx = 0;
 		for(i=1;i<nr_class;i++)
 			if(vote[i] > vote[vote_max_idx])
 				vote_max_idx = i;
+
+		free(kvalue);
+		free(start);
 		free(vote);
-		free(dec_values);
 		return model->label[vote_max_idx];
 	}
+}
+
+double svm_predict(const svm_model *model, const svm_node *x)
+{
+	int nr_class = model->nr_class;
+	double *dec_values;
+	if(model->param.svm_type == ONE_CLASS ||
+	   model->param.svm_type == EPSILON_SVR ||
+	   model->param.svm_type == NU_SVR)
+		dec_values = Malloc(double, 1);
+	else 
+		dec_values = Malloc(double, nr_class*(nr_class-1)/2);
+	double pred_result = svm_predict_values(model, x, dec_values);
+	free(dec_values);
+	return pred_result;
 }
 
 double svm_predict_probability(
