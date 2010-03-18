@@ -613,13 +613,9 @@ where it is installed.
 
 nmake -f Makefile.win clean all
 
-3. (optional) To build python interface, download and install Python.
-Edit Makefile.win and change PYTHON_INC and PYTHON_LIB to your python
-installation. Type
+3. (optional) To build shared library libsvm.dll, type
 
-nmake -f Makefile.win python 
-
-and then copy windows\python\svmc.pyd to the python directory.
+nmake -f Makefile.win lib
 
 Another way is to build them from Visual C++ environment. See details
 in libsvm FAQ.
