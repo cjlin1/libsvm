@@ -570,7 +570,7 @@ public class svm {
 	public static int svm_get_nr_class(svm_model model);
 	public static void svm_get_labels(svm_model model, int[] label);
 	public static double svm_get_svr_probability(svm_model model);
-	public static void svm_predict_values(svm_model model, svm_node[] x, double[] dec_values);
+	public static double svm_predict_values(svm_model model, svm_node[] x, double[] dec_values);
 	public static double svm_predict(svm_model model, svm_node[] x);
 	public static double svm_predict_probability(svm_model model, svm_node[] x, double[] prob_estimates);
 	public static void svm_save_model(String model_file_name, svm_model model) throws IOException

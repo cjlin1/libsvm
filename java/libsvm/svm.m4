@@ -2264,7 +2264,7 @@ public class svm {
 		}
 	}
 
-	public static void svm_predict_values(svm_model model, svm_node[] x, double[] dec_values)
+	public static double svm_predict_values(svm_model model, svm_node[] x, double[] dec_values)
 	{
 		if(model.param.svm_type == svm_parameter.ONE_CLASS ||
 		   model.param.svm_type == svm_parameter.EPSILON_SVR ||
@@ -2276,6 +2276,11 @@ public class svm {
 				sum += sv_coef[i] * Kernel.k_function(x,model.SV[i],model.param);
 			sum -= model.rho[0];
 			dec_values[0] = sum;
+
+			if(model.param.svm_type == svm_parameter.ONE_CLASS)
+				return (sum>0)?1:-1;
+			else
+				return sum;
 		}
 		else
 		{
@@ -2291,6 +2296,10 @@ public class svm {
 			start[0] = 0;
 			for(i=1;i<nr_class;i++)
 				start[i] = start[i-1]+model.nSV[i-1];
+
+			int[] vote = new int[nr_class];
+			for(i=0;i<nr_class;i++)
+				vote[i] = 0;
 
 			int p=0;
 			for(i=0;i<nr_class;i++)
@@ -2311,51 +2320,35 @@ public class svm {
 						sum += coef2[sj+k] * kvalue[sj+k];
 					sum -= model.rho[p];
 					dec_values[p] = sum;					
-					p++;
-				}
-		}
-	}
 
-	public static double svm_predict(svm_model model, svm_node[] x)
-	{
-		if(model.param.svm_type == svm_parameter.ONE_CLASS ||
-		   model.param.svm_type == svm_parameter.EPSILON_SVR ||
-		   model.param.svm_type == svm_parameter.NU_SVR)
-		{
-			double[] res = new double[1];
-			svm_predict_values(model, x, res);
-
-			if(model.param.svm_type == svm_parameter.ONE_CLASS)
-				return (res[0]>0)?1:-1;
-			else
-				return res[0];
-		}
-		else
-		{
-			int i;
-			int nr_class = model.nr_class;
-			double[] dec_values = new double[nr_class*(nr_class-1)/2];
-			svm_predict_values(model, x, dec_values);
-
-			int[] vote = new int[nr_class];
-			for(i=0;i<nr_class;i++)
-				vote[i] = 0;
-			int pos=0;
-			for(i=0;i<nr_class;i++)
-				for(int j=i+1;j<nr_class;j++)
-				{
-					if(dec_values[pos++] > 0)
+					if(dec_values[p] > 0)
 						++vote[i];
 					else
 						++vote[j];
+					p++;
 				}
 
 			int vote_max_idx = 0;
 			for(i=1;i<nr_class;i++)
 				if(vote[i] > vote[vote_max_idx])
 					vote_max_idx = i;
+
 			return model.label[vote_max_idx];
 		}
+	}
+
+	public static double svm_predict(svm_model model, svm_node[] x)
+	{
+		int nr_class = model.nr_class;
+		double[] dec_values;
+		if(model.param.svm_type == svm_parameter.ONE_CLASS ||
+				model.param.svm_type == svm_parameter.EPSILON_SVR ||
+				model.param.svm_type == svm_parameter.NU_SVR)
+			dec_values = new double[1];
+		else
+			dec_values = new double[nr_class*(nr_class-1)/2];
+		double pred_result = svm_predict_values(model, x, dec_values);
+		return pred_result;
 	}
 
 	public static double svm_predict_probability(svm_model model, svm_node[] x, double[] prob_estimates)
