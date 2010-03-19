@@ -172,7 +172,7 @@ LIBSVM shared library:
 - Function: toPyString(char_ptr)
 
     Convert the returned char pointer of libsvm.svm_check_parameter
-    to Python string. If char_ptr == NULL, an ValueError is raised.
+    to a Python string. If char_ptr == NULL, a ValueError is raised.
 
     >>> char_ptr = libsvm.svm_check_parameter(param)
     >>> if char_ptr: 
@@ -187,18 +187,18 @@ LIBSVM shared library:
 
     Note that the returned structure of interface function libsvm.svm_train
     and libsvm.svm_load_model is a ctypes pointer of svm_model, which is 
-    different the returned structure of svmtrain and svm_load_model. We 
-    provide a function toPyModel for the conversion:
+    different from the svm_model object returned by svmtrain and
+    svm_load_model in svmutil.py. We provide a function toPyModel for
+    the conversion:
 
     >>> model_ptr = libsvm.svm_train(prob, param)
     >>> model = toPyModel(model_ptr)
 
-    If you obtain a model in a way other than above approaches, handle it 
-    carefully in case of memory leak or segmentation fault.
+    If you obtain a model in a way other than the above approaches,
+    handle it carefully to avoid memory leak or segmentation fault.
 
-    We also some wrap svm_model access interface functions into member 
-    function of svm_model so that you can access svm_model in a more 
-    Python way.
+    Some interface functions to access LIBSVM models are wrapped as
+    members of the class svm_model:
 
     >>> svm_type = model.get_svm_type()
     >>> nr_class = model.get_nr_class()
