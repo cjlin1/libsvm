@@ -157,7 +157,7 @@ LIBSVM shared library:
 
     If 'training_options' is empty, LIBSVM default values are applied.
 
-    Set param to the default values same as C interface.
+    Set param to LIBSVM default values.
 
     >>> param.set_to_default_values()
 
@@ -185,11 +185,11 @@ LIBSVM shared library:
     >>> model = svmtrain(y, x)
     >>> model = svm_load_model('model_file_name')
 
-    Note that the returned structure of interface function libsvm.svm_train
-    and libsvm.svm_load_model is a ctypes pointer of svm_model, which is 
-    different from the svm_model object returned by svmtrain and
-    svm_load_model in svmutil.py. We provide a function toPyModel for
-    the conversion:
+    Note that the returned structure of interface functions
+    libsvm.svm_train and libsvm.svm_load_model is a ctypes pointer of
+    svm_model, which is different from the svm_model object returned
+    by svmtrain and svm_load_model in svmutil.py. We provide a
+    function toPyModel for the conversion:
 
     >>> model_ptr = libsvm.svm_train(prob, param)
     >>> model = toPyModel(model_ptr)
