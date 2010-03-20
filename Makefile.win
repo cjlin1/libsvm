@@ -10,27 +10,24 @@ TARGET = windows
 
 all: $(TARGET)\svm-train.exe $(TARGET)\svm-predict.exe $(TARGET)\svm-scale.exe $(TARGET)\svm-toy.exe
 
-python: $(TARGET)\python\svmc.pyd
-
 $(TARGET)\svm-predict.exe: svm.h svm-predict.c svm.obj
-    $(CXX) $(CFLAGS) svm-predict.c svm.obj -Fe$(TARGET)\svm-predict.exe
+	$(CXX) $(CFLAGS) svm-predict.c svm.obj -Fe$(TARGET)\svm-predict.exe
 
 $(TARGET)\svm-train.exe: svm.h svm-train.c svm.obj
-    $(CXX) $(CFLAGS) svm-train.c svm.obj -Fe$(TARGET)\svm-train.exe
+	$(CXX) $(CFLAGS) svm-train.c svm.obj -Fe$(TARGET)\svm-train.exe
 
 $(TARGET)\svm-scale.exe: svm.h svm-scale.c
-    $(CXX) $(CFLAGS) svm-scale.c -Fe$(TARGET)\svm-scale.exe
+	$(CXX) $(CFLAGS) svm-scale.c -Fe$(TARGET)\svm-scale.exe
 
 $(TARGET)\svm-toy.exe: svm.h svm.obj svm-toy\windows\svm-toy.cpp
-    $(CXX) $(CFLAGS) svm-toy\windows\svm-toy.cpp svm.obj user32.lib gdi32.lib comdlg32.lib  -Fe$(TARGET)\svm-toy.exe
+	$(CXX) $(CFLAGS) svm-toy\windows\svm-toy.cpp svm.obj user32.lib gdi32.lib comdlg32.lib  -Fe$(TARGET)\svm-toy.exe
 
 svm.obj: svm.cpp svm.h
-    $(CXX) $(CFLAGS) -c svm.cpp
+	$(CXX) $(CFLAGS) -c svm.cpp
 
 lib: svm.cpp svm.h svm.def
-    $(CXX) $(CFLAGS) -LD svm.cpp -Felibsvm -link -DEF:svm.def 
+	$(CXX) $(CFLAGS) -LD svm.cpp -Felibsvm -link -DEF:svm.def 
 
 clean:
-    -erase /Q *.obj *.dll *.lib *.exp $(TARGET)\. $(TARGET)\python\. 
-
+	-erase /Q *.obj *.dll *.lib *.exp $(TARGET)\. $(TARGET)\python\. 
 
