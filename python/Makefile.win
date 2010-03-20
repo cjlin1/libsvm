@@ -1,6 +1,0 @@
-all = lib
-
-lib: ../svm.cpp ../svm.h ../svm.def
-	cd ..
-	nmake -f Makefile.win lib
-	cd python/
