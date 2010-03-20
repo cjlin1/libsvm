@@ -42,7 +42,7 @@ instruction of building windows binaries in libsvm README.
 Quick Start
 ===========
 
-There are two levels of usage.  The high-level one uses utility functions
+There are two levels of usage. The high-level one uses utility functions
 in svmutil.py and the usage is the same as the LIBSVM MATLAB interface.
 
 >>> from svmutil import *
@@ -130,10 +130,10 @@ LIBSVM shared library:
     max_idx: the maximal feature index of xi
 
     issparse: if issparse == True, zero feature values are removed. The default
-            value is False for supporting the pre-computed kernel.
+              value is False for supporting the pre-computed kernel.
 
     feature_max: if feature_max is assigned, features with indices larger than 
-            feature_max are removed.
+                 feature_max are removed.
 
 - class svm_problem:
 
@@ -144,7 +144,7 @@ LIBSVM shared library:
     y: a Python list/tuple of l labels (type must be int/double). 
 
     x: a Python list/tuple of l data instances. Each element of x must be 
-        an instance of list/tuple/dictionary type.
+       an instance of list/tuple/dictionary type.
 
     Note that if your x contains sparse data (i.e., dictionary), the internal 
     ctypes data format is still sparse.
