@@ -169,15 +169,6 @@ LIBSVM shared library:
 
     >>> param.show()
 
-- Function: toPyString(char_ptr)
-
-    Convert the returned char pointer of libsvm.svm_check_parameter
-    to a Python string. If char_ptr == NULL, a ValueError is raised.
-
-    >>> char_ptr = libsvm.svm_check_parameter(param)
-    >>> if char_ptr: 
-    >>>     err_msg = toPyString(char_ptr)
-
 - class svm_model:
 
     There are two ways to obtain an instance of svm_model:
