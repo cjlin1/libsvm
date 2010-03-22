@@ -4,7 +4,7 @@ from ctypes import *
 from ctypes.util import find_library
 import sys
 
-libpath = find_library('libsvm')
+libpath = find_library('svm')
 if libpath :
 	libsvm = CDLL(libpath)
 else  :
@@ -13,48 +13,22 @@ else  :
 	else :
 		libsvm = CDLL('../libsvm.so.1')
 
-def genFields(names, types): 
-	return list(zip(names, types))
-
-def fillprototype(f, restype, argtypes): 
-	f.restype = restype
-	f.argtypes = argtypes
-
-def toPyString(char_ptr):
-	"""
-	toPyString(char_ptr) -> str
-
-	Convert a ctypes char array to a Python string
-	"""
-	if bool(char_ptr) == False:
-		raise ValueError("Null pointer")
-	i = 0
-	while char_ptr[i] != chr(0): 
-		i+=1
-	return char_ptr[:i]
-
-def toPyModel(model_ptr):
-	"""
-	toPyModel(model_ptr) -> svm_model
-
-	Convert a ctypes POINTER(svm_model) to a Python svm_model
-	"""
-	if bool(model_ptr) == False:
-		raise ValueError("Null pointer")
-	m = model_ptr.contents
-	m.__createfrom__ = 'C'
-	return m
-
-
 # Construct constants
 SVM_TYPE = ['C_SVC', 'NU_SVC', 'ONE_CLASS', 'EPSILON_SVR', 'NU_SVR' ]
 KERNEL_TYPE = ['LINEAR', 'POLY', 'RBF', 'SIGMOID', 'PRECOMPUTED']
 for i, s in enumerate(SVM_TYPE): exec("%s = %d" % (s , i))
 for i, s in enumerate(KERNEL_TYPE): exec("%s = %d" % (s , i))
 
+PRINT_STRING_FUN = CFUNCTYPE(None, c_char_p)
 def print_null(s): 
 	return 
-PRINT_STRING_FUN = CFUNCTYPE(None, POINTER(c_char))
+
+def genFields(names, types): 
+	return list(zip(names, types))
+
+def fillprototype(f, restype, argtypes): 
+	f.restype = restype
+	f.argtypes = argtypes
 
 class svm_node(Structure):
 	_names = ["index", "value"]
@@ -109,7 +83,6 @@ class svm_problem(Structure):
 
 		self.x = (POINTER(svm_node) * l)() 
 		for i, xi in enumerate(self.x_space): self.x[i] = xi
-
 
 class svm_parameter(Structure):
 	_names = ["svm_type", "kernel_type", "degree", "gamma", "coef0",
@@ -221,7 +194,6 @@ class svm_parameter(Structure):
 			self.weight[i] = weight[i]
 			self.weight_label[i] = weight_label[i]
 
-
 class svm_model(Structure):
 	def __init__(self):
 		self.__createfrom__ = 'python'
@@ -249,12 +221,23 @@ class svm_model(Structure):
 	def is_probability_model(self):
 		return (libsvm.svm_check_probability_model(self) == 1)
 
+def toPyModel(model_ptr):
+	"""
+	toPyModel(model_ptr) -> svm_model
+
+	Convert a ctypes POINTER(svm_model) to a Python svm_model
+	"""
+	if bool(model_ptr) == False:
+		raise ValueError("Null pointer")
+	m = model_ptr.contents
+	m.__createfrom__ = 'C'
+	return m
 
 fillprototype(libsvm.svm_train, POINTER(svm_model), [POINTER(svm_problem), POINTER(svm_parameter)])
 fillprototype(libsvm.svm_cross_validation, None, [POINTER(svm_problem), POINTER(svm_parameter), c_int, POINTER(c_double)])
 
-fillprototype(libsvm.svm_save_model, c_int, [POINTER(c_char), POINTER(svm_model)])
-fillprototype(libsvm.svm_load_model, POINTER(svm_model), [POINTER(c_char)])
+fillprototype(libsvm.svm_save_model, c_int, [c_char_p, POINTER(svm_model)])
+fillprototype(libsvm.svm_load_model, POINTER(svm_model), [c_char_p])
 
 fillprototype(libsvm.svm_get_svm_type, c_int, [POINTER(svm_model)])
 fillprototype(libsvm.svm_get_nr_class, c_int, [POINTER(svm_model)])
@@ -268,6 +251,6 @@ fillprototype(libsvm.svm_predict_probability, c_double, [POINTER(svm_model), POI
 fillprototype(libsvm.svm_destroy_model, None, [POINTER(svm_model)])
 fillprototype(libsvm.svm_destroy_param, None, [POINTER(svm_parameter)])
 
-fillprototype(libsvm.svm_check_parameter, POINTER(c_char), [POINTER(svm_problem), POINTER(svm_parameter)])
+fillprototype(libsvm.svm_check_parameter, c_char_p, [POINTER(svm_problem), POINTER(svm_parameter)])
 fillprototype(libsvm.svm_check_probability_model, c_int, [POINTER(svm_model)])
-fillprototype(libsvm.svm_set_print_string_function, None, [CFUNCTYPE(None, POINTER(c_char))])
+fillprototype(libsvm.svm_set_print_string_function, None, [PRINT_STRING_FUN])
