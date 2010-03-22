@@ -4,12 +4,14 @@ from ctypes import *
 from ctypes.util import find_library
 import sys
 
-libpath = find_library('svm')
-if libpath :
-	libsvm = CDLL(libpath)
+
+if find_library('libsvm'):
+	libsvm = CDLL(find_library('libsvm'))
+elif find_library('svm'):
+	libsvm = CDLL(find_library('svm'))
 else  :
 	if sys.platform == 'win32':
-		libsvm = CDLL('../libsvm.dll')
+		libsvm = CDLL('../windows/libsvm.dll')
 	else :
 		libsvm = CDLL('../libsvm.so.1')
 
