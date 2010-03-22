@@ -221,7 +221,7 @@ def svmpredict(y, x, m, options=""):
 		if svm_type in (ONE_CLASS, EPSILON_SVR, NU_SVC):
 			nr_classifier = 1
 		else :
-			nr_classifier = nr_class*(nr_class-1)/2
+			nr_classifier = nr_class*(nr_class-1)//2
 		dec_values = (c_double * nr_classifier)()
 		for xi in x:
 			xi, idx = gen_svm_nodearray(xi)
