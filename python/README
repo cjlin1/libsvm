@@ -37,7 +37,7 @@ main directory or in the system path.
 For windows, the shared library libsvm.dll is ready in the directory
 `..\windows'. You can also copy it to the system directory (e.g.,
 `C:\WINDOWS\system32\' for Windows XP). To regenerate the shared library, 
-please follow the instruction of building windows binaries in libsvm README.
+please follow the instruction of building windows binaries in LIBSVM README.
 
 Quick Start
 ===========
