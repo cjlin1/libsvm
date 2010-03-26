@@ -74,11 +74,11 @@ def evaluations(ty, pv):
 		SCC = float('nan')
 	return (ACC, MSE, SCC)
 
-def svmtrain(arg1, arg2=None, arg3=None):
+def svm_train(arg1, arg2=None, arg3=None):
 	"""
-	svmtrain(y, x [, 'options']) -> model | ACC | MSE 
-	svmtrain(prob, [, 'options']) -> model | ACC | MSE 
-	svmtrain(prob, param) -> model | ACC| MSE 
+	svm_train(y, x [, 'options']) -> model | ACC | MSE 
+	svm_train(prob, [, 'options']) -> model | ACC | MSE 
+	svm_train(prob, param) -> model | ACC| MSE 
 
 	Train an SVM model from data (y, x) or an svm_problem prob using
 	'options' or an svm_parameter param. 
@@ -161,9 +161,9 @@ def svmtrain(arg1, arg2=None, arg3=None):
 		m.x_space = prob.x_space
 		return m
 
-def svmpredict(y, x, m, options=""):
+def svm_predict(y, x, m, options=""):
 	"""
-	svmpredict(y, x, m [, "options"]) -> (p_labels, p_acc, p_vals)
+	svm_predict(y, x, m [, "options"]) -> (p_labels, p_acc, p_vals)
 
 	Predict data (y, x) with the SVM model m. 
 	"options": 
