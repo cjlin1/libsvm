@@ -7,7 +7,7 @@
 <a name="_TOP"><b><h1><a
 href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a>  FAQ </h1></b></a>
 <b>last modified : </b>
-Tue, 20 Oct 2009 12:34:49 GMT
+Mon, 29 Mar 2010 12:08:25 GMT
 <class="categories">
 <li><a
 href="#_TOP">All Questions</a>(76)</li>
@@ -158,8 +158,27 @@ summer school, University of Chicago, 2005.
 <a name="faq102"><b>Q: Some applications which have used libsvm </b></a>
 <br/>                                                                                
 <ul>
+<li>
+<a href=http://people.csail.mit.edu/jjl/libpmk/>LIBPMK: A Pyramid Match Toolkit</a>
+</li>
+<li><a href=http://maltparser.org/>Maltparser</a>:
+a system for data-driven dependency parsing
+</li>
+<li>
+<a href=http://www.pymvpa.org/>PyMVPA: python tool for classifying neuroimages</a>
+</li>
+<li>
+<a href=http://solpro.proteomics.ics.uci.edu/>
+SOLpro: protein solubility predictor
+</a>
+</li>
+<li>
+<a href=http://icb.med.cornell.edu/wiki/index.php/BDVAL>
+BDVAL</a>: biomarker discovery in high-throughput datasets.
+</li>
 <li><a href=http://johel.m.free.fr/demo_045.htm>
 Realtime object recognition</a>
+</li>
 </ul>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
@@ -701,12 +720,16 @@ For large problems, please specify enough cache size (i.e.,
 -m).
 Slow convergence may happen for some difficult cases (e.g. -c is large).
 You can try to use a looser stopping tolerance with -e.
-If that still doesn't work, you may want to train only a subset of the data.
+If that still doesn't work, you may train only a subset of the data.
 You can use the program subset.py in the directory "tools" 
 to obtain a random subset.
 
+<p>
+If you have extremely large data and face this difficulty, please
+contact us. We will be happy to discuss possible solutions.
+
 <p> When using large -e, you may want to check if -h 0 (no shrinking) or -h 1 (shrinking) is faster.
-See the next question below.
+See a related question below.
 
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
@@ -994,9 +1017,16 @@ a private variable:
 <pre>
 	double C;
 </pre> 
-In the constructor we assign it to param.C:
+In the constructor replace
 <pre>
-        this->C = param.C;		
+	for(int i=0;i<prob.l;i++)
+		QD[i]= (Qfloat)(this->*kernel_function)(i,i);
+</pre>
+with
+<pre>
+        this->C = param.C;
+	for(int i=0;i<prob.l;i++)
+		QD[i]= (Qfloat)(this->*kernel_function)(i,i)+0.5/C;
 </pre>
 Then in the subroutine get_Q, after the for loop, add
 <pre>
@@ -1508,7 +1538,14 @@ CXX = g++-X.Y
 <br/>                                                                                
 <p>
 
-If you use Microsoft Visual Studio, 
+
+Please make sure that you have modified make.m
+to use -largeArrayDims option. For example,
+<pre>
+mex -largeArrayDims -O -c svm.cpp
+</pre>
+
+Moreover, if you use Microsoft Visual Studio, 
 probabally it is not properly installed. 
 See the explanation 
 <a href=http://www.mathworks.com/support/compilers/current_release/win64.html#n7>here</a>.
@@ -1547,6 +1584,7 @@ for log2c = -1:3,
   end
 end
 </pre>
+You may adjust the parameter range in the above loops.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
