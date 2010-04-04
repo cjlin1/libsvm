@@ -112,8 +112,8 @@ def svm_train(arg1, arg2=None, arg3=None):
 	    -q : quiet mode (no outputs)
 	"""
 	prob, param = None, None
-	if isinstance(arg1,(list,tuple)):
-		assert isinstance(arg2, list)
+	if isinstance(arg1, (list, tuple)):
+		assert isinstance(arg2, (list, tuple))
 		y, x, options = arg1, arg2, arg3
 		prob = svm_problem(y, x)
 		param = svm_parameter(options)
@@ -215,12 +215,12 @@ def svm_predict(y, x, m, options=""):
 			values = prob_estimates[:nr_class]
 			pred_labels += [label]
 			pred_values += [values]
-	else :
+	else:
 		if is_prob_model:
 			print("Model supports probability estimates, but disabled in predicton.")
 		if svm_type in (ONE_CLASS, EPSILON_SVR, NU_SVC):
 			nr_classifier = 1
-		else :
+		else:
 			nr_classifier = nr_class*(nr_class-1)//2
 		dec_values = (c_double * nr_classifier)()
 		for xi in x:
