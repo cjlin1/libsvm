@@ -9,10 +9,10 @@ if find_library('svm'):
 	libsvm = CDLL(find_library('svm'))
 elif find_library('libsvm'):
 	libsvm = CDLL(find_library('libsvm'))
-else  :
+else:
 	if sys.platform == 'win32':
 		libsvm = CDLL('../windows/libsvm.dll')
-	else :
+	else:
 		libsvm = CDLL('../libsvm.so.1')
 
 # Construct constants
@@ -42,13 +42,13 @@ def gen_svm_nodearray(xi, feature_max=None, issparse=None):
 		index_range = xi.keys()
 	elif isinstance(xi, (list, tuple)):
 		index_range = range(len(xi))
-	else :
+	else:
 		raise TypeError('xi should be a dictionary, list or tuple')
 
-	if feature_max :
+	if feature_max:
 		assert(isinstance(feature_max, int))
 		index_range = filter(lambda j: j <= feature_max, index_range)
-	if issparse : 
+	if issparse: 
 		index_range = filter(lambda j:xi[j] != 0, index_range)
 
 	index_range = sorted(index_range)
@@ -68,7 +68,7 @@ class svm_problem(Structure):
 	_fields_ = genFields(_names, _types)
 
 	def __init__(self, y, x):
-		if len(y) != len(x) :
+		if len(y) != len(x):
 			raise ValueError("len(y) != len(x)")
 		self.l = l = len(y)
 
@@ -81,7 +81,7 @@ class svm_problem(Structure):
 		self.n = max_idx
 
 		self.y = (c_double * l)()
-		for i, yi in enumerate(y): self.y[i] = y[i]
+		for i, yi in enumerate(y): self.y[i] = yi
 
 		self.x = (POINTER(svm_node) * l)() 
 		for i, xi in enumerate(self.x_space): self.x[i] = xi
@@ -134,7 +134,7 @@ class svm_parameter(Structure):
 		weight = []
 
 		i = 0
-		while i < len(argv) :
+		while i < len(argv):
 			if argv[i] == "-s":
 				i = i + 1
 				self.svm_type = int(argv[i])
@@ -177,7 +177,7 @@ class svm_parameter(Structure):
 				i = i + 1
 				self.cross_validation = 1
 				self.nr_fold = int(argv[i])
-				if self.nr_fold < 2 :
+				if self.nr_fold < 2:
 					raise ValueError("n-fold cross validation: n must >= 2")
 			elif argv[i].startswith("-w"):
 				i = i + 1
