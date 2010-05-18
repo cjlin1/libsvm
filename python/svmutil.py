@@ -26,7 +26,7 @@ def svm_read_problem(data_file_name):
 
 def svm_load_model(model_file_name):
 	"""
-	svm_model_model(model_file_name) -> model
+	svm_load_model(model_file_name) -> model
 	
 	Load a LIBSVM model from model_file_name and return.
 	"""
