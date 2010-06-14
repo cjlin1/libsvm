@@ -41,7 +41,7 @@ def svm_save_model(model_file_name, model):
 	"""
 	svm_save_model(model_file_name, model) -> None
 
-	Save a LIBSVM model model to the file model_file_name.
+	Save a LIBSVM model to the file model_file_name.
 	"""
 	libsvm.svm_save_model(model_file_name, model)
 
