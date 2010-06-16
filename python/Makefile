@@ -1,4 +1,4 @@
 all = lib
 
-lib: ../svm.cpp ../svm.h
+lib:
 	cd ..; make lib; cd -
