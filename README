@@ -606,8 +606,8 @@ set, type
 
 "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\vcvars32.bat"
 
-You may have to modify the above according which version of VC++ or
-where it is installed.
+You may have to modify the above command according which version of
+VC++ or where it is installed.
 
 2. Type
 
