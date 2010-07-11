@@ -133,6 +133,8 @@ detailed check, we provide a python script `checkdata.py.'
 
 Usage: checkdata.py dataset
 
+Exit status (returned value): 2 if there are errors, 0 otherwise.
+
 This tool is written by Rong-En Fan at National Taiwan University.
 
 Example

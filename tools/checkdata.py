@@ -99,8 +99,10 @@ def main():
 	
 	if error_line_count > 0:
 		print("Found %d lines with error." % (error_line_count))
+		return 2
 	else:
 		print("No error.")
+		return 0
 
-main()
-
+if __name__ == "__main__":
+	exit(main())
