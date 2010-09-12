@@ -317,7 +317,7 @@ void button_run_clicked()
 			}
 		}
 		
-		svm_destroy_model(model);
+		svm_free_and_destroy_model(&model);
 		delete[] j;
 		delete[] x_space;
 		delete[] prob.x;
@@ -358,7 +358,7 @@ void button_run_clicked()
 				SetPixel(buffer_dc, i, j, colors[(int)d]);
 			}
 
-		svm_destroy_model(model);
+		svm_free_and_destroy_model(&model);
 		delete[] x_space;
 		delete[] prob.x;
 		delete[] prob.y;

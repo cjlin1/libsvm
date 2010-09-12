@@ -226,7 +226,7 @@ private slots:
 				}
 			}
 
-			svm_destroy_model(model);
+			svm_free_and_destroy_model(&model);
 			delete[] j;
 			delete[] x_space;
 			delete[] prob.x;
@@ -267,7 +267,7 @@ private slots:
 					buffer_painter.drawPoint(i,j);
 			}
 
-			svm_destroy_model(model);
+			svm_free_and_destroy_model(&model);
 			delete[] x_space;
 			delete[] prob.x;
 			delete[] prob.y;

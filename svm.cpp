@@ -192,7 +192,7 @@ void Cache::swap_index(int i, int j)
 class QMatrix {
 public:
 	virtual Qfloat *get_Q(int column, int len) const = 0;
-	virtual Qfloat *get_QD() const = 0;
+	virtual double *get_QD() const = 0;
 	virtual void swap_index(int i, int j) const = 0;
 	virtual ~QMatrix() {}
 };
@@ -205,7 +205,7 @@ public:
 	static double k_function(const svm_node *x, const svm_node *y,
 				 const svm_parameter& param);
 	virtual Qfloat *get_Q(int column, int len) const = 0;
-	virtual Qfloat *get_QD() const = 0;
+	virtual double *get_QD() const = 0;
 	virtual void swap_index(int i, int j) const	// no so const...
 	{
 		swap(x[i],x[j]);
@@ -412,7 +412,7 @@ protected:
 	char *alpha_status;	// LOWER_BOUND, UPPER_BOUND, FREE
 	double *alpha;
 	const QMatrix *Q;
-	const Qfloat *QD;
+	const double *QD;
 	double eps;
 	double Cp,Cn;
 	double *p;
@@ -598,7 +598,7 @@ void Solver::Solve(int l, const QMatrix& Q, const double *p_, const schar *y_,
 
 		if(y[i]!=y[j])
 		{
-			double quad_coef = Q_i[i]+Q_j[j]+2*Q_i[j];
+			double quad_coef = QD[i]+QD[j]+2*Q_i[j];
 			if (quad_coef <= 0)
 				quad_coef = TAU;
 			double delta = (-G[i]-G[j])/quad_coef;
@@ -641,7 +641,7 @@ void Solver::Solve(int l, const QMatrix& Q, const double *p_, const schar *y_,
 		}
 		else
 		{
-			double quad_coef = Q_i[i]+Q_j[j]-2*Q_i[j];
+			double quad_coef = QD[i]+QD[j]-2*Q_i[j];
 			if (quad_coef <= 0)
 				quad_coef = TAU;
 			double delta = (G[i]-G[j])/quad_coef;
@@ -819,7 +819,7 @@ int Solver::select_working_set(int &out_i, int &out_j)
 				if (grad_diff > 0)
 				{
 					double obj_diff; 
-					double quad_coef=Q_i[i]+QD[j]-2.0*y[i]*Q_i[j];
+					double quad_coef = QD[i]+QD[j]-2.0*y[i]*Q_i[j];
 					if (quad_coef > 0)
 						obj_diff = -(grad_diff*grad_diff)/quad_coef;
 					else
@@ -843,7 +843,7 @@ int Solver::select_working_set(int &out_i, int &out_j)
 				if (grad_diff > 0)
 				{
 					double obj_diff; 
-					double quad_coef=Q_i[i]+QD[j]+2.0*y[i]*Q_i[j];
+					double quad_coef = QD[i]+QD[j]+2.0*y[i]*Q_i[j];
 					if (quad_coef > 0)
 						obj_diff = -(grad_diff*grad_diff)/quad_coef;
 					else
@@ -1071,7 +1071,7 @@ int Solver_NU::select_working_set(int &out_i, int &out_j)
 				if (grad_diff > 0)
 				{
 					double obj_diff; 
-					double quad_coef = Q_ip[ip]+QD[j]-2*Q_ip[j];
+					double quad_coef = QD[ip]+QD[j]-2*Q_ip[j];
 					if (quad_coef > 0)
 						obj_diff = -(grad_diff*grad_diff)/quad_coef;
 					else
@@ -1095,7 +1095,7 @@ int Solver_NU::select_working_set(int &out_i, int &out_j)
 				if (grad_diff > 0)
 				{
 					double obj_diff; 
-					double quad_coef = Q_in[in]+QD[j]-2*Q_in[j];
+					double quad_coef = QD[in]+QD[j]-2*Q_in[j];
 					if (quad_coef > 0)
 						obj_diff = -(grad_diff*grad_diff)/quad_coef;
 					else
@@ -1256,9 +1256,9 @@ public:
 	{
 		clone(y,y_,prob.l);
 		cache = new Cache(prob.l,(long int)(param.cache_size*(1<<20)));
-		QD = new Qfloat[prob.l];
+		QD = new double[prob.l];
 		for(int i=0;i<prob.l;i++)
-			QD[i]= (Qfloat)(this->*kernel_function)(i,i);
+			QD[i] = (this->*kernel_function)(i,i);
 	}
 	
 	Qfloat *get_Q(int i, int len) const
@@ -1273,7 +1273,7 @@ public:
 		return data;
 	}
 
-	Qfloat *get_QD() const
+	double *get_QD() const
 	{
 		return QD;
 	}
@@ -1295,7 +1295,7 @@ public:
 private:
 	schar *y;
 	Cache *cache;
-	Qfloat *QD;
+	double *QD;
 };
 
 class ONE_CLASS_Q: public Kernel
@@ -1305,9 +1305,9 @@ public:
 	:Kernel(prob.l, prob.x, param)
 	{
 		cache = new Cache(prob.l,(long int)(param.cache_size*(1<<20)));
-		QD = new Qfloat[prob.l];
+		QD = new double[prob.l];
 		for(int i=0;i<prob.l;i++)
-			QD[i]= (Qfloat)(this->*kernel_function)(i,i);
+			QD[i] = (this->*kernel_function)(i,i);
 	}
 	
 	Qfloat *get_Q(int i, int len) const
@@ -1322,7 +1322,7 @@ public:
 		return data;
 	}
 
-	Qfloat *get_QD() const
+	double *get_QD() const
 	{
 		return QD;
 	}
@@ -1341,7 +1341,7 @@ public:
 	}
 private:
 	Cache *cache;
-	Qfloat *QD;
+	double *QD;
 };
 
 class SVR_Q: public Kernel
@@ -1352,7 +1352,7 @@ public:
 	{
 		l = prob.l;
 		cache = new Cache(l,(long int)(param.cache_size*(1<<20)));
-		QD = new Qfloat[2*l];
+		QD = new double[2*l];
 		sign = new schar[2*l];
 		index = new int[2*l];
 		for(int k=0;k<l;k++)
@@ -1361,8 +1361,8 @@ public:
 			sign[k+l] = -1;
 			index[k] = k;
 			index[k+l] = k;
-			QD[k]= (Qfloat)(this->*kernel_function)(k,k);
-			QD[k+l]=QD[k];
+			QD[k] = (this->*kernel_function)(k,k);
+			QD[k+l] =QD[k];
 		}
 		buffer[0] = new Qfloat[2*l];
 		buffer[1] = new Qfloat[2*l];
@@ -1395,7 +1395,7 @@ public:
 		return buf;
 	}
 
-	Qfloat *get_QD() const
+	double *get_QD() const
 	{
 		return QD;
 	}
@@ -1416,7 +1416,7 @@ private:
 	int *index;
 	mutable int next_buffer;
 	Qfloat *buffer[2];
-	Qfloat *QD;
+	double *QD;
 };
 
 //
@@ -1436,7 +1436,7 @@ static void solve_c_svc(
 	{
 		alpha[i] = 0;
 		minus_ones[i] = -1;
-		if(prob->y[i] > 0) y[i] = +1; else y[i]=-1;
+		if(prob->y[i] > 0) y[i] = +1; else y[i] = -1;
 	}
 
 	Solver s;
@@ -1685,30 +1685,6 @@ static decision_function svm_train_one(
 	f.rho = si.rho;
 	return f;
 }
-
-//
-// svm_model
-// 
-struct svm_model
-{
-	struct svm_parameter param;	/* parameter */
-	int nr_class;		/* number of classes, = 2 in regression/one class svm */
-	int l;			/* total #SV */
-	struct svm_node **SV;		/* SVs (SV[l]) */
-	double **sv_coef;	/* coefficients for SVs in decision functions (sv_coef[k-1][l]) */
-	double *rho;		/* constants in decision functions (rho[k*(k-1)/2]) */
-	double *probA;		/* pariwise probability information */
-	double *probB;
-
-	/* for classification only */
-
-	int *label;		/* label of each class (label[k]) */
-	int *nSV;		/* number of SVs for each class (nSV[k]) */
-				/* nSV[0] + nSV[1] + ... + nSV[k-1] = l */
-	/* XXX */
-	int free_sv;		/* 1 if svm_model is created by svm_load_model*/
-				/* 0 if svm_model is created by svm_train */
-};
 
 // Platt's binary SVM Probablistic Output: an improvement from Lin et al.
 static void sigmoid_train(
@@ -1973,7 +1949,7 @@ static void svm_binary_svc_probability(
 				// ensure +1 -1 order; reason not using CV subroutine
 				dec_values[perm[j]] *= submodel->label[0];
 			}		
-			svm_destroy_model(submodel);
+			svm_free_and_destroy_model(&submodel);
 			svm_destroy_param(&subparam);
 		}
 		free(subprob.x);
@@ -2423,7 +2399,7 @@ void svm_cross_validation(const svm_problem *prob, const svm_parameter *param, i
 		else
 			for(j=begin;j<end;j++)
 				target[perm[j]] = svm_predict(submodel,prob->x[perm[j]]);
-		svm_destroy_model(submodel);
+		svm_free_and_destroy_model(&submodel);
 		free(subprob.x);
 		free(subprob.y);
 	}		
@@ -2909,20 +2885,35 @@ svm_model *svm_load_model(const char *model_file_name)
 	return model;
 }
 
-void svm_destroy_model(svm_model* model)
+void svm_free_model_content(svm_model* model_ptr)
 {
-	if(model->free_sv && model->l > 0)
-		free((void *)(model->SV[0]));
-	for(int i=0;i<model->nr_class-1;i++)
-		free(model->sv_coef[i]);
-	free(model->SV);
-	free(model->sv_coef);
-	free(model->rho);
-	free(model->label);
-	free(model->probA);
-	free(model->probB);
-	free(model->nSV);
-	free(model);
+	if(model_ptr->free_sv && model_ptr->l > 0)
+		free((void *)(model_ptr->SV[0]));
+	for(int i=0;i<model_ptr->nr_class-1;i++)
+		free(model_ptr->sv_coef[i]);
+	free(model_ptr->SV);
+	free(model_ptr->sv_coef);
+	free(model_ptr->rho);
+	free(model_ptr->label);
+	free(model_ptr->probA);
+	free(model_ptr->probB);
+	free(model_ptr->nSV);
+}
+
+void svm_free_and_destroy_model(svm_model** model_ptr_ptr)
+{
+	svm_model* model_ptr = *model_ptr_ptr;
+	if(model_ptr != NULL)
+	{
+		svm_free_model_content(model_ptr);
+		free(model_ptr);
+	}
+}
+
+void svm_destroy_model(svm_model* model_ptr)
+{
+	fprintf(stderr,"warning: svm_destroy_model is deprecated and should not be used. Please use svm_free_and_destroy_model(svm_model **model_ptr_ptr)\n");
+	svm_free_and_destroy_model(&model_ptr);
 }
 
 void svm_destroy_param(svm_parameter* param)

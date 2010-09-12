@@ -13,7 +13,7 @@ else:
 	if sys.platform == 'win32':
 		libsvm = CDLL('../windows/libsvm.dll')
 	else:
-		libsvm = CDLL('../libsvm.so.1')
+		libsvm = CDLL('../libsvm.so.2')
 
 # Construct constants
 SVM_TYPE = ['C_SVC', 'NU_SVC', 'ONE_CLASS', 'EPSILON_SVR', 'NU_SVR' ]
@@ -203,7 +203,7 @@ class svm_model(Structure):
 	def __del__(self):
 		# free memory created by C to avoid memory leak
 		if hasattr(self, '__createfrom__') and self.__createfrom__ == 'C':
-			libsvm.svm_destroy_model(self)
+			libsvm.svm_free_and_destroy_model(pointer(self))
 
 	def get_svm_type(self):
 		return libsvm.svm_get_svm_type(self)
@@ -250,7 +250,8 @@ fillprototype(libsvm.svm_predict_values, c_double, [POINTER(svm_model), POINTER(
 fillprototype(libsvm.svm_predict, c_double, [POINTER(svm_model), POINTER(svm_node)])
 fillprototype(libsvm.svm_predict_probability, c_double, [POINTER(svm_model), POINTER(svm_node), POINTER(c_double)])
 
-fillprototype(libsvm.svm_destroy_model, None, [POINTER(svm_model)])
+fillprototype(libsvm.svm_free_model_content, None, [POINTER(svm_model)])
+fillprototype(libsvm.svm_free_and_destroy_model, None, [POINTER(POINTER(svm_model))])
 fillprototype(libsvm.svm_destroy_param, None, [POINTER(svm_parameter)])
 
 fillprototype(libsvm.svm_check_parameter, c_char_p, [POINTER(svm_problem), POINTER(svm_parameter)])

@@ -1,5 +1,6 @@
 #include <gtk/gtk.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <ctype.h>
 #include <list>
 #include "callbacks.h"
@@ -245,7 +246,7 @@ on_button_run_clicked                  (GtkButton       *button,
 			}
 		}
 
-		svm_destroy_model(model);
+		svm_free_and_destroy_model(&model);
 		delete[] j;
 		delete[] x_space;
 		delete[] prob.x;
@@ -287,7 +288,7 @@ on_button_run_clicked                  (GtkButton       *button,
 				gdk_draw_point(draw_main->window,gc,i,j);
 			}
 
-		svm_destroy_model(model);
+		svm_free_and_destroy_model(&model);
 		delete[] x_space;
 		delete[] prob.x;
 		delete[] prob.y;
