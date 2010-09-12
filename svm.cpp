@@ -1362,7 +1362,7 @@ public:
 			index[k] = k;
 			index[k+l] = k;
 			QD[k] = (this->*kernel_function)(k,k);
-			QD[k+l] =QD[k];
+			QD[k+l] = QD[k];
 		}
 		buffer[0] = new Qfloat[2*l];
 		buffer[1] = new Qfloat[2*l];
