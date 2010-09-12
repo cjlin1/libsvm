@@ -8,7 +8,7 @@ CXX = cl.exe
 CFLAGS = -nologo -O2 -EHsc -I. -D __WIN32__ -D _CRT_SECURE_NO_DEPRECATE
 TARGET = windows
 
-all: $(TARGET)\svm-train.exe $(TARGET)\svm-predict.exe $(TARGET)\svm-scale.exe $(TARGET)\svm-toy.exe
+all: $(TARGET)\svm-train.exe $(TARGET)\svm-predict.exe $(TARGET)\svm-scale.exe $(TARGET)\svm-toy.exe lib
 
 $(TARGET)\svm-predict.exe: svm.h svm-predict.c svm.obj
 	$(CXX) $(CFLAGS) svm-predict.c svm.obj -Fe$(TARGET)\svm-predict.exe

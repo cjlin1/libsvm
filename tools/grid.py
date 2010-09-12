@@ -219,7 +219,7 @@ class Worker(Thread):
                 break
             try:
                 rate = self.run_one(2.0**cexp,2.0**gexp)
-                if rate is None: raise "get no rate"
+                if rate is None: raise RuntimeError("get no rate")
             except:
                 # we failed, let others do that and we just quit
             

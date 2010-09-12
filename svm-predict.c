@@ -217,7 +217,7 @@ int main(int argc, char **argv)
 			printf("Model supports probability estimates, but disabled in prediction.\n");
 	}
 	predict(input,output);
-	svm_destroy_model(model);
+	svm_free_and_destroy_model(&model);
 	free(x);
 	free(line);
 	fclose(input);
