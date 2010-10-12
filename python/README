@@ -76,7 +76,7 @@ carefully.
 >>> prob = svm_problem([1,-1], [{1:1, 3:1}, {1:-1,3:-1}])
 >>> param = svm_parameter('-c 4')
 >>> m = libsvm.svm_train(prob, param) # m is a ctype pointer to an svm_model
-# Convet a Python-fromat instance to svm_nodearray, a ctypes structure
+# Convert a Python-format instance to svm_nodearray, a ctypes structure
 >>> x0, max_idx = gen_svm_nodearray({1:1, 3:1})
 >>> label = libsvm.svm_predict(m, x0)
 
