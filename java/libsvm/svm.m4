@@ -1280,6 +1280,7 @@ public class svm {
 	// construct and solve various formulations
 	//
 	public static final int LIBSVM_VERSION=300; 
+	public static final Random rand = new Random();
 
 	private static svm_print_interface svm_print_stdout = new svm_print_interface()
 	{
@@ -1735,7 +1736,7 @@ public class svm {
 		for(i=0;i<prob.l;i++) perm[i]=i;
 		for(i=0;i<prob.l;i++)
 		{
-			int j = i+(int)(Math.random()*(prob.l-i));
+			int j = i+rand.nextInt(prob.l-i);
 			swap(int,perm[i],perm[j]);
 		}
 		for(i=0;i<nr_fold;i++)
@@ -2157,7 +2158,7 @@ public class svm {
 			for (c=0; c<nr_class; c++)
 				for(i=0;i<count[c];i++)
 				{
-					int j = i+(int)(Math.random()*(count[c]-i));
+					int j = i+rand.nextInt(count[c]-i);
 					swap(int,index[start[c]+j],index[start[c]+i]);
 				}
 			for(i=0;i<nr_fold;i++)
@@ -2189,7 +2190,7 @@ public class svm {
 			for(i=0;i<l;i++) perm[i]=i;
 			for(i=0;i<l;i++)
 			{
-				int j = i+(int)(Math.random()*(l-i));
+				int j = i+rand.nextInt(l-i);
 				swap(int,perm[i],perm[j]);
 			}
 			for(i=0;i<=nr_fold;i++)
