@@ -1,6 +1,6 @@
 CC? = gcc
 CXX? = g++
-CFLAGS = -Wall -O3 -g `pkg-config --libs gtk+-2.0`
+CFLAGS = -Wall -O3 -g `pkg-config --cflags gtk+-2.0`
 LIBS = `pkg-config --libs gtk+-2.0`
 
 svm-toy: main.o interface.o callbacks.o ../../svm.o
