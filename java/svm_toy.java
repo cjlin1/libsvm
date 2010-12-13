@@ -372,7 +372,7 @@ public class svm_toy extends Applet {
 	{
 		FileDialog dialog = new FileDialog(new Frame(),"Save",FileDialog.SAVE);
 		dialog.setVisible(true);
-		String filename = dialog.getFile();
+		String filename = dialog.getDirectory() + dialog.getFile();
 		if (filename == null) return;
 		try {
 			DataOutputStream fp = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(filename)));
@@ -390,7 +390,7 @@ public class svm_toy extends Applet {
 	{
 		FileDialog dialog = new FileDialog(new Frame(),"Load",FileDialog.LOAD);
 		dialog.setVisible(true);
-		String filename = dialog.getFile();
+		String filename = dialog.getDirectory() + dialog.getFile();
 		if (filename == null) return;
 		clear_all();
 		try {
