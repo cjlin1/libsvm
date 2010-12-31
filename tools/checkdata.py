@@ -16,7 +16,7 @@ from sys import argv, exit
 import os.path
 
 def err(line_no, msg):
-	print("line %d: %s" % (line_no, msg))
+	print("line {0}: {1}".format(line_no, msg))
 
 # works like float() but does not accept nan and inf
 def my_float(x):
@@ -27,13 +27,13 @@ def my_float(x):
 
 def main():
 	if len(argv) != 2:
-		print("Usage: %s dataset" % (argv[0]))
+		print("Usage: {0} dataset".format(argv[0]))
 		exit(1)
 
 	dataset = argv[1]
 
 	if not os.path.exists(dataset):
-		print("dataset %s not found" % (dataset))
+		print("dataset {0} not found".format(dataset))
 		exit(1)
 
 	line_no = 1
@@ -58,13 +58,13 @@ def main():
 					for l in label.split(','):
 						l = my_float(l)
 				except:
-					err(line_no, "label %s is not a valid multi-label form" % label)
+					err(line_no, "label {0} is not a valid multi-label form".format(label))
 					line_error = True
 			else:
 				try:
 					label = my_float(label)
 				except:
-					err(line_no, "label %s is not a number" % label)
+					err(line_no, "label {0} is not a number".format(label))
 					line_error = True
 		except:
 			err(line_no, "missing label, perhaps an empty line?")
@@ -82,14 +82,14 @@ def main():
 				# precomputed kernel's index starts from 0 and LIBSVM
 				# checks it. Hence, don't treat index 0 as an error.
 				if index < 0:
-					err(line_no, "feature index must be positive; wrong feature %s" % nodes[i])
+					err(line_no, "feature index must be positive; wrong feature {0}".format(nodes[i]))
 					line_error = True
 				elif index < prev_index:
-					err(line_no, "feature indices must be in an ascending order, previous/current features %s %s" % (nodes[i-1], nodes[i]))
+					err(line_no, "feature indices must be in an ascending order, previous/current features {0} {1}".format(nodes[i-1], nodes[i]))
 					line_error = True
 				prev_index = index
 			except:
-				err(line_no, "feature '%s' not an <index>:<value> pair, <index> integer, <value> real number " % nodes[i])
+				err(line_no, "feature '{0}' not an <index>:<value> pair, <index> integer, <value> real number ".format(nodes[i]))
 				line_error = True
 
 		line_no += 1
@@ -98,7 +98,7 @@ def main():
 			error_line_count += 1
 	
 	if error_line_count > 0:
-		print("Found %d lines with error." % (error_line_count))
+		print("Found {0} lines with error.".format(error_line_count))
 		return 1
 	else:
 		print("No error.")

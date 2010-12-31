@@ -10,7 +10,7 @@ rest_filename = ""
 
 def exit_with_help():
 	print("""\
-Usage: %s [options] dataset number [output1] [output2]
+Usage: {0} [options] dataset number [output1] [output2]
 
 This script selects a subset of the given dataset.
 
@@ -21,7 +21,7 @@ options:
 
 output1 : the subset (optional)
 output2 : rest of the data (optional)
-If output1 is omitted, the subset will be printed on the screen.""" % argv[0])
+If output1 is omitted, the subset will be printed on the screen.""".format(argv[0]))
 	exit(1)
 
 def process_options():
@@ -40,7 +40,7 @@ def process_options():
 			i = i + 1
 			method = int(argv[i])
 			if method < 0 or method > 1:
-				print("Unknown selection method %d" % (method))
+				print("Unknown selection method {0}".format(method))
 				exit_with_help()
 		i = i + 1
 
@@ -132,8 +132,8 @@ def main():
 Warning:
 1. You may have regression data. Please use -s 1.
 2. Classification data unbalanced or too small. We select at least 1 per class.
-   The subset thus contains %d instances.
-""" % (n+warning))
+   The subset thus contains {0} instances.
+""".format(n+warning))
 
 	# cleanup
 	f.close()

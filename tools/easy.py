@@ -5,7 +5,7 @@ import os
 from subprocess import *
 
 if len(sys.argv) <= 1:
-	print('Usage: %s training_file [testing_file]' % sys.argv[0])
+	print('Usage: {0} training_file [testing_file]'.format(sys.argv[0]))
 	raise SystemExit
 
 # svm, grid, and gnuplot executable files
@@ -45,11 +45,11 @@ if len(sys.argv) > 2:
 	scaled_test_file = file_name + ".scale"
 	predict_test_file = file_name + ".predict"
 
-cmd = '%s -s "%s" "%s" > "%s"' % (svmscale_exe, range_file, train_pathname, scaled_file)
+cmd = '{0} -s "{1}" "{2}" > "{3}"'.format(svmscale_exe, range_file, train_pathname, scaled_file)
 print('Scaling training data...')
 Popen(cmd, shell = True, stdout = PIPE).communicate()	
 
-cmd = '%s -svmtrain "%s" -gnuplot "%s" "%s"' % (grid_py, svmtrain_exe, gnuplot_exe, scaled_file)
+cmd = '{0} -svmtrain "{1}" -gnuplot "{2}" "{3}"'.format(grid_py, svmtrain_exe, gnuplot_exe, scaled_file)
 print('Cross validation...')
 f = Popen(cmd, shell = True, stdout = PIPE).stdout
 
@@ -60,20 +60,20 @@ while True:
 	if not line: break
 c,g,rate = map(float,last_line.split())
 
-print('Best c=%s, g=%s CV rate=%s' % (c,g,rate))
+print('Best c={0}, g={1} CV rate={2}'.format(c,g,rate))
 
-cmd = '%s -c %s -g %s "%s" "%s"' % (svmtrain_exe,c,g,scaled_file,model_file)
+cmd = '{0} -c {1} -g {2} "{3}" "{4}"'.format(svmtrain_exe,c,g,scaled_file,model_file)
 print('Training...')
 Popen(cmd, shell = True, stdout = PIPE).communicate()
 
-print('Output model: %s' % model_file)
+print('Output model: {0}'.format(model_file))
 if len(sys.argv) > 2:
-	cmd = '%s -r "%s" "%s" > "%s"' % (svmscale_exe, range_file, test_pathname, scaled_test_file)
+	cmd = '{0} -r "{1}" "{2}" > "{3}"'.format(svmscale_exe, range_file, test_pathname, scaled_test_file)
 	print('Scaling testing data...')
 	Popen(cmd, shell = True, stdout = PIPE).communicate()	
 
-	cmd = '%s "%s" "%s" "%s"' % (svmpredict_exe, scaled_test_file, model_file, predict_test_file)
+	cmd = '{0} "{1}" "{2}" "{3}"'.format(svmpredict_exe, scaled_test_file, model_file, predict_test_file)
 	print('Testing...')
 	Popen(cmd, shell = True).communicate()	
 
-	print('Output prediction: %s' % predict_test_file)
+	print('Output prediction: {0}'.format(predict_test_file))

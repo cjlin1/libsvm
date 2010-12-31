@@ -58,8 +58,8 @@ Usage: grid.py [-log2c begin,end,step] [-log2g begin,end,step] [-v fold]
 
     dataset_pathname = argv[-1]
     dataset_title = os.path.split(dataset_pathname)[1]
-    out_filename = '%s.out' % dataset_title
-    png_filename = '%s.png' % dataset_title
+    out_filename = '{0}.out'.format(dataset_title)
+    png_filename = '{0}.png'.format(dataset_title)
     pass_through_options = []
 
     i = 1
@@ -133,31 +133,31 @@ def redraw(db,best_param,tofile=False):
     best_log2c,best_log2g,best_rate = best_param
 
     if tofile:
-        gnuplot.write( "set term png transparent small\n".encode())
-        gnuplot.write( ("set output \"%s\"\n" % png_filename.replace('\\','\\\\')).encode())
-        #gnuplot.write("set term postscript color solid\n".encode())
-        #gnuplot.write(("set output \"%s.ps\"\n" % dataset_title).encode())
+        gnuplot.write( b"set term png transparent small\n")
+        gnuplot.write( "set output \"{0}\"\n".format(png_filename.replace('\\','\\\\')).encode())
+        #gnuplot.write(b"set term postscript color solid\n")
+        #gnuplot.write("set output \"{0}.ps\"\n".format(dataset_title).encode().encode())
     elif is_win32:
-        gnuplot.write("set term windows\n".encode())
+        gnuplot.write(b"set term windows\n")
     else:
-        gnuplot.write( "set term x11\n".encode())
-    gnuplot.write("set xlabel \"log2(C)\"\n".encode())
-    gnuplot.write("set ylabel \"log2(gamma)\"\n".encode())
-    gnuplot.write(("set xrange [%s:%s]\n" % (c_begin,c_end)).encode())
-    gnuplot.write(("set yrange [%s:%s]\n" % (g_begin,g_end)).encode())
-    gnuplot.write("set contour\n".encode())
-    gnuplot.write(("set cntrparam levels incremental %s,%s,100\n" % (begin_level,step_size)).encode())
-    gnuplot.write("unset surface\n".encode())
-    gnuplot.write("unset ztics\n".encode())
-    gnuplot.write("set view 0,0\n".encode())
-    gnuplot.write(("set title \"%s\"\n" % dataset_title).encode())
-    gnuplot.write("unset label\n".encode())
-    gnuplot.write(("set label \"Best log2(C) = %s  log2(gamma) = %s  accuracy = %s%%\" \
-                  at screen 0.5,0.85 center\n" % \
-                  (best_log2c, best_log2g, best_rate)).encode())
-    gnuplot.write(("set label \"C = %s  gamma = %s\""
-                  " at screen 0.5,0.8 center\n" % (2**best_log2c, 2**best_log2g)).encode())
-    gnuplot.write("splot \"-\" with lines\n".encode())
+        gnuplot.write( b"set term x11\n")
+    gnuplot.write(b"set xlabel \"log2(C)\"\n")
+    gnuplot.write(b"set ylabel \"log2(gamma)\"\n")
+    gnuplot.write("set xrange [{0}:{1}]\n".format(c_begin,c_end).encode())
+    gnuplot.write("set yrange [{0}:{1}]\n".format(g_begin,g_end).encode())
+    gnuplot.write(b"set contour\n")
+    gnuplot.write("set cntrparam levels incremental {0},{1},100\n".format(begin_level,step_size).encode())
+    gnuplot.write(b"unset surface\n")
+    gnuplot.write(b"unset ztics\n")
+    gnuplot.write(b"set view 0,0\n")
+    gnuplot.write("set title \"{0}\"\n".format(dataset_title).encode())
+    gnuplot.write(b"unset label\n")
+    gnuplot.write("set label \"Best log2(C) = {0}  log2(gamma) = {1}  accuracy = {2}%\" \
+                  at screen 0.5,0.85 center\n". \
+                  format(best_log2c, best_log2g, best_rate).encode())
+    gnuplot.write("set label \"C = {0}  gamma = {1}\""
+                  " at screen 0.5,0.8 center\n".format(2**best_log2c, 2**best_log2g).encode())
+    gnuplot.write(b"splot \"-\" with lines\n")
     
 
 
@@ -167,11 +167,11 @@ def redraw(db,best_param,tofile=False):
     prevc = db[0][0]
     for line in db:
         if prevc != line[0]:
-            gnuplot.write("\n".encode())
+            gnuplot.write(b"\n")
             prevc = line[0]
-        gnuplot.write(("%s %s %s\n" % line).encode())
-    gnuplot.write("e\n".encode())
-    gnuplot.write("\n".encode()) # force gnuplot back to prompt when term set failure
+        gnuplot.write("{0[0]} {0[1]} {0[2]}\n".format(line).encode())
+    gnuplot.write(b"e\n")
+    gnuplot.write(b"\n") # force gnuplot back to prompt when term set failure
     gnuplot.flush()
 
 
@@ -215,7 +215,7 @@ class Worker(Thread):
             (cexp,gexp) = self.job_queue.get()
             if cexp is WorkerStopToken:
                 self.job_queue.put((cexp,gexp))
-                # print 'worker %s stop.' % self.name
+                # print('worker {0} stop.'.format(self.name))
                 break
             try:
                 rate = self.run_one(2.0**cexp,2.0**gexp)
@@ -226,14 +226,14 @@ class Worker(Thread):
                 traceback.print_exception(sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
                 
                 self.job_queue.put((cexp,gexp))
-                print('worker %s quit.' % self.name)
+                print('worker {0} quit.'.format(self.name))
                 break
             else:
                 self.result_queue.put((self.name,cexp,gexp,rate))
 
 class LocalWorker(Worker):
     def run_one(self,c,g):
-        cmdline = '%s -c %s -g %s -v %s %s %s' % \
+        cmdline = '{0} -c {1} -g {2} -v {3} {4} {5}'.format \
           (svmtrain_exe,c,g,fold,pass_through_string,dataset_pathname)
         result = Popen(cmdline,shell=True,stdout=PIPE).stdout
         for line in result.readlines():
@@ -246,8 +246,8 @@ class SSHWorker(Worker):
         self.host = host
         self.cwd = os.getcwd()
     def run_one(self,c,g):
-        cmdline = 'ssh -x %s "cd %s; %s -c %s -g %s -v %s %s %s"' % \
-          (self.host,self.cwd,
+        cmdline = 'ssh -x {0} "cd {1}; {2} -c {3} -g {4} -v {5} {6} {7}"'.format \
+          (self.host,self.cwd, \
            svmtrain_exe,c,g,fold,pass_through_string,dataset_pathname)
         result = Popen(cmdline,shell=True,stdout=PIPE).stdout
         for line in result.readlines():
@@ -276,7 +276,7 @@ class TelnetWorker(Worker):
         Worker.run(self)
         tn.write("exit\n")               
     def run_one(self,c,g):
-        cmdline = '%s -c %s -g %s -v %s %s %s' % \
+        cmdline = '{0} -c {1} -g {2} -v {3} {4} {5}'.format \
           (svmtrain_exe,c,g,fold,pass_through_string,dataset_pathname)
         result = self.tn.write(cmdline+'\n')
         (idx,matchm,output) = self.tn.expect(['Cross.*\n'])
@@ -300,6 +300,13 @@ def main():
         for (c,g) in line:
             job_queue.put((c,g))
 
+    # hack the queue to become a stack --
+    # this is important when some thread
+    # failed and re-put a job. It we still
+    # use FIFO, the job will be put
+    # into the end of the queue, and the graph
+    # will only be updated in the end
+ 
     job_queue._put = job_queue.queue.appendleft
 
 
@@ -341,19 +348,19 @@ def main():
             while (c, g) not in done_jobs:
                 (worker,c1,g1,rate) = result_queue.get()
                 done_jobs[(c1,g1)] = rate
-                result_file.write('%s %s %s\n' %(c1,g1,rate))
+                result_file.write('{0} {1} {2}\n'.format(c1,g1,rate))
                 result_file.flush()
                 if (rate > best_rate) or (rate==best_rate and g1==best_g1 and c1<best_c1):
                     best_rate = rate
                     best_c1,best_g1=c1,g1
                     best_c = 2.0**c1
                     best_g = 2.0**g1
-                print("[%s] %s %s %s (best c=%s, g=%s, rate=%s)" % \
+                print("[{0}] {1} {2} {3} (best c={4}, g={5}, rate={6})".format \
 		    (worker,c1,g1,rate, best_c, best_g, best_rate))
             db.append((c,g,done_jobs[(c,g)]))
         redraw(db,[best_c1, best_g1, best_rate])
         redraw(db,[best_c1, best_g1, best_rate],True)
 
     job_queue.put((WorkerStopToken,None))
-    print("%s %s %s" % (best_c, best_g, best_rate))
+    print("{0} {1} {2}".format(best_c, best_g, best_rate))
 main()
