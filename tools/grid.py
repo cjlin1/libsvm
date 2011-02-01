@@ -133,7 +133,7 @@ def redraw(db,best_param,tofile=False):
     best_log2c,best_log2g,best_rate = best_param
 
     if tofile:
-        gnuplot.write( b"set term png transparent small\n")
+        gnuplot.write( "set term png transparent small linewidth 2 medium enhanced\n".encode()
         gnuplot.write( "set output \"{0}\"\n".format(png_filename.replace('\\','\\\\')).encode())
         #gnuplot.write(b"set term postscript color solid\n")
         #gnuplot.write("set output \"{0}.ps\"\n".format(dataset_title).encode().encode())
