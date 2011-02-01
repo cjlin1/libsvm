@@ -157,6 +157,7 @@ def redraw(db,best_param,tofile=False):
                   format(best_log2c, best_log2g, best_rate).encode())
     gnuplot.write("set label \"C = {0}  gamma = {1}\""
                   " at screen 0.5,0.8 center\n".format(2**best_log2c, 2**best_log2g).encode())
+    gnuplot.write("set key at screen 0.9,0.9\n".encode())
     gnuplot.write(b"splot \"-\" with lines\n")
     
 
