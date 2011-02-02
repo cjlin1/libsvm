@@ -133,8 +133,8 @@ def redraw(db,best_param,tofile=False):
     best_log2c,best_log2g,best_rate = best_param
 
     if tofile:
-        gnuplot.write( "set term png transparent small linewidth 2 medium enhanced\n".encode()
-        gnuplot.write( "set output \"{0}\"\n".format(png_filename.replace('\\','\\\\')).encode())
+        gnuplot.write(b"set term png transparent small linewidth 2 medium enhanced\n")
+        gnuplot.write("set output \"{0}\"\n".format(png_filename.replace('\\','\\\\')).encode())
         #gnuplot.write(b"set term postscript color solid\n")
         #gnuplot.write("set output \"{0}.ps\"\n".format(dataset_title).encode().encode())
     elif is_win32:
@@ -157,7 +157,7 @@ def redraw(db,best_param,tofile=False):
                   format(best_log2c, best_log2g, best_rate).encode())
     gnuplot.write("set label \"C = {0}  gamma = {1}\""
                   " at screen 0.5,0.8 center\n".format(2**best_log2c, 2**best_log2g).encode())
-    gnuplot.write("set key at screen 0.9,0.9\n".encode())
+    gnuplot.write(b"set key at screen 0.9,0.9\n")
     gnuplot.write(b"splot \"-\" with lines\n")
     
 
