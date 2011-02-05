@@ -321,9 +321,12 @@ void read_problem(const char *filename)
 		inst_max_index = -1; // strtol gives 0 if wrong format, and precomputed kernel has <index> start from 0
 		readline(fp);
 		prob.x[i] = &x_space[j];
-		label = strtok(line," \t");
+		label = strtok(line," \t\n");
+		if(label == NULL) // empty line
+			exit_input_error(i+1);
+
 		prob.y[i] = strtod(label,&endptr);
-		if(endptr == label)
+		if(endptr == label || *endptr != '\0')
 			exit_input_error(i+1);
 
 		while(1)
