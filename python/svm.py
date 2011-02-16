@@ -3,6 +3,7 @@
 from ctypes import *
 from ctypes.util import find_library
 import sys
+import os
 
 # For unix the prefix 'lib' is not considered.
 if find_library('svm'):
@@ -11,9 +12,11 @@ elif find_library('libsvm'):
 	libsvm = CDLL(find_library('libsvm'))
 else:
 	if sys.platform == 'win32':
-		libsvm = CDLL('../windows/libsvm.dll')
+		libsvm = CDLL(os.path.join(os.path.dirname(__file__),\
+				'../windows/libsvm.dll'))
 	else:
-		libsvm = CDLL('../libsvm.so.2')
+		libsvm = CDLL(os.path.join(os.path.dirname(__file__),\
+				'../libsvm.so.2'))
 
 # Construct constants
 SVM_TYPE = ['C_SVC', 'NU_SVC', 'ONE_CLASS', 'EPSILON_SVR', 'NU_SVR' ]
