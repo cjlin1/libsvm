@@ -23,6 +23,7 @@ Table of Contents
 - Java Version
 - Building Windows Binaries
 - Additional Tools: Sub-sampling, Parameter Selection, Format checking, etc.
+- MATLAB/OCTAVE Interface
 - Python Interface
 - Additional Information
 
@@ -704,6 +705,11 @@ in libsvm FAQ.
 ============================================================================
 
 See the README file in the tools directory.
+
+MATLAB/OCTAVE Interface
+=======================
+
+Please check the file README in the directory `matlab'.
 
 Python Interface
 ================
