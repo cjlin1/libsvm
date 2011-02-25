@@ -9,8 +9,8 @@ Table of Contents
 - Installation
 - Usage
 - Returned Model Structure
-- Examples
 - Other Utilities
+- Examples
 - Additional Information
 
 
@@ -134,20 +134,41 @@ indicating the probability that the testing instance is in each class.
 Note that the order of classes here is the same as 'Label' field
 in the model structure.
 
+Other Utilities
+===============
+
+A matlab function libsvmread reads files in LIBSVM format: 
+
+[label_vector, instance_matrix] = libsvmread('data.txt'); 
+
+Two outputs are labels and instances, which can then be used as inputs
+of svmtrain or svmpredict. 
+
+A matlab function libsvmwrite writes Matlab matrix to a file in LIBSVM format:
+
+libsvmwrite('data.txt', label_vector, instance_matrix]
+
+The instance_matrix must be a sparse matrix. (type must be double)
+For windows, `libsvmread.mexw32' and `libsvmwrite.mexw32' are ready in 
+the directory `..\windows'.
+
+These codes are prepared by Rong-En Fan and Kai-Wei Chang from National
+Taiwan University.
+
 Examples
 ========
 
 Train and test on the provided data heart_scale:
 
-matlab> load heart_scale.mat
+matlab> [heart_scale_label, heart_scale_inst] = libsvmread('../heart_scale');
 matlab> model = svmtrain(heart_scale_label, heart_scale_inst, '-c 1 -g 0.07');
 matlab> [predict_label, accuracy, dec_values] = svmpredict(heart_scale_label, heart_scale_inst, model); % test the training data
 
 For probability estimates, you need '-b 1' for training and testing:
 
-matlab> load heart_scale.mat
+matlab> [heart_scale_label, heart_scale_inst] = libsvmread('../heart_scale');
 matlab> model = svmtrain(heart_scale_label, heart_scale_inst, '-c 1 -g 0.07 -b 1');
-matlab> load heart_scale.mat
+matlab> [heart_scale_label, heart_scale_inst] = libsvmread('../heart_scale');
 matlab> [predict_label, accuracy, prob_estimates] = svmpredict(heart_scale_label, heart_scale_inst, model, '-b 1');
 
 To use precomputed kernel, you must include sample serial number as
@@ -163,7 +184,7 @@ We give the following detailed example by splitting heart_scale into
 matrix and then using the precomputed kernel gives exactly the same
 testing error as using the LIBSVM built-in linear kernel.
 
-matlab> load heart_scale.mat
+matlab> [heart_scale_label, heart_scale_inst] = libsvmread('../heart_scale');
 matlab>
 matlab> % Split Data
 matlab> train_data = heart_scale_inst(1:150,:);
@@ -186,27 +207,6 @@ Note that for testing, you can put anything in the
 testing_label_vector.  For more details of precomputed kernels, please
 read the section ``Precomputed Kernels'' in the README of the LIBSVM
 package.
-
-Other Utilities
-===============
-
-A matlab function libsvmread reads files in LIBSVM format: 
-
-[label_vector, instance_matrix] = libsvmread('data.txt'); 
-
-Two outputs are labels and instances, which can then be used as inputs
-of svmtrain or svmpredict. 
-
-A matlab function libsvmwrite writes Matlab matrix to a file in LIBSVM format:
-
-libsvmwrite('data.txt', label_vector, instance_matrix]
-
-The instance_matrix must be a sparse matrix. (type must be double)
-For windows, `libsvmread.mexw32' and `libsvmwrite.mexw32' are ready in 
-the directory `..\windows'.
-
-These codes are prepared by Rong-En Fan and Kai-Wei Chang from National
-Taiwan University.
 
 Additional Information
 ======================
