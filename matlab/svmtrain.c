@@ -15,6 +15,7 @@ typedef int mwIndex;
 #define Malloc(type,n) (type *)malloc((n)*sizeof(type))
 
 void print_null(const char *s) {}
+void print_string_matlab(const char *s) {mexPrintf(s);}
 
 void exit_with_help()
 {
@@ -107,7 +108,7 @@ int parse_command_line(int nrhs, const mxArray *prhs[], char *model_file_name)
 	int i, argc = 1;
 	char cmd[CMD_LEN];
 	char *argv[CMD_LEN/2];
-	void (*print_func)(const char *) = NULL;	// default printing to stdout
+	void (*print_func)(const char *) = print_string_matlab;	// default printing to matlab display
 
 	// default values
 	param.svm_type = C_SVC;

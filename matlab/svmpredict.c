@@ -326,7 +326,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
 		else
 		{
 			if(svm_check_probability_model(model)!=0)
-				printf("Model supports probability estimates, but disabled in predicton.\n");
+				mexPrintf("Model supports probability estimates, but disabled in predicton.\n");
 		}
 
 		predict(plhs, prhs, model, prob_estimate_flag);
