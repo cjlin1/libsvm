@@ -2928,12 +2928,6 @@ void svm_free_and_destroy_model(svm_model** model_ptr_ptr)
 	}
 }
 
-void svm_destroy_model(svm_model* model_ptr)
-{
-	fprintf(stderr,"warning: svm_destroy_model is deprecated and should not be used. Please use svm_free_and_destroy_model(svm_model **model_ptr_ptr)\n");
-	svm_free_and_destroy_model(&model_ptr);
-}
-
 void svm_destroy_param(svm_parameter* param)
 {
 	free(param->weight_label);
