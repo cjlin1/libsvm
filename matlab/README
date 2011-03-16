@@ -37,10 +37,12 @@ To use Octave, type 'make octave':
 Example:
 	linux> make octave
 
-On Windows systems, pre-built 'svmtrain.mexw32' and 'svmpredict.mexw32' are
-already in the directory `..\windows', so no need to conduct installation. If you
-have modified the sources and would like to re-build the package, type
-'mex -setup' in MATLAB to choose a compiler for mex first. Then type
+On Windows systems, pre-built binary files are already in the directory 
+`..\windows', so no need to conduct installation. Now we include both
+32bit binary files and 64bit binary files, but in future releases, we 
+will provide binary files only for 64bit MATLAB on Windows. If you have 
+modified the sources and would like to re-build the package, type 
+'mex -setup' in MATLAB to choose a compiler for mex first. Then type 
 'make' to start the installation.
 
 Example:
@@ -149,8 +151,9 @@ A matlab function libsvmwrite writes Matlab matrix to a file in LIBSVM format:
 libsvmwrite('data.txt', label_vector, instance_matrix]
 
 The instance_matrix must be a sparse matrix. (type must be double)
-For windows, `libsvmread.mexw32' and `libsvmwrite.mexw32' are ready in 
-the directory `..\windows'.
+For 32bit and 64bit MATLAB on Windows, pre-built binary files are ready 
+in the directory `..\windows', but in future releases, we will only 
+include 64bit MATLAB binary files.
 
 These codes are prepared by Rong-En Fan and Kai-Wei Chang from National
 Taiwan University.
