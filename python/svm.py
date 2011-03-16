@@ -200,6 +200,18 @@ class svm_parameter(Structure):
 			self.weight_label[i] = weight_label[i]
 
 class svm_model(Structure):
+	_fields_ = [('param', svm_parameter),
+		('nr_class', c_int),
+		('l', c_int),
+		('SV', POINTER(POINTER(svm_node))),
+		('sv_coef', POINTER(POINTER(c_double))),
+		('rho', POINTER(c_double)),
+		('probA', POINTER(c_double)),
+		('probB', POINTER(c_double)),
+		('label', POINTER(c_int)),
+		('nSV', POINTER(c_int)),
+		('free_sv', c_int)]
+
 	def __init__(self):
 		self.__createfrom__ = 'python'
 
@@ -225,6 +237,25 @@ class svm_model(Structure):
 
 	def is_probability_model(self):
 		return (libsvm.svm_check_probability_model(self) == 1)
+
+	def get_sv_coef(self):
+		return [tuple(self.sv_coef[j][i] for j in xrange(self.nr_class - 1))
+				for i in xrange(self.l)]
+
+	def get_SV(self):
+		result = []
+		for sparse_sv in self.SV[:self.l]:
+			row = dict()
+			
+			i = 0
+			while True:
+				row[sparse_sv[i].index] = sparse_sv[i].value
+				if sparse_sv[i].index == -1:
+					break
+				i += 1
+
+			result.append(row)
+		return result
 
 def toPyModel(model_ptr):
 	"""
