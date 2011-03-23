@@ -200,17 +200,13 @@ class svm_parameter(Structure):
 			self.weight_label[i] = weight_label[i]
 
 class svm_model(Structure):
-	_fields_ = [('param', svm_parameter),
-		('nr_class', c_int),
-		('l', c_int),
-		('SV', POINTER(POINTER(svm_node))),
-		('sv_coef', POINTER(POINTER(c_double))),
-		('rho', POINTER(c_double)),
-		('probA', POINTER(c_double)),
-		('probB', POINTER(c_double)),
-		('label', POINTER(c_int)),
-		('nSV', POINTER(c_int)),
-		('free_sv', c_int)]
+	_names = ['param', 'nr_class', 'l', 'SV', 'sv_coef', 'rho',
+			'probA', 'probB', 'label', 'nSV', 'free_sv']
+	_types = [svm_parameter, c_int, c_int, POINTER(POINTER(svm_node)),
+			POINTER(POINTER(c_double)), POINTER(c_double),
+			POINTER(c_double), POINTER(c_double), POINTER(c_int),
+			POINTER(c_int), c_int]
+	_fields_ = genFields(_names, _types)
 
 	def __init__(self):
 		self.__createfrom__ = 'python'

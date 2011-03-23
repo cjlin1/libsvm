@@ -97,10 +97,12 @@ functions. The usage is similar to LIBSVM MATLAB interface.
 Data Structures
 ===============
 
-Three data structures derived from svm.h are svm_node, svm_problem, and
-svm_parameter. They all contain fields with the same names in
-svm.h. Access these fields carefully because you directly use a C structure
-instead of a Python object. The following description introduces additional
+Four data structures derived from svm.h are svm_node, svm_problem, svm_parameter, 
+and svm_model. They all contain fields with the same names in svm.h. Access 
+these fields carefully because you directly use a C structure instead of a 
+Python object. For svm_model, accessing the field directly is not recommanded. 
+Programmers should use the interface functions or methods of svm_model class
+in Python to get the values. The following description introduces additional
 fields and methods.
 
 Before using the data structures, execute the following command to load the
@@ -195,6 +197,8 @@ LIBSVM shared library:
     >>> svr_probability = model.get_svr_probability()
     >>> class_labels = model.get_labels()
     >>> is_prob_model = model.is_probability_model()
+    >>> support_vector_coefficients = model.get_sv_coef()
+    >>> support_vectors = model.get_SV() 
 
 Utility Functions
 =================
