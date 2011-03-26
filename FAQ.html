@@ -7,15 +7,15 @@
 <a name="_TOP"><b><h1><a
 href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a>  FAQ </h1></b></a>
 <b>last modified : </b>
-Mon, 29 Mar 2010 12:08:25 GMT
+Sun, 13 Mar 2011 13:30:52 GMT
 <class="categories">
 <li><a
-href="#_TOP">All Questions</a>(76)</li>
+href="#_TOP">All Questions</a>(74)</li>
 <ul><b>
 <li><a
 href="#/Q1:_Some_sample_uses_of_libsvm">Q1:_Some_sample_uses_of_libsvm</a>(2)</li>
 <li><a
-href="#/Q2:_Installation_and_running_the_program">Q2:_Installation_and_running_the_program</a>(10)</li>
+href="#/Q2:_Installation_and_running_the_program">Q2:_Installation_and_running_the_program</a>(12)</li>
 <li><a
 href="#/Q3:_Data_preparation">Q3:_Data_preparation</a>(7)</li>
 <li><a
@@ -27,7 +27,7 @@ href="#/Q6:_Graphic_interface">Q6:_Graphic_interface</a>(3)</li>
 <li><a
 href="#/Q7:_Java_version_of_libsvm">Q7:_Java_version_of_libsvm</a>(4)</li>
 <li><a
-href="#/Q8:_Python_interface">Q8:_Python_interface</a>(5)</li>
+href="#/Q8:_Python_interface">Q8:_Python_interface</a>(1)</li>
 <li><a
 href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(9)</li>
 </b></ul>
@@ -35,10 +35,10 @@ href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(9)</li>
 
 <ul><ul class="headlines">
 <li class="headlines_item"><a href="#faq101">Some courses which have used libsvm as a tool</a></li>
-<li class="headlines_item"><a href="#faq102">Some applications which have used libsvm </a></li>
+<li class="headlines_item"><a href="#faq102">Some applications/tools which have used libsvm </a></li>
 <li class="headlines_item"><a href="#f201">Where can I find documents of libsvm ?</a></li>
 <li class="headlines_item"><a href="#f202">Where are change log and earlier versions?</a></li>
-<li class="headlines_item"><a href="#f203">I would like to cite LIBSVM. Which paper should I cite?   </a></li>
+<li class="headlines_item"><a href="#f203">How to cite LIBSVM?</a></li>
 <li class="headlines_item"><a href="#f204">I would like to use libsvm in my software. Is there any license problem?</a></li>
 <li class="headlines_item"><a href="#f205">Is there a repository of additional tools based on libsvm?</a></li>
 <li class="headlines_item"><a href="#f206">On unix machines, I got "error in loading shared libraries" or "cannot open shared object file." What happened ? </a></li>
@@ -46,6 +46,8 @@ href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(9)</li>
 <li class="headlines_item"><a href="#f208">I am an MS windows user but why only one (svm-toy) of those precompiled .exe actually runs ?  </a></li>
 <li class="headlines_item"><a href="#f209">What is the difference between "." and "*" outputed during training? </a></li>
 <li class="headlines_item"><a href="#f210">Why occasionally the program (including MATLAB or other interfaces) crashes and gives a segmentation fault?</a></li>
+<li class="headlines_item"><a href="#f211">How to build a dynamic library (.dll file) on MS windows?</a></li>
+<li class="headlines_item"><a href="#f212">On some systems (e.g., Ubuntu), compiling LIBSVM gives many warning messages. Is this a problem and how to disable the warning message?</a></li>
 <li class="headlines_item"><a href="#f301">Why sometimes not all attributes of a data appear in the training/model files ?</a></li>
 <li class="headlines_item"><a href="#f302">What if my data are non-numerical ?</a></li>
 <li class="headlines_item"><a href="#f303">Why do you consider sparse format ? Will the training of dense data be much slower ?</a></li>
@@ -71,12 +73,12 @@ href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(9)</li>
 <li class="headlines_item"><a href="#f415">How do I get the decision value(s)?</a></li>
 <li class="headlines_item"><a href="#f4151">How do I get the distance between a point and the hyperplane?</a></li>
 <li class="headlines_item"><a href="#f416">On 32-bit machines, if I use a large cache (i.e. large -m) on a linux machine, why sometimes I get "segmentation fault ?"</a></li>
-<li class="headlines_item"><a href="#f417">How do I disable screen output of svm-train and svm-predict ?</a></li>
-<li class="headlines_item"><a href="#f418">I would like to use my own kernel but find out that there are two subroutines for kernel evaluations: k_function() and kernel_function(). Which one should I modify ?</a></li>
+<li class="headlines_item"><a href="#f417">How do I disable screen output of svm-train?</a></li>
+<li class="headlines_item"><a href="#f418">I would like to use my own kernel. Any example? In svm.cpp, there are two subroutines for kernel evaluations: k_function() and kernel_function(). Which one should I modify ?</a></li>
 <li class="headlines_item"><a href="#f419">What method does libsvm use for multi-class SVM ? Why don't you use the "1-against-the rest" method ?</a></li>
 <li class="headlines_item"><a href="#f420">After doing cross validation, why there is no model file outputted ?</a></li>
 <li class="headlines_item"><a href="#f4201">Why my cross-validation results are different from those in the Practical Guide?</a></li>
-<li class="headlines_item"><a href="#f421">But on some systems CV accuracy is the same in several runs. How could I use different data partitions?</a></li>
+<li class="headlines_item"><a href="#f421">On some systems CV accuracy is the same in several runs. How could I use different data partitions? In other words, how do I set random seed in LIBSVM?</a></li>
 <li class="headlines_item"><a href="#f422">I would like to solve L2-loss SVM (i.e., error term is quadratic). How should I modify the code ?</a></li>
 <li class="headlines_item"><a href="#f424">How do I choose parameters for one-class svm as training data are in only one class?</a></li>
 <li class="headlines_item"><a href="#f427">Why the code gives NaN (not a number) results?</a></li>
@@ -96,11 +98,7 @@ href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(9)</li>
 <li class="headlines_item"><a href="#f602">Is the Java version significantly slower than the C++ version?</a></li>
 <li class="headlines_item"><a href="#f603">While training I get the following error message: java.lang.OutOfMemoryError. What is wrong?</a></li>
 <li class="headlines_item"><a href="#f604">Why you have the main source file svm.m4 and then transform it to svm.java?</a></li>
-<li class="headlines_item"><a href="#f702">On MS windows, why does python fail to load the pyd file?</a></li>
-<li class="headlines_item"><a href="#f703">How to modify the python interface on MS windows and rebuild the .pyd file ?</a></li>
 <li class="headlines_item"><a href="#f704">Except the python-C++ interface provided, could I use Jython to call libsvm ?</a></li>
-<li class="headlines_item"><a href="#f705">How could I install the python interface on Mac OS? </a></li>
-<li class="headlines_item"><a href="#f706">I typed "make" on a unix system, but it says "Python.h: No such file or directory?"</a></li>
 <li class="headlines_item"><a href="#f801">I compile the MATLAB interface without problem, but why errors occur while running it?</a></li>
 <li class="headlines_item"><a href="#f8011">On 64bit Windows I compile the MATLAB interface without problem, but why errors occur while running it?</a></li>
 <li class="headlines_item"><a href="#f802">Does the MATLAB interface provide a function to do scaling?</a></li>
@@ -155,8 +153,9 @@ summer school, University of Chicago, 2005.
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q1:_Some_sample_uses_of_libsvm"></a>
-<a name="faq102"><b>Q: Some applications which have used libsvm </b></a>
+<a name="faq102"><b>Q: Some applications/tools which have used libsvm </b></a>
 <br/>                                                                                
+(and maybe liblinear).
 <ul>
 <li>
 <a href=http://people.csail.mit.edu/jjl/libpmk/>LIBPMK: A Pyramid Match Toolkit</a>
@@ -173,11 +172,14 @@ SOLpro: protein solubility predictor
 </a>
 </li>
 <li>
-<a href=http://icb.med.cornell.edu/wiki/index.php/BDVAL>
-BDVAL</a>: biomarker discovery in high-throughput datasets.
+<a href=http://bdval.campagnelab.org>
+BDVal</a>: biomarker discovery in high-throughput datasets.
 </li>
 <li><a href=http://johel.m.free.fr/demo_045.htm>
 Realtime object recognition</a>
+</li>
+<li><a href=http://scikit-learn.sourceforge.net/>
+scikits.learn: machine learning in Python</a>
 </li>
 </ul>
 <p align="right">
@@ -187,17 +189,31 @@ Realtime object recognition</a>
 <a name="f201"><b>Q: Where can I find documents of libsvm ?</b></a>
 <br/>                                                                                
 <p>
-In the package there is a README file which 
-details all options, data format, and library calls.
-The model selection tool and the python interface
-have a separate README under the directory python.
-The guide
+
+<ul>
+<li>
+Official implementation document:
+<br>
+C.-C. Chang and
+C.-J. Lin.
+<a href="http://www.csie.ntu.edu.tw/~cjlin/papers/libsvm.pdf">LIBSVM
+: a library for support vector machines.
+</a>
+
+<li> Instructions for using LIBSVM are in the README files of some directories
+<br>
+README in the main directory: details all options, data format, and library calls.
+<br>
+tools/README: parameter selection and other tools
+<li>
+A guide for beginners:
+<br>
+C.-W. Hsu, C.-C. Chang, and
+C.-J. Lin.
 <A HREF="http://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf">
 A practical guide to support vector classification
-</A> shows beginners how to train/test their data.
-The paper <a href="http://www.csie.ntu.edu.tw/~cjlin/papers/libsvm.pdf">LIBSVM
-: a library for support vector machines</a> discusses the implementation of
-libsvm in detail.
+</A> 
+</ul>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
@@ -212,7 +228,7 @@ libsvm in detail.
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q2:_Installation_and_running_the_program"></a>
-<a name="f203"><b>Q: I would like to cite LIBSVM. Which paper should I cite?   </b></a>
+<a name="f203"><b>Q: How to cite LIBSVM?</b></a>
 <br/>                                                                                
 <p>
 Please cite the following document:
@@ -241,6 +257,16 @@ The libsvm license ("the modified BSD license")
 is compatible with many
 free software licenses such as GPL. Hence, it is very easy to
 use libsvm in your software.
+Please check the COPYRIGHT file in detail. Basically
+you need to 
+<ol>
+<li>
+Clearly indicate that LIBSVM is used.
+</li>
+<li>
+Retain the LIBSVM COPYRIGHT file in your software.
+</li>
+</ol>
 It can also be used in commercial products.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
@@ -325,6 +351,60 @@ program still crashes.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
+  <a name="/Q2:_Installation_and_running_the_program"></a>
+<a name="f211"><b>Q: How to build a dynamic library (.dll file) on MS windows?</b></a>
+<br/>                                                                                
+<p>
+
+The easiest way is to use Makefile.win.
+See details in README.
+
+Alternatively, you can use Visual C++. Here is 
+the example using Visual Studio .Net 2008:
+<ol>
+<li>Create a Win32 empty DLL project and set (in Project->$Project_Name
+Properties...->Configuration) to "Release."
+   About how to create a new dynamic link library, please refer to
+<a href=http://msdn2.microsoft.com/en-us/library/ms235636(VS.80).aspx>http://msdn2.microsoft.com/en-us/library/ms235636(VS.80).aspx</a>
+
+<li> Add svm.cpp, svm.h to your project.
+<li> Add __WIN32__ and _CRT_SECURE_NO_DEPRECATE to Preprocessor definitions (in
+Project->$Project_Name Properties...->C/C++->Preprocessor)
+<li> Set Create/Use Precompiled Header to Not Using Precompiled Headers
+(in Project->$Project_Name Properties...->C/C++->Precompiled Headers)
+<li> Set the path for the Modulation Definition File svm.def (in 
+Project->$Project_Name Properties...->Linker->input
+<li> Build the DLL.
+<li> Rename the dll file to libsvm.dll and move it to the correct path.
+</ol>
+
+
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q2:_Installation_and_running_the_program"></a>
+<a name="f212"><b>Q: On some systems (e.g., Ubuntu), compiling LIBSVM gives many warning messages. Is this a problem and how to disable the warning message?</b></a>
+<br/>                                                                                
+
+<p>
+The warning message is like
+<pre>
+svm.cpp:2730: warning: ignoring return value of int fscanf(FILE*, const char*, ...), declared with attribute warn_unused_result
+</pre>
+but this is not a problem. In the future we may modify the code
+so that these messages do not appear.
+At this moment, to disable the warning message you can replace
+<pre>
+CFLAGS = -Wall -Wconversion -O3 -fPIC
+</pre>
+with
+<pre>
+CFLAGS = -Wall -Wconversion -O3 -fPIC -U_FORTIFY_SOURCE
+</pre>
+in Makefile.
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
   <a name="/Q3:_Data_preparation"></a>
 <a name="f301"><b>Q: Why sometimes not all attributes of a data appear in the training/model files ?</b></a>
 <br/>                                                                                
@@ -394,6 +474,15 @@ detailed check, after libsvm 2.85, you can use the python script tools/checkdata
 <br/>                                                                                
 
 <p>
+We don't officially support this. But, cureently LIBSVM
+is able to process data in the following
+format:
+<pre>
+1 1:2 2:1 # your comments
+</pre>
+Note that the character ":" should not appear in your
+comments.
+<!--
 No, for simplicity we don't support that.
 However, you can easily preprocess your data before
 using libsvm. For example,
@@ -409,6 +498,7 @@ cut -d '#' -f 2 < test.txt > test.comments
 svm-predict test.feature train.model test.predicts
 paste -d '#' test.predicts test.comments | sed 's/#/ #/' > test.results
 </pre>
+-->
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
@@ -870,7 +960,7 @@ $ info libc "Malloc Tunable Parameters"
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q4:_Training_and_prediction"></a>
-<a name="f417"><b>Q: How do I disable screen output of svm-train and svm-predict ?</b></a>
+<a name="f417"><b>Q: How do I disable screen output of svm-train?</b></a>
 <br/>                                                                                
 <p>
 For commend-line users, use the -q option:
@@ -912,10 +1002,12 @@ void info(const char *fmt,...)
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q4:_Training_and_prediction"></a>
-<a name="f418"><b>Q: I would like to use my own kernel but find out that there are two subroutines for kernel evaluations: k_function() and kernel_function(). Which one should I modify ?</b></a>
+<a name="f418"><b>Q: I would like to use my own kernel. Any example? In svm.cpp, there are two subroutines for kernel evaluations: k_function() and kernel_function(). Which one should I modify ?</b></a>
 <br/>                                                                                
 <p>
-The reason why we have two functions is as follows:
+An example is "LIBSVM for string data" in LIBSVM Tools.
+<p>
+The reason why we have two functions is as follows.
 For the RBF kernel exp(-g |xi - xj|^2), if we calculate
 xi - xj first and then the norm square, there are 3n operations.
 Thus we consider exp(-g (|xi|^2 - 2dot(xi,xj) +|xj|^2))
@@ -973,7 +1065,7 @@ may be different.
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q4:_Training_and_prediction"></a>
-<a name="f421"><b>Q: But on some systems CV accuracy is the same in several runs. How could I use different data partitions?</b></a>
+<a name="f421"><b>Q: On some systems CV accuracy is the same in several runs. How could I use different data partitions? In other words, how do I set random seed in LIBSVM?</b></a>
 <br/>                                                                                
 <p>
 If you use GNU C library,
@@ -988,6 +1080,22 @@ and in the beginning of the subroutine do_cross_validation(),
 <pre>
 srand(time(0));
 </pre>
+Alternatively, if you are not using GNU C library
+and would like to use a fixed seed, you can have
+<pre>
+srand(1);
+</pre>
+
+<p>
+For Java, the random number generator
+is initialized using the time information.
+So results of two CV runs are different.
+To fix the seed, after version 3.1 (released
+in mid 2011), you can add
+<pre>
+svm.rand.setSeed(0);
+</pre>
+in the main() function of svm_train.java.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
@@ -1019,13 +1127,13 @@ a private variable:
 </pre> 
 In the constructor replace
 <pre>
-	for(int i=0;i<prob.l;i++)
+	for(int i=0;i&lt;prob.l;i++)
 		QD[i]= (Qfloat)(this->*kernel_function)(i,i);
 </pre>
 with
 <pre>
         this->C = param.C;
-	for(int i=0;i<prob.l;i++)
+	for(int i=0;i&lt;prob.l;i++)
 		QD[i]= (Qfloat)(this->*kernel_function)(i,i)+0.5/C;
 </pre>
 Then in the subroutine get_Q, after the for loop, add
@@ -1163,6 +1271,12 @@ of get_Q to:
 		for(i=0;i&lt;l;i++)
 			kvalue[i] = Kernel::k_function(x,model-&gt;SV[i],model-&gt;param);
 </pre>
+For regression, you need a reduction clause for the variable sum:
+<pre>
+#pragma omp parallel for private(i) reduction(+:sum) 
+		for(i=0;i&lt;model->l;i++)
+			sum += sv_coef[i] * Kernel::k_function(x,model&gt;SV[i],model&gt;param);
+</pre>
 
 <p> Then rebuild the package. Kernel evaluations in training/testing will be parallelized. An example of running this modification on
 an 8-core machine using the data set
@@ -1180,7 +1294,16 @@ an 8-core machine using the data set
 %time svm-train -c 16 -g 4 -m 400 ijcnn1
 79.8sec
 </pre>
-For this data, kernel evaluations take 80% of training time.
+For this data, kernel evaluations take 80% of training time. In the above example, we assume you use csh. For bash, use
+<pre>
+export OMP_NUM_THREADS=8
+</pre>
+instead.
+
+<p> For Python interface, you need to add the -lgomp link option:
+<pre>
+$(CXX) -lgomp -shared -dynamiclib svm.o -o libsvm.so.$(SHVER)
+</pre>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
@@ -1390,73 +1513,12 @@ However,  we need some macros (see first 3 lines of svm.m4).
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q8:_Python_interface"></a>
-<a name="f702"><b>Q: On MS windows, why does python fail to load the pyd file?</b></a>
-<br/>                                                                                
-<p>
-It seems the pyd file is version dependent. So far we haven't
-found out a good solution. Please email us if you have any
-good suggestions.
-<p align="right">
-<a href="#_TOP">[Go Top]</a>  
-<hr/>
-  <a name="/Q8:_Python_interface"></a>
-<a name="f703"><b>Q: How to modify the python interface on MS windows and rebuild the .pyd file ?</b></a>
-<br/>                                                                                
-<p>
-
-To modify the interface, follow the instructions given in
-<a href=
-http://www.swig.org/Doc1.3/Python.html#Python>
-http://www.swig.org/Doc1.3/Python.html#Python
-</a>
-
-<p>
-
-If you just want to build .pyd for a different python version,
-after libsvm 2.5, you can easily use the file Makefile.win.
-See details in README.
-
-Alternatively, you can use Visual C++. Here is 
-the example using Visual Studio .Net 2005:
-<ol>
-<li>Create a Win32 DLL project and set (in Project->$Project_Name
-Properties...->Configuration) to "Release."
-   About how to create a new dynamic link library, please refer to
-<a href=http://msdn2.microsoft.com/en-us/library/ms235636(VS.80).aspx>http://msdn2.microsoft.com/en-us/library/ms235636(VS.80).aspx</a>
-
-<li> Add svm.cpp, svmc_wrap.c, pythonXX.lib to your project.
-<li> Add the directories containing Python.h and svm.h to the Additional
-Include Directories(in Project->$Project_Name
-Properties...->C/C++->General)
-<li> Add __WIN32__ to Preprocessor definitions (in
-Project->$Project_Name Properties...->C/C++->Preprocessor)
-<li> Set Create/Use Precompiled Header to Not Using Precompiled Headers
-(in Project->$Project_Name Properties...->C/C++->Precompiled Headers)
-<li> Build the DLL.
-<li> You may have to rename .dll to .pyd 
-</ol>
-
-
-<!--
-There do exist work arounds, however. In
-http://aspn.activestate.com/ASPN/Mail/Message/python-list/983252
-they presented a solution: 1) find the version of python in the
-registry 2) perform LoadLibrary("pythonxx.dll") and 3) resolve the
-reference to functions through GetProcAddress. It is said that SWIG
-may help on this.
-http://mailman.cs.uchicago.edu/pipermail/swig/2001-July/002744.html
-presented a similar example.
--->
-<p align="right">
-<a href="#_TOP">[Go Top]</a>  
-<hr/>
-  <a name="/Q8:_Python_interface"></a>
 <a name="f704"><b>Q: Except the python-C++ interface provided, could I use Jython to call libsvm ?</b></a>
 <br/>                                                                                
 <p> Yes, here are some examples:
 
 <pre>
-$ export CLASSPATH=$CLASSPATH:~/libsvm-2.4/java/libsvm.jar
+$ export CLASSPATH=$CLASSPATH:~/libsvm-2.91/java/libsvm.jar
 $ ./jython
 Jython 2.1a3 on java1.3.0 (JIT: jitc)
 Type "copyright", "credits" or "license" for more information.
@@ -1483,36 +1545,6 @@ Total nSV = 2
 
 </pre>
 
-<p align="right">
-<a href="#_TOP">[Go Top]</a>  
-<hr/>
-  <a name="/Q8:_Python_interface"></a>
-<a name="f705"><b>Q: How could I install the python interface on Mac OS? </b></a>
-<br/>                                                                                
-<p> Instead of 
-LDFLAGS = -shared
-in the Makefile, you need
-<pre>
-LDFLAGS = -framework Python -bundle
-</pre>
-<!-- 
-LDFLAGS = -bundle -flat_namespace -undefined suppress
--->
-
-The problem is that under MacOs there is no "shared libraries."
-Instead they use "dynamic libraries."
-<p align="right">
-<a href="#_TOP">[Go Top]</a>  
-<hr/>
-  <a name="/Q8:_Python_interface"></a>
-<a name="f706"><b>Q: I typed "make" on a unix system, but it says "Python.h: No such file or directory?"</b></a>
-<br/>                                                                                
-<p> 
-Even though you may have python on your
-system, very likely 
-python development tools 
-are not installed. Please check with 
-your system administrator.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
