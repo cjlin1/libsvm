@@ -2440,13 +2440,14 @@ double svm_get_svr_probability(const svm_model *model)
 
 double svm_predict_values(const svm_model *model, const svm_node *x, double* dec_values)
 {
+	int i;
 	if(model->param.svm_type == ONE_CLASS ||
 	   model->param.svm_type == EPSILON_SVR ||
 	   model->param.svm_type == NU_SVR)
 	{
 		double *sv_coef = model->sv_coef[0];
 		double sum = 0;
-		for(int i=0;i<model->l;i++)
+		for(i=0;i<model->l;i++)
 			sum += sv_coef[i] * Kernel::k_function(x,model->SV[i],model->param);
 		sum -= model->rho[0];
 		*dec_values = sum;
@@ -2458,7 +2459,6 @@ double svm_predict_values(const svm_model *model, const svm_node *x, double* dec
 	}
 	else
 	{
-		int i;
 		int nr_class = model->nr_class;
 		int l = model->l;
 		
