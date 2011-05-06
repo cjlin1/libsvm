@@ -64,15 +64,9 @@ so can be any number.  The pair <index>:<value> gives a feature
 (attribute) value: <index> is an integer starting from 1 and <value>
 is a real number. The only exception is the precomputed kernel, where
 <index> starts from 0; see the section of precomputed kernels. Indices
-must be in ASCENDING order. For classification, if the training data
-only contains one class, i.e., all labels are the same, or some classes
-only have one instance and cross-validation is applied, then you will
-see a warning message: `Warning: training data in only one class. 
-See README for details.,' which means the training data is very
-unbalanced. The label in the training data is directly returned when
-testing. Labels in the testing file are only used to calculate 
-accuracy or errors. If they are unknown, just fill the first column 
-with any numbers.
+must be in ASCENDING order. Labels in the testing file are only used
+to calculate accuracy or errors. If they are unknown, just fill the
+first column with any numbers.
 
 A sample classification data included in this package is
 `heart_scale'. To check if your data is in a correct form, use
@@ -83,6 +77,12 @@ data and output the model file `heart_scale.model'. If you have a test
 set called heart_scale.t, then type `svm-predict heart_scale.t
 heart_scale.model output' to see the prediction accuracy. The `output'
 file contains the predicted class labels.
+
+For classification, if training data are in only one class (i.e., all
+labels are the same), then `svm-train' issues a warning message:
+`Warning: training data in only one class. See README for details,'
+which means the training data is very unbalanced. The label in the
+training data is directly returned when testing.
 
 There are some other useful programs in this package.
 
