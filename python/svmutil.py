@@ -226,7 +226,10 @@ def svm_predict(y, x, m, options=""):
 		for xi in x:
 			xi, idx = gen_svm_nodearray(xi)
 			label = libsvm.svm_predict_values(m, xi, dec_values)
-			values = dec_values[:nr_classifier]
+			if(nr_class == 1): 
+				values = [1]
+			else: 
+				values = dec_values[:nr_classifier]
 			pred_labels += [label]
 			pred_values += [values]
 

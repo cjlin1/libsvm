@@ -64,9 +64,15 @@ so can be any number.  The pair <index>:<value> gives a feature
 (attribute) value: <index> is an integer starting from 1 and <value>
 is a real number. The only exception is the precomputed kernel, where
 <index> starts from 0; see the section of precomputed kernels. Indices
-must be in ASCENDING order. Labels in the testing file are only used
-to calculate accuracy or errors. If they are unknown, just fill the
-first column with any numbers.
+must be in ASCENDING order. For classification, if the training data
+only contains one class, i.e., all labels are the same, or some classes
+only have one instance and cross-validation is applied, then you will
+see a warning message: `Warning: training data in only one class. 
+See README for details.,' which means the training data is very
+unbalanced. The label in the training data is directly returned when
+testing. Labels in the testing file are only used to calculate 
+accuracy or errors. If they are unknown, just fill the first column 
+with any numbers.
 
 A sample classification data included in this package is
 `heart_scale'. To check if your data is in a correct form, use
@@ -558,7 +564,8 @@ to classify new data.
     label[0] vs. label[nr_class-1], label[1] vs. label[2], ...,
     label[nr_class-2] vs. label[nr_class-1], where label can be
     obtained from the function svm_get_labels. The returned value is
-    the predicted class for x.
+    the predicted class for x. Note that when nr_class = 1, this 
+    function does not give any decision value.
 
     For a regression model, dec_values[0] and the returned value are
     both the function value of x calculated using the model. For a

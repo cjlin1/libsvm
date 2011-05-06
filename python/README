@@ -280,9 +280,12 @@ The above command loads
            regression).
 
     p_vals: a list of decision values or probability estimates (if '-b 1'
-            is specified). If k is the number of classes, for decision values,
-            each element includes results of predicting k(k-1)/2 binary-class
-            SVMs. For probabilities, each element contains k values indicating
+            is specified). If k is the number of classes in training data, 
+	    for decision values, each element includes results of predicting 
+	    k(k-1)/2 binary-class SVMs. For classification, k = 1 is a 
+	    special case. Decision value [+1] is returned for each testing
+	    instance, instead of an empty list.
+	    For probabilities, each element contains k values indicating
             the probability that the testing instance is in each class.
             Note that the order of classes is the same as the 'model.label'
             field in the model structure.
