@@ -46,8 +46,8 @@ libsvmwrite.$(MEX_EXT):	libsvmwrite.c
 svm_model_matlab.o:     svm_model_matlab.c ../svm.h
 	$(CXX) $(CFLAGS) -c svm_model_matlab.c
 
-../svm.o:
-	cd ../; make svm.o
+../svm.o: ../svm.cpp ../svm.h
+	make -C .. svm.o
 
 clean:
 	rm -f *~ *.o *.mex* *.obj ../svm.o
