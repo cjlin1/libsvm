@@ -1,4 +1,4 @@
 all = lib
 
 lib:
-	cd ..; make lib; cd -
+	make -C .. lib
