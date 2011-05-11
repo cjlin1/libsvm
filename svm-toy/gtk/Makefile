@@ -15,8 +15,8 @@ interface.o: interface.c interface.h
 callbacks.o: callbacks.cpp callbacks.h
 	$(CXX) $(CFLAGS) -c callbacks.cpp
 
-../../svm.o:
-	cd ../..; make svm.o
+../../svm.o: ../../svm.cpp ../../svm.h
+	make -C ../.. svm.o
 
 clean:
 	rm -f *~ callbacks.o svm-toy main.o interface.o callbacks.o ../../svm.o

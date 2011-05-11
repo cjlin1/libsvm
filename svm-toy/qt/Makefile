@@ -9,8 +9,8 @@ svm-toy: svm-toy.cpp svm-toy.moc ../../svm.o
 svm-toy.moc: svm-toy.cpp
 	$(MOC) svm-toy.cpp -o svm-toy.moc
 
-../../svm.o:
-	cd ../..; make svm.o
+../../svm.o: ../../svm.cpp ../../svm.h
+	make -C ../.. svm.o
 
 clean:
 	rm -f *~ svm-toy svm-toy.moc ../../svm.o
