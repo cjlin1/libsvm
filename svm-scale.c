@@ -286,7 +286,7 @@ int main(int argc,char **argv)
 
 	if (new_num_nonzeros > num_nonzeros)
 		fprintf(stderr, 
-			"Warning: original #nonzeros %ld\n"
+			"WARNING: original #nonzeros %ld\n"
 			"         new      #nonzeros %ld\n"
 			"Use -l 0 if many original feature values are zeros\n",
 			num_nonzeros, new_num_nonzeros);

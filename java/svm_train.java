@@ -97,7 +97,7 @@ class svm_train {
 
 		if(error_msg != null)
 		{
-			System.err.print("Error: "+error_msg+"\n");
+			System.err.print("ERROR: "+error_msg+"\n");
 			System.exit(1);
 		}
 
