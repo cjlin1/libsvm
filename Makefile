@@ -5,7 +5,7 @@ SHVER = 2
 all: svm-train svm-predict svm-scale
 
 lib: svm.o
-	$(CXX) -shared -dynamiclib svm.o -o libsvm.so.$(SHVER)
+	$(CXX) -shared -dynamiclib -Wl,-soname,libsvm.so.$(SHVER) svm.o -o libsvm.so.$(SHVER)
 
 svm-predict: svm-predict.c svm.o
 	$(CXX) $(CFLAGS) svm-predict.c svm.o -o svm-predict -lm
