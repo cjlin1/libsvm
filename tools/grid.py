@@ -22,6 +22,7 @@ if not is_win32:
 else:
        # example for windows
        svmtrain_exe = r"..\windows\svm-train.exe"
+       # svmtrain_exe = r"c:\Program Files\libsvm\windows\svm-train.exe" 
        gnuplot_exe = r"c:\tmp\gnuplot\binary\pgnuplot.exe"
 
 # global parameters and their default values
