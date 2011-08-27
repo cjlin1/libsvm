@@ -1,11 +1,13 @@
 #include <stdlib.h>
 #include <string.h>
-#include "svm.h"
+#include "../svm.h"
 
 #include "mex.h"
 
+#ifdef MX_API_VER
 #if MX_API_VER < 0x07030000
 typedef int mwIndex;
+#endif
 #endif
 
 #define NUM_OF_RETURN_FIELD 10

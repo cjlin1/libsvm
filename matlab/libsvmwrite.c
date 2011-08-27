@@ -3,8 +3,10 @@
 #include <string.h>
 #include "mex.h"
 
+#ifdef MX_API_VER
 #if MX_API_VER < 0x07030000
 typedef int mwIndex;
+#endif
 #endif
 
 void exit_with_help()
