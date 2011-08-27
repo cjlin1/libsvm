@@ -2,13 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "svm.h"
+#include "../svm.h"
 
 #include "mex.h"
 #include "svm_model_matlab.h"
 
+#ifdef MX_API_VER
 #if MX_API_VER < 0x07030000
 typedef int mwIndex;
+#endif
 #endif
 
 #define CMD_LEN 2048
