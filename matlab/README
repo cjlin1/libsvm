@@ -24,46 +24,56 @@ the usage and the way of specifying parameters are the same as that of LIBSVM.
 Installation
 ============
 
-On Unix systems, we recommend using GNU g++ as your
-compiler and type 'make' to build 'svmtrain.mexglx' and 'svmpredict.mexglx'.
-Note that we assume your MATLAB is installed in '/usr/local/matlab',
-if not, please change MATLABDIR in Makefile.
+On Windows systems, pre-built binary files are already in the 
+directory '..\windows', so no need to conduct installation. Now we 
+provide binary files only for 64bit MATLAB on Windows. If you would 
+like to re-build the package, please rely on the following steps.
+
+We recommend using make.m on both MATLAB and OCTAVE. Just type 'make'
+to build 'libsvmread.mex', 'libsvmwrite.mex', 'svmtrain.mex', and
+'svmpredict.mex'.
+
+On MATLAB or Octave:
+
+        >> make
+
+If make.m does not work on MATLAB (especially for Windows), try 'mex
+-setup' to choose a suitable compiler for mex. Make sure your compiler
+is accessible and workable. Then type 'make' to start the
+installation.
+
+Example:
+
+	matlab>> mex -setup
+	(ps: MATLAB will show the following messages to setup default compiler.)
+	Please choose your compiler for building external interface (MEX) files:
+	Would you like mex to locate installed compilers [y]/n? y
+	Select a compiler:
+	[1] Microsoft Visual C/C++ version 7.1 in C:\Program Files\Microsoft Visual Studio
+	[0] None
+	Compiler: 1
+	Please verify your choices:
+	Compiler: Microsoft Visual C/C++ 7.1
+	Location: C:\Program Files\Microsoft Visual Studio
+	Are these correct?([y]/n): y
+
+	matlab>> make
+
+On Unix systems, if neither make.m nor 'mex -setup' works, please use
+Makefile and type 'make' in a command window. Note that we assume 
+your MATLAB is installed in '/usr/local/matlab'. If not, please change 
+MATLABDIR in Makefile.
 
 Example:
         linux> make
 
-To use Octave, type 'make octave':
+To use octave, type 'make octave':
 
 Example:
 	linux> make octave
 
-On Windows systems, pre-built binary files are already in the directory 
-`..\windows', so no need to conduct installation. Now we include both
-32bit binary files and 64bit binary files, but in future releases, we 
-will provide binary files only for 64bit MATLAB on Windows. If you have 
-modified the sources and would like to re-build the package, type 
-'mex -setup' in MATLAB to choose a compiler for mex first. Then type 
-'make' to start the installation.
-
-Example:
-        matlab> mex -setup
-        (ps: MATLAB will show the following messages to setup default compiler.)
-        Please choose your compiler for building external interface (MEX) files: 
-        Would you like mex to locate installed compilers [y]/n? y
-        Select a compiler: 
-        [1] Microsoft Visual C/C++ version 7.1 in C:\Program Files\Microsoft Visual Studio 
-        [0] None 
-        Compiler: 1
-        Please verify your choices: 
-        Compiler: Microsoft Visual C/C++ 7.1 
-        Location: C:\Program Files\Microsoft Visual Studio 
-        Are these correct?([y]/n): y
-
-        matlab> make
-
-
-For list of supported/compatible compilers for MATLAB, please check the
-following page:
+For a list of supported/compatible compilers for MATLAB, please check
+the following page:
 
 http://www.mathworks.com/support/compilers/current_release/
 
