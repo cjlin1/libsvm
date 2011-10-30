@@ -232,8 +232,9 @@ Science, National Taiwan University. The current version was prepared
 by Rong-En Fan and Ting-Fan Wu. If you find this tool useful, please
 cite LIBSVM as follows
 
-Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for
-support vector machines, 2001. Software available at
+Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for support
+vector machines. ACM Transactions on Intelligent Systems and
+Technology, 2:27:1--27:27, 2011. Software available at
 http://www.csie.ntu.edu.tw/~cjlin/libsvm
 
 For any question, please contact Chih-Jen Lin <cjlin@csie.ntu.edu.tw>,
