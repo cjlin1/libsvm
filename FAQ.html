@@ -7,10 +7,10 @@
 <a name="_TOP"><b><h1><a
 href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a>  FAQ </h1></b></a>
 <b>last modified : </b>
-Sun, 13 Mar 2011 13:30:52 GMT
+Tue, 11 Oct 2011 13:35:12 GMT
 <class="categories">
 <li><a
-href="#_TOP">All Questions</a>(74)</li>
+href="#_TOP">All Questions</a>(75)</li>
 <ul><b>
 <li><a
 href="#/Q1:_Some_sample_uses_of_libsvm">Q1:_Some_sample_uses_of_libsvm</a>(2)</li>
@@ -29,14 +29,14 @@ href="#/Q7:_Java_version_of_libsvm">Q7:_Java_version_of_libsvm</a>(4)</li>
 <li><a
 href="#/Q8:_Python_interface">Q8:_Python_interface</a>(1)</li>
 <li><a
-href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(9)</li>
+href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(10)</li>
 </b></ul>
 </li>
 
 <ul><ul class="headlines">
 <li class="headlines_item"><a href="#faq101">Some courses which have used libsvm as a tool</a></li>
 <li class="headlines_item"><a href="#faq102">Some applications/tools which have used libsvm </a></li>
-<li class="headlines_item"><a href="#f201">Where can I find documents of libsvm ?</a></li>
+<li class="headlines_item"><a href="#f201">Where can I find documents/videos of libsvm ?</a></li>
 <li class="headlines_item"><a href="#f202">Where are change log and earlier versions?</a></li>
 <li class="headlines_item"><a href="#f203">How to cite LIBSVM?</a></li>
 <li class="headlines_item"><a href="#f204">I would like to use libsvm in my software. Is there any license problem?</a></li>
@@ -108,6 +108,7 @@ href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(9)</li>
 <li class="headlines_item"><a href="#f804">How could I generate the primal variable w of linear SVM?</a></li>
 <li class="headlines_item"><a href="#f805">Is there an OCTAVE interface for libsvm?</a></li>
 <li class="headlines_item"><a href="#f806">How to handle the name conflict between svmtrain in the libsvm matlab interface and that in MATLAB bioinformatics toolbox?</a></li>
+<li class="headlines_item"><a href="#f807">On Windows I got an error message "Invalid MEX-file: Specific module not found" when running the pre-built MATLAB interface in the windows sub-directory. What should I do?</a></li>
 </ul></ul>
 
 
@@ -186,7 +187,7 @@ scikits.learn: machine learning in Python</a>
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q2:_Installation_and_running_the_program"></a>
-<a name="f201"><b>Q: Where can I find documents of libsvm ?</b></a>
+<a name="f201"><b>Q: Where can I find documents/videos of libsvm ?</b></a>
 <br/>                                                                                
 <p>
 
@@ -196,11 +197,15 @@ Official implementation document:
 <br>
 C.-C. Chang and
 C.-J. Lin.
-<a href="http://www.csie.ntu.edu.tw/~cjlin/papers/libsvm.pdf">LIBSVM
+LIBSVM
 : a library for support vector machines.
-</a>
+ACM Transactions on Intelligent
+Systems and Technology, 2:27:1--27:27, 2011.
+<a href="http://www.csie.ntu.edu.tw/~cjlin/papers/libsvm.pdf">pdf</a>, <a href=http://www.csie.ntu.edu.tw/~cjlin/papers/libsvm.ps.gz>ps.gz</a>,
+<a href=http://portal.acm.org/citation.cfm?id=1961199&CFID=29950432&CFTOKEN=30974232>ACM digital lib</a>.
 
-<li> Instructions for using LIBSVM are in the README files of some directories
+
+<li> Instructions for using LIBSVM are in the README files in the main directory and some sub-directories.
 <br>
 README in the main directory: details all options, data format, and library calls.
 <br>
@@ -213,6 +218,9 @@ C.-J. Lin.
 <A HREF="http://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf">
 A practical guide to support vector classification
 </A> 
+<li> An <a href=http://www.youtube.com/watch?v=gePWtNAQcK8>introductory video</a>
+for windows users.
+
 </ul>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
@@ -231,19 +239,24 @@ A practical guide to support vector classification
 <a name="f203"><b>Q: How to cite LIBSVM?</b></a>
 <br/>                                                                                
 <p>
-Please cite the following document:
+Please cite the following paper:
 <p>
 Chih-Chung Chang and Chih-Jen Lin, LIBSVM
-: a library for support vector machines, 2001.
+: a library for support vector machines.
+ACM Transactions on Intelligent Systems and Technology, 2:27:1--27:27, 2011.
 Software available at http://www.csie.ntu.edu.tw/~cjlin/libsvm
 <p>
 The bibtex format is 
 <pre>
-@Manual{CC01a,
-  author =	 {Chih-Chung Chang and Chih-Jen Lin},
-  title =	 {{LIBSVM}: a library for support vector machines},
-  year =	 {2001},
-  note =	 {Software available at \url{http://www.csie.ntu.edu.tw/~cjlin/libsvm}}
+@article{CC01a,
+ author = {Chang, Chih-Chung and Lin, Chih-Jen},
+ title = {{LIBSVM}: A library for support vector machines},
+ journal = {ACM Transactions on Intelligent Systems and Technology},
+ volume = {2},
+ issue = {3},
+ year = {2011},
+ pages = {27:1--27:27},
+ note =	 {Software available at \url{http://www.csie.ntu.edu.tw/~cjlin/libsvm}}
 }
 </pre>
 <p align="right">
@@ -507,16 +520,10 @@ paste -d '#' test.predicts test.comments | sed 's/#/ #/' > test.results
 <br/>                                                                                
 
 <p>
-It depends on your data format.
-We have a simple C code to transfer space/colon
-separated format to libsvm format. Please contact
-us if needed.
-
-<p>
-Alternatively, a simple way is to use
+It depends on your data format. A simple way is to use
 libsvmwrite in the libsvm matlab/octave interface.
 
-Take a CSV (colon separated format) file
+Take a CSV (comma-separated values) file
 in UCI machine learning repository as an example.
 We download <a href=http://archive.ics.uci.edu/ml/machine-learning-databases/spect/SPECTF.train>SPECTF.train</a>. 
 Labels are in the first column. The following steps produce
@@ -529,6 +536,10 @@ matlab> features_sparse = sparse(features); % features must be in a sparse matri
 matlab> libsvmwrite('SPECTFlibsvm.train', labels, features_sparse);
 </pre>
 The tranformed data are stored in SPECTFlibsvm.train.
+
+<p>
+Alternatively, you can use <a href="./faqfiles/convert.c">convert.c</a> 
+to convert CSV format to libsvm format.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
@@ -799,6 +810,18 @@ Therefore, this means you are
 handling ill-conditioned situations
 (e.g. too large/small parameters) so numerical
 difficulties occur.
+<p>
+You may get better numerical stability by replacing
+<pre>
+typedef float Qfloat;
+</pre>
+in svm.cpp with
+<pre>
+typedef double Qfloat;
+</pre>
+That is, elements in the kernel cache are stored
+in double instead of single. However, this means fewer elements
+can be put in the kernel cache.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
@@ -1076,7 +1099,7 @@ in svm-train.c:
 <pre>
 #include &lt;time.h&gt;
 </pre>
-and in the beginning of the subroutine do_cross_validation(),
+and in the beginning of main(),
 <pre>
 srand(time(0));
 </pre>
@@ -1571,8 +1594,8 @@ CXX = g++-X.Y
 <p>
 
 
-Please make sure that you have modified make.m
-to use -largeArrayDims option. For example,
+Please make sure that you use
+the -largeArrayDims option in make.m. For example,
 <pre>
 mex -largeArrayDims -O -c svm.cpp
 </pre>
@@ -1590,7 +1613,7 @@ See the explanation
 <p>
 It is extremely easy to do scaling under MATLAB.
 The following one-line code scale each feature to the range
-of [0.1]:
+of [0,1]:
 <pre>
 (data - repmat(min(data,[],1),size(data,1),1))*spdiags(1./(max(data,[],1)-min(data,[],1))',0,size(data,2),size(data,2))
 </pre>
@@ -1641,7 +1664,7 @@ you need to add -fopenmp to CFLAGS and -lgomp to MEX_OPTION. For Octave, you nee
 
 <p> However, a minor problem is that
 the number of threads cannot
-be specified in MATLAB. We tried Version 7.7 (R2008b) and gcc-4.3.3.
+be specified in MATLAB. We tried Version 7.12 (R2011a) and gcc-4.6.1.
 
 <pre>
 % export OMP_NUM_THREADS=4; matlab
@@ -1649,7 +1672,12 @@ be specified in MATLAB. We tried Version 7.7 (R2008b) and gcc-4.3.3.
 </pre>
 
 Then OMP_NUM_THREADS is still 4 while running the program. Please contact us if you 
-see how to solve this problem.
+see how to solve this problem. You can, however,
+specify the number in the source code (thanks
+to comments from Ricardo Santiago-mozos):
+<pre>
+#pragma omp parallel  for private(i) num_threads(4)
+</pre>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
@@ -1771,6 +1799,34 @@ The easiest way is to rename the svmtrain binary
 file (e.g., svmtrain.mexw32 on 32-bit windows) 
 to a different
 name (e.g., svmtrain2.mexw32).
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q9:_MATLAB_interface"></a>
+<a name="f807"><b>Q: On Windows I got an error message "Invalid MEX-file: Specific module not found" when running the pre-built MATLAB interface in the windows sub-directory. What should I do?</b></a>
+<br/>                                                                                
+<p>
+
+The error usually happens
+when there are missing runtime components
+such as MSVCR100.dll on your Windows platform.
+You can use tools such as 
+<a href=http://www.dependencywalker.com/>Dependency 
+Walker</a> to find missing library files.
+
+<p>
+Because the pre-built MEX files are compiled by
+Visual C++ 2010,
+please make sure that you have installed
+Microsoft Visual C++ Redistributable Package 2010
+(vcredist_x86.exe). You can easily find the freely
+available file from Microsoft's web site. 
+
+<p>
+For 64bit Windows, the pre-built files are by
+Visual C++ 2008, so please install
+Microsoft Visual C++ Redistributable Package 2008
+(vcredist_x64.exe).
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
