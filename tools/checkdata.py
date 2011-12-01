@@ -84,7 +84,7 @@ def main():
 				if index < 0:
 					err(line_no, "feature index must be positive; wrong feature {0}".format(nodes[i]))
 					line_error = True
-				elif index < prev_index:
+				elif index <= prev_index:
 					err(line_no, "feature indices must be in an ascending order, previous/current features {0} {1}".format(nodes[i-1], nodes[i]))
 					line_error = True
 				prev_index = index
