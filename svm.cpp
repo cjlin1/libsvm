@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <limits.h>
+#include <locale.h>
 #include "svm.h"
 int libsvm_version = LIBSVM_VERSION;
 typedef float Qfloat;
@@ -2600,6 +2601,9 @@ int svm_save_model(const char *model_file_name, const svm_model *model)
 	FILE *fp = fopen(model_file_name,"w");
 	if(fp==NULL) return -1;
 
+	char *old_locale = strdup(setlocale(LC_ALL, NULL));
+	setlocale(LC_ALL, "C");
+
 	const svm_parameter& param = model->param;
 
 	fprintf(fp,"svm_type %s\n", svm_type_table[param.svm_type]);
@@ -2678,6 +2682,10 @@ int svm_save_model(const char *model_file_name, const svm_model *model)
 			}
 		fprintf(fp, "\n");
 	}
+
+	setlocale(LC_ALL, old_locale);
+	free(old_locale);
+
 	if (ferror(fp) != 0 || fclose(fp) != 0) return -1;
 	else return 0;
 }
@@ -2707,7 +2715,10 @@ svm_model *svm_load_model(const char *model_file_name)
 {
 	FILE *fp = fopen(model_file_name,"rb");
 	if(fp==NULL) return NULL;
-	
+
+	char *old_locale = strdup(setlocale(LC_ALL, NULL));
+	setlocale(LC_ALL, "C");
+
 	// read parameters
 
 	svm_model *model = Malloc(svm_model,1);
@@ -2738,6 +2749,9 @@ svm_model *svm_load_model(const char *model_file_name)
 			if(svm_type_table[i] == NULL)
 			{
 				fprintf(stderr,"unknown svm type.\n");
+				
+				setlocale(LC_ALL, old_locale);
+				free(old_locale);
 				free(model->rho);
 				free(model->label);
 				free(model->nSV);
@@ -2760,6 +2774,9 @@ svm_model *svm_load_model(const char *model_file_name)
 			if(kernel_type_table[i] == NULL)
 			{
 				fprintf(stderr,"unknown kernel function.\n");
+				
+				setlocale(LC_ALL, old_locale);
+				free(old_locale);
 				free(model->rho);
 				free(model->label);
 				free(model->nSV);
@@ -2824,6 +2841,9 @@ svm_model *svm_load_model(const char *model_file_name)
 		else
 		{
 			fprintf(stderr,"unknown text in model file: [%s]\n",cmd);
+			
+			setlocale(LC_ALL, old_locale);
+			free(old_locale);
 			free(model->rho);
 			free(model->label);
 			free(model->nSV);
@@ -2895,6 +2915,9 @@ svm_model *svm_load_model(const char *model_file_name)
 		x_space[j++].index = -1;
 	}
 	free(line);
+
+	setlocale(LC_ALL, old_locale);
+	free(old_locale);
 
 	if (ferror(fp) != 0 || fclose(fp) != 0)
 		return NULL;
