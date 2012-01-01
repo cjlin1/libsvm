@@ -1,11 +1,17 @@
 CXX ?= g++
 CFLAGS = -Wall -Wconversion -O3 -fPIC
 SHVER = 2
+OS = $(shell uname)
 
 all: svm-train svm-predict svm-scale
 
 lib: svm.o
-	$(CXX) -shared -dynamiclib -Wl,-soname,libsvm.so.$(SHVER) svm.o -o libsvm.so.$(SHVER)
+	if [ "$(OS)" = "Darwin" ]; then \
+		SHARED_LIB_FLAG="-dynamiclib -W1,-install_name,libsvm.so.$(SHVER)"; \
+	else \
+		SHARED_LIB_FLAG="-shared -W1,-soname,libsvm.so.$(SHVER)"; \
+	fi; \
+	$(CXX) $${SHARED_LIB_FLAG} svm.o -o libsvm.so.$(SHVER)
 
 svm-predict: svm-predict.c svm.o
 	$(CXX) $(CFLAGS) svm-predict.c svm.o -o svm-predict -lm
