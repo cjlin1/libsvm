@@ -115,8 +115,8 @@ def svm_train(arg1, arg2=None, arg3=None):
 	if isinstance(arg1, (list, tuple)):
 		assert isinstance(arg2, (list, tuple))
 		y, x, options = arg1, arg2, arg3
-		prob = svm_problem(y, x)
 		param = svm_parameter(options)
+		prob = svm_problem(y, x, isKernel=(param.kernel_type == PRECOMPUTED))
 	elif isinstance(arg1, svm_problem):
 		prob = arg1
 		if isinstance(arg2, svm_parameter):
@@ -210,7 +210,7 @@ def svm_predict(y, x, m, options=""):
 
 		prob_estimates = (c_double * nr_class)()
 		for xi in x:
-			xi, idx = gen_svm_nodearray(xi)
+			xi, idx = gen_svm_nodearray(xi, isKernel=(m.param.kernel_type == PRECOMPUTED))
 			label = libsvm.svm_predict_probability(m, xi, prob_estimates)
 			values = prob_estimates[:nr_class]
 			pred_labels += [label]
@@ -224,7 +224,7 @@ def svm_predict(y, x, m, options=""):
 			nr_classifier = nr_class*(nr_class-1)//2
 		dec_values = (c_double * nr_classifier)()
 		for xi in x:
-			xi, idx = gen_svm_nodearray(xi)
+			xi, idx = gen_svm_nodearray(xi, isKernel=(m.param.kernel_type == PRECOMPUTED))
 			label = libsvm.svm_predict_values(m, xi, dec_values)
 			if(nr_class == 1): 
 				values = [1]

@@ -40,10 +40,12 @@ class svm_node(Structure):
 	_types = [c_int, c_double]
 	_fields_ = genFields(_names, _types)
 
-def gen_svm_nodearray(xi, feature_max=None, issparse=None):
+def gen_svm_nodearray(xi, feature_max=None, isKernel=None):
 	if isinstance(xi, dict):
 		index_range = xi.keys()
 	elif isinstance(xi, (list, tuple)):
+		if not isKernel:
+			xi = [0] + xi  # idx should start from 1
 		index_range = range(len(xi))
 	else:
 		raise TypeError('xi should be a dictionary, list or tuple')
@@ -51,7 +53,7 @@ def gen_svm_nodearray(xi, feature_max=None, issparse=None):
 	if feature_max:
 		assert(isinstance(feature_max, int))
 		index_range = filter(lambda j: j <= feature_max, index_range)
-	if issparse: 
+	if not isKernel: 
 		index_range = filter(lambda j:xi[j] != 0, index_range)
 
 	index_range = sorted(index_range)
@@ -70,7 +72,7 @@ class svm_problem(Structure):
 	_types = [c_int, POINTER(c_double), POINTER(POINTER(svm_node))]
 	_fields_ = genFields(_names, _types)
 
-	def __init__(self, y, x):
+	def __init__(self, y, x, isKernel=None):
 		if len(y) != len(x):
 			raise ValueError("len(y) != len(x)")
 		self.l = l = len(y)
@@ -78,7 +80,7 @@ class svm_problem(Structure):
 		max_idx = 0
 		x_space = self.x_space = []
 		for i, xi in enumerate(x):
-			tmp_xi, tmp_idx = gen_svm_nodearray(xi)
+			tmp_xi, tmp_idx = gen_svm_nodearray(xi,isKernel=isKernel)
 			x_space += [tmp_xi]
 			max_idx = max(max_idx, tmp_idx)
 		self.n = max_idx
