@@ -103,10 +103,12 @@ svm-toy:
 	You can enter options in the bottom of the window, the syntax of
 	options is the same as `svm-train'.
 
-	Note that "load" and "save" consider data in the
-	classification but not the regression case. Each data point
-	has one label (the color) which must be 1, 2, or 3 and two
-	attributes (x-axis and y-axis values) in [0,1].
+	Note that "load" and "save" consider dense data format both in
+	classification and the regression cases. For classification,
+	each data point has one label (the color) that must be 1, 2,
+	or 3 and two attributes (x-axis and y-axis values) in
+	[0,1). For regression, each data point has one target value
+	(y-axis) and one attribute (x-axis values) in [0, 1).
 
 	Type `make' in respective directories to build them.
 

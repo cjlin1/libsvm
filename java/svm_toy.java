@@ -98,7 +98,7 @@ public class svm_toy extends Applet {
 
 		button_save.addActionListener(new ActionListener()
 		{ public void actionPerformed (ActionEvent e)
-		  { button_save_clicked(); }});
+		  { button_save_clicked(input_line.getText()); }});
 
 		button_load.addActionListener(new ActionListener()
 		{ public void actionPerformed (ActionEvent e)
@@ -368,7 +368,7 @@ public class svm_toy extends Applet {
 		clear_all();
 	}
 
-	void button_save_clicked()
+	void button_save_clicked(String args)
 	{
 		FileDialog dialog = new FileDialog(new Frame(),"Save",FileDialog.SAVE);
 		dialog.setVisible(true);
@@ -376,11 +376,31 @@ public class svm_toy extends Applet {
 		if (filename == null) return;
 		try {
 			DataOutputStream fp = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(filename)));
-			int n = point_list.size();
-			for(int i=0;i<n;i++)
+
+			int svm_type = svm_parameter.C_SVC;
+			int svm_type_idx = args.indexOf("-s ");
+			if(svm_type_idx != -1)
 			{
-				point p = point_list.elementAt(i);
-				fp.writeBytes(p.value+" 1:"+p.x+" 2:"+p.y+"\n");
+				StringTokenizer svm_str_st = new StringTokenizer(args.substring(svm_type_idx+2).trim());
+				svm_type = atoi(svm_str_st.nextToken());
+			}
+
+			int n = point_list.size();
+			if(svm_type == svm_parameter.EPSILON_SVR || svm_type == svm_parameter.NU_SVR)
+			{
+				for(int i=0;i<n;i++)
+				{
+					point p = point_list.elementAt(i);
+					fp.writeBytes(p.y+" 1:"+p.x+"\n");
+				}
+			}
+			else
+			{
+				for(int i=0;i<n;i++)
+				{
+					point p = point_list.elementAt(i);
+					fp.writeBytes(p.value+" 1:"+p.x+" 2:"+p.y+"\n");
+				}
 			}
 			fp.close();
 		} catch (IOException e) { System.err.print(e); }
@@ -399,12 +419,23 @@ public class svm_toy extends Applet {
 			while((line = fp.readLine()) != null)
 			{
 				StringTokenizer st = new StringTokenizer(line," \t\n\r\f:");
-				byte value = (byte)atoi(st.nextToken());
-				st.nextToken();
-				double x = atof(st.nextToken());
-				st.nextToken();
-				double y = atof(st.nextToken());
-				point_list.addElement(new point(x,y,value));
+				if(st.countTokens() == 5)
+				{
+					byte value = (byte)atoi(st.nextToken());
+					st.nextToken();
+					double x = atof(st.nextToken());
+					st.nextToken();
+					double y = atof(st.nextToken());
+					point_list.addElement(new point(x,y,value));
+				}
+				else if(st.countTokens() == 3)
+				{
+					double y = atof(st.nextToken());
+					st.nextToken();
+					double x = atof(st.nextToken());
+					point_list.addElement(new point(x,y,current_value));
+				}else
+					break;
 			}
 			fp.close();
 		} catch (IOException e) { System.err.print(e); }
