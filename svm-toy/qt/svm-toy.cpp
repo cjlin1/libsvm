@@ -1,6 +1,7 @@
 #include <QtGui>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 #include <list>
 #include "../../svm.h"
@@ -286,10 +287,25 @@ private slots:
 		if(!filename.isNull())
 		{
 			FILE *fp = fopen(filename.toAscii().constData(),"w");
+			
+			const char *p = input_line.text().toAscii().constData();
+			const char* svm_type_str = strstr(p, "-s ");
+			int svm_type = C_SVC;
+			if(svm_type_str != NULL)
+				sscanf(svm_type_str, "-s %d", &svm_type);
+		
 			if(fp)
 			{
-				for(list<point>::iterator p = point_list.begin(); p != point_list.end();p++)
-					fprintf(fp,"%d 1:%f 2:%f\n", p->value, p->x, p->y);
+				if(svm_type == EPSILON_SVR || svm_type == NU_SVR)
+				{
+					for(list<point>::iterator p = point_list.begin(); p != point_list.end();p++)
+						fprintf(fp,"%f 1:%f\n", p->y, p->x);
+				}
+				else
+				{
+					for(list<point>::iterator p = point_list.begin(); p != point_list.end();p++)
+						fprintf(fp,"%d 1:%f 2:%f\n", p->value, p->x, p->y);
+				}
 				fclose(fp);
 			}
 		}
@@ -308,10 +324,18 @@ private slots:
 				{
 					int v;
 					double x,y;
-					if(sscanf(buf,"%d%*d:%lf%*d:%lf",&v,&x,&y)!=3)
-						break;													
-					point p = {x,y,v};
-					point_list.push_back(p);
+					if(sscanf(buf,"%d%*d:%lf%*d:%lf",&v,&x,&y)==3)
+					{
+						point p = {x,y,v};
+						point_list.push_back(p);
+					}
+					else if(sscanf(buf,"%lf%*d:%lf",&y,&x)==2)
+					{
+						point p = {x,y,current_value};
+						point_list.push_back(p);
+					}
+					else
+						break;
 				}
 				fclose(fp);
 				draw_all_points();
