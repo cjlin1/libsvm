@@ -133,6 +133,12 @@ def redraw(db,best_param,tofile=False):
 
     best_log2c,best_log2g,best_rate = best_param
 
+    # if all c, g, or cv values are the same,
+    # then stop drawing.
+    if all(x[0] == db[0][0]  for x in db): return
+    if all(x[1] == db[0][1]  for x in db): return
+    if all(x[2] == db[0][2]  for x in db): return
+
     if tofile:
         gnuplot.write(b"set term png transparent small linewidth 2 medium enhanced\n")
         gnuplot.write("set output \"{0}\"\n".format(png_filename.replace('\\','\\\\')).encode())
