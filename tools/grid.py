@@ -133,8 +133,8 @@ def redraw(db,best_param,tofile=False):
 
     best_log2c,best_log2g,best_rate = best_param
 
-    # if all c, g, or cv values are the same,
-    # then stop drawing.
+    # if newly obtained c, g, or cv values are the same,
+    # then stop redrawing the contour.
     if all(x[0] == db[0][0]  for x in db): return
     if all(x[1] == db[0][1]  for x in db): return
     if all(x[2] == db[0][2]  for x in db): return
