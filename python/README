@@ -76,7 +76,7 @@ in svmutil.py and the usage is the same as the LIBSVM MATLAB interface.
 >>> svm_save_model('heart_scale.model', m)
 >>> m = svm_load_model('heart_scale.model')
 >>> p_label, p_acc, p_val = svm_predict(y, x, m, '-b 1')
->>> ACC, MSE, SCC = evaluations(y, p_val)
+>>> ACC, MSE, SCC = evaluations(y, p_label)
 
 # Getting online help
 >>> help(svm_train)
