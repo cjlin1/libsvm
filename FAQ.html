@@ -1,3 +1,5 @@
+
+
 <html>
 <head>
 <title>LIBSVM FAQ</title>
@@ -7,15 +9,15 @@
 <a name="_TOP"><b><h1><a
 href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a>  FAQ </h1></b></a>
 <b>last modified : </b>
-Tue, 11 Oct 2011 13:35:12 GMT
+Thu,  1 Mar 2012 14:45:34 GMT
 <class="categories">
 <li><a
-href="#_TOP">All Questions</a>(75)</li>
+href="#_TOP">All Questions</a>(77)</li>
 <ul><b>
 <li><a
 href="#/Q1:_Some_sample_uses_of_libsvm">Q1:_Some_sample_uses_of_libsvm</a>(2)</li>
 <li><a
-href="#/Q2:_Installation_and_running_the_program">Q2:_Installation_and_running_the_program</a>(12)</li>
+href="#/Q2:_Installation_and_running_the_program">Q2:_Installation_and_running_the_program</a>(13)</li>
 <li><a
 href="#/Q3:_Data_preparation">Q3:_Data_preparation</a>(7)</li>
 <li><a
@@ -29,7 +31,7 @@ href="#/Q7:_Java_version_of_libsvm">Q7:_Java_version_of_libsvm</a>(4)</li>
 <li><a
 href="#/Q8:_Python_interface">Q8:_Python_interface</a>(1)</li>
 <li><a
-href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(10)</li>
+href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(11)</li>
 </b></ul>
 </li>
 
@@ -48,6 +50,7 @@ href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(10)</li>
 <li class="headlines_item"><a href="#f210">Why occasionally the program (including MATLAB or other interfaces) crashes and gives a segmentation fault?</a></li>
 <li class="headlines_item"><a href="#f211">How to build a dynamic library (.dll file) on MS windows?</a></li>
 <li class="headlines_item"><a href="#f212">On some systems (e.g., Ubuntu), compiling LIBSVM gives many warning messages. Is this a problem and how to disable the warning message?</a></li>
+<li class="headlines_item"><a href="#f213">In LIBSVM, why you don't use certain C/C++ library functions to make the code shorter?</a></li>
 <li class="headlines_item"><a href="#f301">Why sometimes not all attributes of a data appear in the training/model files ?</a></li>
 <li class="headlines_item"><a href="#f302">What if my data are non-numerical ?</a></li>
 <li class="headlines_item"><a href="#f303">Why do you consider sparse format ? Will the training of dense data be much slower ?</a></li>
@@ -109,6 +112,7 @@ href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(10)</li>
 <li class="headlines_item"><a href="#f805">Is there an OCTAVE interface for libsvm?</a></li>
 <li class="headlines_item"><a href="#f806">How to handle the name conflict between svmtrain in the libsvm matlab interface and that in MATLAB bioinformatics toolbox?</a></li>
 <li class="headlines_item"><a href="#f807">On Windows I got an error message "Invalid MEX-file: Specific module not found" when running the pre-built MATLAB interface in the windows sub-directory. What should I do?</a></li>
+<li class="headlines_item"><a href="#f808">LIBSVM supports 1-vs-1 multi-class classification. If instead I would like to use 1-vs-rest, how to implement it using MATLAB interface?</a></li>
 </ul></ul>
 
 
@@ -404,7 +408,9 @@ The warning message is like
 <pre>
 svm.cpp:2730: warning: ignoring return value of int fscanf(FILE*, const char*, ...), declared with attribute warn_unused_result
 </pre>
-but this is not a problem. In the future we may modify the code
+This is not a problem; see <a href=https://wiki.ubuntu.com/CompilerFlags#-D_FORTIFY_SOURCE=2>for more 
+details of ubuntu systems.
+In the future we may modify the code
 so that these messages do not appear.
 At this moment, to disable the warning message you can replace
 <pre>
@@ -415,6 +421,18 @@ with
 CFLAGS = -Wall -Wconversion -O3 -fPIC -U_FORTIFY_SOURCE
 </pre>
 in Makefile.
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q2:_Installation_and_running_the_program"></a>
+<a name="f213"><b>Q: In LIBSVM, why you don't use certain C/C++ library functions to make the code shorter?</b></a>
+<br/>                                                                                
+
+<p>
+For portability, we use only features defined in ISO C89. Note that features in ISO C99 may not be available everywhere. 
+Even the newest gcc lacks some features in C99 (see <a href=http://gcc.gnu.org/c99status.html>http://gcc.gnu.org/c99status.html</a> for details).
+If the situation changes in the future, 
+we might consider using these newer features.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
@@ -569,8 +587,8 @@ libsvm document</a>.
 <br/>                                                                                
 
 <p>
-After the parameters, each line represents a support vector.
-Support vectors are listed in the order of "labels" listed earlier.
+In the model file, after parameters and other informations such as labels , each line represents a support vector.
+Support vectors are listed in the order of "labels" shown earlier.
 (i.e., those from the first class in the "labels" list are
 grouped first, and so on.) 
 If k is the total number of classes,
@@ -872,6 +890,10 @@ svm_predict_values. Their corresponding labels
 can be obtained from svm_get_labels. 
 Details are in 
 README of libsvm package. 
+
+<p>
+If you are using MATLAB/OCTAVE interface, svmpredict can directly
+give you decision values. Please see matlab/README for details.
 
 <p>
 We do not recommend the following. But if you would
@@ -1294,11 +1316,14 @@ of get_Q to:
 		for(i=0;i&lt;l;i++)
 			kvalue[i] = Kernel::k_function(x,model-&gt;SV[i],model-&gt;param);
 </pre>
-For regression, you need a reduction clause for the variable sum:
+For regression, you need to modify
+class SVR_Q instead. The loop in svm_predict_values
+is also different because you need
+a reduction clause for the variable sum:
 <pre>
 #pragma omp parallel for private(i) reduction(+:sum) 
 		for(i=0;i&lt;model->l;i++)
-			sum += sv_coef[i] * Kernel::k_function(x,model&gt;SV[i],model&gt;param);
+			sum += sv_coef[i] * Kernel::k_function(x,model-&gt;SV[i],model-&gt;param);
 </pre>
 
 <p> Then rebuild the package. Kernel evaluations in training/testing will be parallelized. An example of running this modification on
@@ -1327,6 +1352,9 @@ instead.
 <pre>
 $(CXX) -lgomp -shared -dynamiclib svm.o -o libsvm.so.$(SHVER)
 </pre>
+
+<p> For MS Windows, you need to add /openmp in CFLAGS of Makefile.win
+
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
@@ -1815,18 +1843,52 @@ You can use tools such as
 Walker</a> to find missing library files.
 
 <p>
-Because the pre-built MEX files are compiled by
+For example, if the pre-built MEX files are compiled by
 Visual C++ 2010,
-please make sure that you have installed
+you must have installed
 Microsoft Visual C++ Redistributable Package 2010
 (vcredist_x86.exe). You can easily find the freely
 available file from Microsoft's web site. 
 
 <p>
-For 64bit Windows, the pre-built files are by
-Visual C++ 2008, so please install
+For 64bit Windows, the situation is similar. If
+the pre-built files are by
+Visual C++ 2008, then you must have
 Microsoft Visual C++ Redistributable Package 2008
 (vcredist_x64.exe).
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q9:_MATLAB_interface"></a>
+<a name="f808"><b>Q: LIBSVM supports 1-vs-1 multi-class classification. If instead I would like to use 1-vs-rest, how to implement it using MATLAB interface?</b></a>
+<br/>                                                                                
+
+<p>
+Please use code in the following <a href=../libsvmtools/ovr_multiclass>directory</a>. The following example shows how to
+train and test the problem dna (<a href=../libsvmtools/datasets/multiclass/dna.scale>training</a> and <a href=../libsvmtools/datasets/multiclass/dna.scale.t>testing</a>).
+
+<p> Load, train and predict data:
+<pre>
+[trainY trainX] = libsvmread('./dna.scale');
+[testY testX] = libsvmread('./dna.scale.t');
+model = ovrtrain(trainY, trainX, '-c 8 -g 4');
+[pred ac decv] = ovrpredict(testY, testX, model);
+fprintf('Accuracy = %g%%\n', ac * 100);
+</pre>
+Conduct CV on a grid of parameters 
+<pre>
+bestcv = 0;
+for log2c = -1:2:3,
+  for log2g = -4:2:1,
+    cmd = ['-q -c ', num2str(2^log2c), ' -g ', num2str(2^log2g)];
+    cv = get_cv_ac(trainY, trainX, cmd, 3);
+    if (cv >= bestcv),
+      bestcv = cv; bestc = 2^log2c; bestg = 2^log2g;
+    end
+    fprintf('%g %g %g (best c=%g, g=%g, rate=%g)\n', log2c, log2g, cv, bestc, bestg, bestcv);
+  end
+end
+</pre>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
