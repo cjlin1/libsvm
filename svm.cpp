@@ -1006,7 +1006,7 @@ double Solver::calculate_rho()
 //
 // additional constraint: e^T \alpha = constant
 //
-class Solver_NU : public Solver
+class Solver_NU: public Solver
 {
 public:
 	Solver_NU() {}
