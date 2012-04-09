@@ -217,10 +217,10 @@ stopping tolerance 0.1.
 Solve SVM regression with linear kernel u'v and epsilon=0.1
 in the loss function.
 
-> svm-train -c 10 -w1 1 -w2 5 -w4 2 data_file
+> svm-train -c 10 -w1 1 -w-2 5 -w4 2 data_file
 
 Train a classifier with penalty 10 = 1 * 10 for class 1, penalty 50 =
-5 * 10 for class 2, and penalty 20 = 2 * 10 for class 4.
+5 * 10 for class -2, and penalty 20 = 2 * 10 for class 4.
 
 > svm-train -s 0 -c 100 -g 0.1 -v 5 data_file
 
