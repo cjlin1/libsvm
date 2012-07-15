@@ -183,15 +183,12 @@ def svm_predict(y, x, m, options=""):
 	        field in the model structure.
 	"""
 	predict_probability = 0
-	quiet_mode_flag = 0
 	argv = options.split()
 	i = 0
 	while i < len(argv):
 		if argv[i] == '-b':
 			i += 1
 			predict_probability = int(argv[i])
-		elif argv[i] == '-q':
-			quiet_mode_flag = 1
 		else:
 			raise ValueError("Wrong options")
 		i+=1
@@ -207,9 +204,8 @@ def svm_predict(y, x, m, options=""):
 			raise ValueError("Model does not support probabiliy estimates")
 
 		if svm_type in [NU_SVR, EPSILON_SVR]:
-			if quiet_mode_flag == 0:
-				print("Prob. model for test data: target value = predicted value + z,\n"
-				"z: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma=%g" % m.get_svr_probability());
+			print("Prob. model for test data: target value = predicted value + z,\n"
+			"z: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma=%g" % m.get_svr_probability());
 			nr_class = 0
 
 		prob_estimates = (c_double * nr_class)()
@@ -220,7 +216,7 @@ def svm_predict(y, x, m, options=""):
 			pred_labels += [label]
 			pred_values += [values]
 	else:
-		if is_prob_model and (quiet_mode_flag == 0):
+		if is_prob_model:
 			print("Model supports probability estimates, but disabled in predicton.")
 		if svm_type in (ONE_CLASS, EPSILON_SVR, NU_SVC):
 			nr_classifier = 1
@@ -239,13 +235,11 @@ def svm_predict(y, x, m, options=""):
 
 	ACC, MSE, SCC = evaluations(y, pred_labels)
 	l = len(y)
-
-	if quiet_mode_flag == 0:
-		if svm_type in [EPSILON_SVR, NU_SVR]:
-			print("Mean squared error = %g (regression)" % MSE)
-			print("Squared correlation coefficient = %g (regression)" % SCC)
-		else:
-			print("Accuracy = %g%% (%d/%d) (classification)" % (ACC, int(l*ACC/100), l))
+	if svm_type in [EPSILON_SVR, NU_SVR]:
+		print("Mean squared error = %g (regression)" % MSE)
+		print("Squared correlation coefficient = %g (regression)" % SCC)
+	else:
+		print("Accuracy = %g%% (%d/%d) (classification)" % (ACC, int(l*ACC/100), l))
 
 	return pred_labels, (ACC, MSE, SCC), pred_values
 
