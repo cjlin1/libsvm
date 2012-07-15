@@ -13,7 +13,7 @@ class svm_predict {
 		return Integer.parseInt(s);
 	}
 
-	private static void predict(BufferedReader input, DataOutputStream output, svm_model model, int predict_probability) throws IOException
+	private static void predict(BufferedReader input, DataOutputStream output, svm_model model, int predict_probability, int quiet_mode) throws IOException
 	{
 		int correct = 0;
 		int total = 0;
@@ -29,7 +29,8 @@ class svm_predict {
 			if(svm_type == svm_parameter.EPSILON_SVR ||
 			   svm_type == svm_parameter.NU_SVR)
 			{
-				System.out.print("Prob. model for test data: target value = predicted value + z,\nz: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma="+svm.svm_get_svr_probability(model)+"\n");
+				if(quiet_mode == 0)
+					System.out.print("Prob. model for test data: target value = predicted value + z,\nz: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma="+svm.svm_get_svr_probability(model)+"\n");
 			}
 			else
 			{
@@ -84,32 +85,34 @@ class svm_predict {
 			sumvy += v*target;
 			++total;
 		}
-		if(svm_type == svm_parameter.EPSILON_SVR ||
-		   svm_type == svm_parameter.NU_SVR)
-		{
-			System.out.print("Mean squared error = "+error/total+" (regression)\n");
-			System.out.print("Squared correlation coefficient = "+
-				 ((total*sumvy-sumv*sumy)*(total*sumvy-sumv*sumy))/
-				 ((total*sumvv-sumv*sumv)*(total*sumyy-sumy*sumy))+
-				 " (regression)\n");
-		}
-		else
-			System.out.print("Accuracy = "+(double)correct/total*100+
-				 "% ("+correct+"/"+total+") (classification)\n");
+        if(quiet_mode == 0)
+			if(svm_type == svm_parameter.EPSILON_SVR ||
+			   svm_type == svm_parameter.NU_SVR)
+			{
+				System.out.print("Mean squared error = "+error/total+" (regression)\n");
+				System.out.print("Squared correlation coefficient = "+
+					 ((total*sumvy-sumv*sumy)*(total*sumvy-sumv*sumy))/
+					 ((total*sumvv-sumv*sumv)*(total*sumyy-sumy*sumy))+
+					 " (regression)\n");
+			}
+			else
+				System.out.print("Accuracy = "+(double)correct/total*100+
+					 "% ("+correct+"/"+total+") (classification)\n");
 	}
 
 	private static void exit_with_help()
 	{
 		System.err.print("usage: svm_predict [options] test_file model_file output_file\n"
 		+"options:\n"
-		+"-b probability_estimates: whether to predict probability estimates, 0 or 1 (default 0); one-class SVM not supported yet\n");
+		+"-b probability_estimates: whether to predict probability estimates, 0 or 1 (default 0); one-class SVM not supported yet\n"
+		+"-q : quiet mode (no outputs)\n");
 		System.exit(1);
 	}
 
 	public static void main(String argv[]) throws IOException
 	{
 		int i, predict_probability=0;
-
+		int quiet_mode_flag = 0;
 		// parse options
 		for(i=0;i<argv.length;i++)
 		{
@@ -119,6 +122,10 @@ class svm_predict {
 			{
 				case 'b':
 					predict_probability = atoi(argv[i]);
+					break;
+				case 'q':
+					quiet_mode_flag = 1;
+					i--;
 					break;
 				default:
 					System.err.print("Unknown option: " + argv[i-1] + "\n");
@@ -142,12 +149,12 @@ class svm_predict {
 			}
 			else
 			{
-				if(svm.svm_check_probability_model(model)!=0)
+				if((svm.svm_check_probability_model(model)!=0)&&(quiet_mode_flag == 0))
 				{
 					System.out.print("Model supports probability estimates, but disabled in prediction.\n");
 				}
 			}
-			predict(input,output,model,predict_probability);
+			predict(input,output,model,predict_probability,quiet_mode_flag);
 			input.close();
 			output.close();
 		} 

@@ -5,6 +5,10 @@
 #include <errno.h>
 #include "svm.h"
 
+int print_null(const char *s,...) {}
+
+static int (*info)(const char *fmt,...) = & printf;
+
 struct svm_node *x;
 int max_nr_attr = 64;
 
@@ -17,7 +21,7 @@ static int max_line_len;
 static char* readline(FILE *input)
 {
 	int len;
-	
+
 	if(fgets(line,max_line_len,input) == NULL)
 		return NULL;
 
@@ -53,7 +57,7 @@ void predict(FILE *input, FILE *output)
 	if(predict_probability)
 	{
 		if (svm_type==NU_SVR || svm_type==EPSILON_SVR)
-			printf("Prob. model for test data: target value = predicted value + z,\nz: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma=%g\n",svm_get_svr_probability(model));
+			info("Prob. model for test data: target value = predicted value + z,\nz: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma=%g\n",svm_get_svr_probability(model));
 		else
 		{
 			int *labels=(int *) malloc(nr_class*sizeof(int));
@@ -139,15 +143,15 @@ void predict(FILE *input, FILE *output)
 	}
 	if (svm_type==NU_SVR || svm_type==EPSILON_SVR)
 	{
-		printf("Mean squared error = %g (regression)\n",error/total);
-		printf("Squared correlation coefficient = %g (regression)\n",
-		       ((total*sumpt-sump*sumt)*(total*sumpt-sump*sumt))/
-		       ((total*sumpp-sump*sump)*(total*sumtt-sumt*sumt))
-		       );
+		info("Mean squared error = %g (regression)\n",error/total);
+		info("Squared correlation coefficient = %g (regression)\n",
+			((total*sumpt-sump*sumt)*(total*sumpt-sump*sumt))/
+			((total*sumpp-sump*sump)*(total*sumtt-sumt*sumt))
+			);
 	}
 	else
-		printf("Accuracy = %g%% (%d/%d) (classification)\n",
-		       (double)correct/total*100,correct,total);
+		info("Accuracy = %g%% (%d/%d) (classification)\n",
+			(double)correct/total*100,correct,total);
 	if(predict_probability)
 		free(prob_estimates);
 }
@@ -155,10 +159,11 @@ void predict(FILE *input, FILE *output)
 void exit_with_help()
 {
 	printf(
-	"Usage: svm-predict [options] test_file model_file output_file\n"
-	"options:\n"
-	"-b probability_estimates: whether to predict probability estimates, 0 or 1 (default 0); for one-class SVM only 0 is supported\n"
-	);
+			"Usage: svm-predict [options] test_file model_file output_file\n"
+			"options:\n"
+			"-b probability_estimates: whether to predict probability estimates, 0 or 1 (default 0); for one-class SVM only 0 is supported\n"
+			"-q : quiet mode (no outputs)\n"
+	      );
 	exit(1);
 }
 
@@ -166,7 +171,6 @@ int main(int argc, char **argv)
 {
 	FILE *input, *output;
 	int i;
-
 	// parse options
 	for(i=1;i<argc;i++)
 	{
@@ -177,14 +181,19 @@ int main(int argc, char **argv)
 			case 'b':
 				predict_probability = atoi(argv[i]);
 				break;
+			case 'q':
+				info = &print_null;
+				i--;
+				break;
 			default:
 				fprintf(stderr,"Unknown option: -%c\n", argv[i-1][1]);
 				exit_with_help();
 		}
 	}
+
 	if(i>=argc-2)
 		exit_with_help();
-	
+
 	input = fopen(argv[i],"r");
 	if(input == NULL)
 	{
@@ -217,8 +226,9 @@ int main(int argc, char **argv)
 	else
 	{
 		if(svm_check_probability_model(model)!=0)
-			printf("Model supports probability estimates, but disabled in prediction.\n");
+			info("Model supports probability estimates, but disabled in prediction.\n");
 	}
+
 	predict(input,output);
 	svm_free_and_destroy_model(&model);
 	free(x);

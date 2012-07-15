@@ -14,6 +14,9 @@ typedef int mwIndex;
 
 #define CMD_LEN 2048
 
+int print_null(const char *s,...) {}
+int (*info)(const char *fmt,...) = & mexPrintf;
+
 void read_sparse_instance(const mxArray *prhs, int index, struct svm_node *x)
 {
 	int i, j, low, high;
@@ -117,7 +120,7 @@ void predict(mxArray *plhs[], const mxArray *prhs[], struct svm_model *model, co
 	if(predict_probability)
 	{
 		if(svm_type==NU_SVR || svm_type==EPSILON_SVR)
-			mexPrintf("Prob. model for test data: target value = predicted value + z,\nz: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma=%g\n",svm_get_svr_probability(model));
+			info("Prob. model for test data: target value = predicted value + z,\nz: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma=%g\n",svm_get_svr_probability(model));
 		else
 			prob_estimates = (double *) malloc(nr_class*sizeof(double));
 	}
@@ -215,14 +218,14 @@ void predict(mxArray *plhs[], const mxArray *prhs[], struct svm_model *model, co
 	}
 	if(svm_type==NU_SVR || svm_type==EPSILON_SVR)
 	{
-		mexPrintf("Mean squared error = %g (regression)\n",error/total);
-		mexPrintf("Squared correlation coefficient = %g (regression)\n",
+		info("Mean squared error = %g (regression)\n",error/total);
+		info("Squared correlation coefficient = %g (regression)\n",
 			((total*sumpt-sump*sumt)*(total*sumpt-sump*sumt))/
 			((total*sumpp-sump*sump)*(total*sumtt-sumt*sumt))
 			);
 	}
 	else
-		mexPrintf("Accuracy = %g%% (%d/%d) (classification)\n",
+		info("Accuracy = %g%% (%d/%d) (classification)\n",
 			(double)correct/total*100,correct,total);
 
 	// return accuracy, mean squared error, squared correlation coefficient
@@ -246,6 +249,7 @@ void exit_with_help()
 		"  model: SVM model structure from svmtrain.\n"
 		"  libsvm_options:\n"
 		"    -b probability_estimates: whether to predict probability estimates, 0 or 1 (default 0); one-class SVM not supported yet\n"
+		"    -q : quiet mode (no outputs)\n"
 		"Returns:\n"
 		"  predicted_label: SVM prediction output vector.\n"
 		"  accuracy: a vector with accuracy, mean squared error, squared correlation coefficient.\n"
@@ -291,7 +295,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
 			for(i=1;i<argc;i++)
 			{
 				if(argv[i][0] != '-') break;
-				if(++i>=argc)
+				if((++i>=argc) && argv[i-1][1] != 'q')
 				{
 					exit_with_help();
 					fake_answer(plhs);
@@ -301,6 +305,10 @@ void mexFunction( int nlhs, mxArray *plhs[],
 				{
 					case 'b':
 						prob_estimate_flag = atoi(argv[i]);
+						break;
+					case 'q':
+						i--;
+						info = &print_null;
 						break;
 					default:
 						mexPrintf("Unknown option: -%c\n", argv[i-1][1]);
@@ -332,7 +340,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
 		else
 		{
 			if(svm_check_probability_model(model)!=0)
-				mexPrintf("Model supports probability estimates, but disabled in predicton.\n");
+				info("Model supports probability estimates, but disabled in predicton.\n");
 		}
 
 		predict(plhs, prhs, model, prob_estimate_flag);
