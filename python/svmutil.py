@@ -169,6 +169,7 @@ def svm_predict(y, x, m, options=""):
 	"options": 
 	    -b probability_estimates: whether to predict probability estimates, 
 	        0 or 1 (default 0); for one-class SVM only 0 is supported.
+	    -q : quiet mode (no outputs).
 
 	The return tuple contains
 	p_labels: a list of predicted labels
@@ -182,6 +183,10 @@ def svm_predict(y, x, m, options=""):
 	        Note that the order of classes here is the same as 'model.label'
 	        field in the model structure.
 	"""
+
+	def info(s):
+		print(s)
+
 	predict_probability = 0
 	argv = options.split()
 	i = 0
@@ -189,6 +194,8 @@ def svm_predict(y, x, m, options=""):
 		if argv[i] == '-b':
 			i += 1
 			predict_probability = int(argv[i])
+		elif argv[i] == '-q':
+			info = print_null
 		else:
 			raise ValueError("Wrong options")
 		i+=1
@@ -204,7 +211,7 @@ def svm_predict(y, x, m, options=""):
 			raise ValueError("Model does not support probabiliy estimates")
 
 		if svm_type in [NU_SVR, EPSILON_SVR]:
-			print("Prob. model for test data: target value = predicted value + z,\n"
+			info("Prob. model for test data: target value = predicted value + z,\n"
 			"z: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma=%g" % m.get_svr_probability());
 			nr_class = 0
 
@@ -217,7 +224,7 @@ def svm_predict(y, x, m, options=""):
 			pred_values += [values]
 	else:
 		if is_prob_model:
-			print("Model supports probability estimates, but disabled in predicton.")
+			info("Model supports probability estimates, but disabled in predicton.")
 		if svm_type in (ONE_CLASS, EPSILON_SVR, NU_SVC):
 			nr_classifier = 1
 		else:
@@ -236,10 +243,10 @@ def svm_predict(y, x, m, options=""):
 	ACC, MSE, SCC = evaluations(y, pred_labels)
 	l = len(y)
 	if svm_type in [EPSILON_SVR, NU_SVR]:
-		print("Mean squared error = %g (regression)" % MSE)
-		print("Squared correlation coefficient = %g (regression)" % SCC)
+		info("Mean squared error = %g (regression)" % MSE)
+		info("Squared correlation coefficient = %g (regression)" % SCC)
 	else:
-		print("Accuracy = %g%% (%d/%d) (classification)" % (ACC, int(l*ACC/100), l))
+		info("Accuracy = %g%% (%d/%d) (classification)" % (ACC, int(l*ACC/100), l))
 
 	return pred_labels, (ACC, MSE, SCC), pred_values
 
