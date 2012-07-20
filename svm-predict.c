@@ -7,7 +7,7 @@
 
 int print_null(const char *s,...) {}
 
-static int (*info)(const char *fmt,...) = & printf;
+static int (*info)(const char *fmt,...) = &printf;
 
 struct svm_node *x;
 int max_nr_attr = 64;
