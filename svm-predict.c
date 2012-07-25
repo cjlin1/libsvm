@@ -159,11 +159,11 @@ void predict(FILE *input, FILE *output)
 void exit_with_help()
 {
 	printf(
-			"Usage: svm-predict [options] test_file model_file output_file\n"
-			"options:\n"
-			"-b probability_estimates: whether to predict probability estimates, 0 or 1 (default 0); for one-class SVM only 0 is supported\n"
-			"-q : quiet mode (no outputs)\n"
-	      );
+	"Usage: svm-predict [options] test_file model_file output_file\n"
+	"options:\n"
+	"-b probability_estimates: whether to predict probability estimates, 0 or 1 (default 0); for one-class SVM only 0 is supported\n"
+	"-q : quiet mode (no outputs)\n"
+	);
 	exit(1);
 }
 

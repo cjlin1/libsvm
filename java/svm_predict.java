@@ -3,15 +3,25 @@ import java.io.*;
 import java.util.*;
 
 class svm_predict {
-	private static svm_print_interface info = new svm_print_interface()
-	{
-		public void print(String s) {System.out.println(s);}
-	};
-
-	private static svm_print_interface print_null = new svm_print_interface()
+	private static svm_print_interface svm_print_null = new svm_print_interface()
 	{
 		public void print(String s) {}
 	};
+
+	private static svm_print_interface svm_print_stdout = new svm_print_interface()
+	{
+		public void print(String s)
+		{
+			System.out.print(s);
+		}
+	};
+
+	private static svm_print_interface svm_print_string = svm_print_stdout;
+
+	static void info(String s) 
+	{
+		svm_print_string.print(s);
+	}
 
 	private static double atof(String s)
 	{
@@ -39,7 +49,7 @@ class svm_predict {
 			if(svm_type == svm_parameter.EPSILON_SVR ||
 			   svm_type == svm_parameter.NU_SVR)
 			{
-				info.print("Prob. model for test data: target value = predicted value + z,\nz: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma="+svm.svm_get_svr_probability(model)+"\n");
+				svm_predict.info("Prob. model for test data: target value = predicted value + z,\nz: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma="+svm.svm_get_svr_probability(model)+"\n");
 			}
 			else
 			{
@@ -97,14 +107,14 @@ class svm_predict {
 		if(svm_type == svm_parameter.EPSILON_SVR ||
 		   svm_type == svm_parameter.NU_SVR)
 		{
-			info.print("Mean squared error = "+error/total+" (regression)\n");
-			info.print("Squared correlation coefficient = "+
+			svm_predict.info("Mean squared error = "+error/total+" (regression)\n");
+			svm_predict.info("Squared correlation coefficient = "+
 				 ((total*sumvy-sumv*sumy)*(total*sumvy-sumv*sumy))/
 				 ((total*sumvv-sumv*sumv)*(total*sumyy-sumy*sumy))+
 				 " (regression)\n");
 		}
 		else
-			info.print("Accuracy = "+(double)correct/total*100+
+			svm_predict.info("Accuracy = "+(double)correct/total*100+
 				 "% ("+correct+"/"+total+") (classification)\n");
 	}
 
@@ -120,6 +130,7 @@ class svm_predict {
 	public static void main(String argv[]) throws IOException
 	{
 		int i, predict_probability=0;
+        	svm_print_string = svm_print_stdout;
 
 		// parse options
 		for(i=0;i<argv.length;i++)
@@ -132,7 +143,7 @@ class svm_predict {
 					predict_probability = atoi(argv[i]);
 					break;
 				case 'q':
-					info = print_null;
+					svm_print_string = svm_print_null;
 					i--;
 					break;
 				default:
@@ -159,7 +170,7 @@ class svm_predict {
 			{
 				if(svm.svm_check_probability_model(model)!=0)
 				{
-					System.out.print("Model supports probability estimates, but disabled in prediction.\n");
+					svm_predict.info("Model supports probability estimates, but disabled in prediction.\n");
 				}
 			}
 			predict(input,output,model,predict_probability);
