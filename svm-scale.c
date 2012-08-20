@@ -27,6 +27,7 @@ double *feature_min;
 double y_max = -DBL_MAX;
 double y_min = DBL_MAX;
 int max_index;
+int min_index;
 long int num_nonzeros = 0;
 long int new_num_nonzeros = 0;
 
@@ -104,6 +105,7 @@ int main(int argc,char **argv)
 	/* assumption: min index of attributes is 1 */
 	/* pass 1: find out max index of attributes */
 	max_index = 0;
+	min_index = 1;
 
 	if(restore_filename)
 	{
@@ -140,15 +142,21 @@ int main(int argc,char **argv)
 		while(sscanf(p,"%d:%*f",&index)==1)
 		{
 			max_index = max(max_index, index);
+			min_index = min(min_index, index);
 			SKIP_ELEMENT
 			num_nonzeros++;
-		}		
+		}
 	}
+
+	if(min_index < 1)
+		fprintf(stderr,
+			"WARNING: minimal feature index is %d, but indices should start from 1\n", min_index);
+
 	rewind(fp);
-	
+
 	feature_max = (double *)malloc((max_index+1)* sizeof(double));
 	feature_min = (double *)malloc((max_index+1)* sizeof(double));
-	
+
 	if(feature_max == NULL || feature_min == NULL)
 	{
 		fprintf(stderr,"can't allocate enough memory\n");
@@ -206,6 +214,7 @@ int main(int argc,char **argv)
 		/* fp_restore rewinded in finding max_index */
 		int idx, c;
 		double fmin, fmax;
+		int next_index = 1;
 		
 		if((c = fgetc(fp_restore)) == 'y')
 		{
@@ -216,20 +225,32 @@ int main(int argc,char **argv)
 		else
 			ungetc(c, fp_restore);
 
-		if (fgetc(fp_restore) == 'x') {
+		if (fgetc(fp_restore) == 'x') 
+		{
 			fscanf(fp_restore, "%lf %lf\n", &lower, &upper);
 			while(fscanf(fp_restore,"%d %lf %lf\n",&idx,&fmin,&fmax)==3)
 			{
-				if(idx<=max_index)
-				{
-					feature_min[idx] = fmin;
-					feature_max[idx] = fmax;
-				}
+				for(i = next_index;i<idx;i++)
+					if(feature_min[i] != feature_max[i])
+						fprintf(stderr,
+							"WARNING: feature index %d appeared in file %s was not seen in the scaling factor file %s.\n",
+							i, argv[argc-1], restore_filename);
+
+				feature_min[idx] = fmin;
+				feature_max[idx] = fmax;
+
+				next_index = idx + 1;
 			}
+			
+			for(i=next_index;i<=max_index;i++)
+				if(feature_min[i] != feature_max[i])
+					fprintf(stderr,
+						"WARNING: feature index %d appeared in file %s was not seen in the scaling factor file %s.\n",
+						i, argv[argc-1], restore_filename);
 		}
 		fclose(fp_restore);
 	}
-	
+
 	if(save_filename)
 	{
 		FILE *fp_save = fopen(save_filename,"w");
@@ -251,6 +272,11 @@ int main(int argc,char **argv)
 			if(feature_min[i]!=feature_max[i])
 				fprintf(fp_save,"%d %.16g %.16g\n",i,feature_min[i],feature_max[i]);
 		}
+
+		if(min_index < 1)
+			fprintf(stderr,
+				"WARNING: scaling factors with indices smaller than 1 are not stored to the file %s.\n", save_filename);
+
 		fclose(fp_save);
 	}
 	
