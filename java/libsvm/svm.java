@@ -639,7 +639,7 @@ class Solver {
 				active_size = l;
 				svm.info("*");
 			}
-			svm.info("\nWARNING: reaching max number of iterations");
+			System.err.print("\nWARNING: reaching max number of iterations\n");
 		}
 
 		// calculate rho
@@ -1664,7 +1664,7 @@ public class svm {
 		}
 		
 		if (iter>=max_iter)
-			svm.info("Reaching maximal iterations in two-class probability estimates\n");
+			System.err.print("Reaching maximal iterations in two-class probability estimates\n");
 		probAB[0]=A;probAB[1]=B;
 	}
 
@@ -1734,7 +1734,7 @@ public class svm {
 			}
 		}
 		if (iter>=max_iter)
-			svm.info("Exceeds max_iter in multiclass_prob\n");
+			System.err.print("Exceeds max_iter in multiclass_prob\n");
 	}
 
 	// Cross-validation decision values for probability estimates
