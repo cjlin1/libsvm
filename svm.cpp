@@ -737,7 +737,7 @@ void Solver::Solve(int l, const QMatrix& Q, const double *p_, const schar *y_,
 			active_size = l;
 			info("*");
 		}
-		info("\nWARNING: reaching max number of iterations");
+		fprintf(stderr,"\nWARNING: reaching max number of iterations\n");
 	}
 
 	// calculate rho
@@ -1811,7 +1811,7 @@ static void sigmoid_train(
 	}
 
 	if (iter>=max_iter)
-		info("Reaching maximal iterations in two-class probability estimates\n");
+		fprintf(stderr,"Reaching maximal iterations in two-class probability estimates\n");
 	free(t);
 }
 
@@ -1883,7 +1883,7 @@ static void multiclass_probability(int k, double **r, double *p)
 		}
 	}
 	if (iter>=max_iter)
-		info("Exceeds max_iter in multiclass_prob\n");
+		fprintf(stderr,"Exceeds max_iter in multiclass_prob\n");
 	for(t=0;t<k;t++) free(Q[t]);
 	free(Q);
 	free(Qp);
