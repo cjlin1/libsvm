@@ -1664,7 +1664,7 @@ public class svm {
 		}
 		
 		if (iter>=max_iter)
-			System.err.print("Reaching maximal iterations in two-class probability estimates\n");
+			svm.info("Reaching maximal iterations in two-class probability estimates\n");
 		probAB[0]=A;probAB[1]=B;
 	}
 
@@ -1734,7 +1734,7 @@ public class svm {
 			}
 		}
 		if (iter>=max_iter)
-			System.err.print("Exceeds max_iter in multiclass_prob\n");
+			svm.info("Exceeds max_iter in multiclass_prob\n");
 	}
 
 	// Cross-validation decision values for probability estimates
