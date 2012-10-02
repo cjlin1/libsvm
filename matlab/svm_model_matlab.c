@@ -20,6 +20,7 @@ static const char *field_names[] = {
 	"totalSV",
 	"rho",
 	"Label",
+	"sv_indices",
 	"ProbA",
 	"ProbB",
 	"nSV",
@@ -73,6 +74,18 @@ const char *model_to_matlab_structure(mxArray *plhs[], int num_of_feature, struc
 		ptr = mxGetPr(rhs[out_id]);
 		for(i = 0; i < model->nr_class; i++)
 			ptr[i] = model->label[i];
+	}
+	else
+		rhs[out_id] = mxCreateDoubleMatrix(0, 0, mxREAL);
+	out_id++;
+
+	// sv_indices
+	if(model->sv_indices)
+	{
+		rhs[out_id] = mxCreateDoubleMatrix(model->l, 1, mxREAL);
+		ptr = mxGetPr(rhs[out_id]);
+		for(i = 0; i < model->l; i++)
+			ptr[i] = model->sv_indices[i];
 	}
 	else
 		rhs[out_id] = mxCreateDoubleMatrix(0, 0, mxREAL);
@@ -220,6 +233,7 @@ struct svm_model *matlab_matrix_to_model(const mxArray *matlab_struct, const cha
 	model->probA = NULL;
 	model->probB = NULL;
 	model->label = NULL;
+	model->sv_indices = NULL;
 	model->nSV = NULL;
 	model->free_sv = 1; // XXX
 
@@ -254,6 +268,16 @@ struct svm_model *matlab_matrix_to_model(const mxArray *matlab_struct, const cha
 		ptr = mxGetPr(rhs[id]);
 		for(i=0;i<model->nr_class;i++)
 			model->label[i] = (int)ptr[i];
+	}
+	id++;
+
+	// sv_indices
+	if(mxIsEmpty(rhs[id]) == 0)
+	{
+		model->sv_indices = (int*) malloc(model->l*sizeof(int));
+		ptr = mxGetPr(rhs[id]);
+		for(i=0;i<model->l;i++)
+			model->sv_indices[i] = (int)ptr[i];
 	}
 	id++;
 

@@ -203,11 +203,11 @@ class svm_parameter(Structure):
 
 class svm_model(Structure):
 	_names = ['param', 'nr_class', 'l', 'SV', 'sv_coef', 'rho',
-			'probA', 'probB', 'label', 'nSV', 'free_sv']
+			'probA', 'probB', 'sv_indices', 'label', 'nSV', 'free_sv']
 	_types = [svm_parameter, c_int, c_int, POINTER(POINTER(svm_node)),
 			POINTER(POINTER(c_double)), POINTER(c_double),
 			POINTER(c_double), POINTER(c_double), POINTER(c_int),
-			POINTER(c_int), c_int]
+			POINTER(c_int), POINTER(c_int), c_int]
 	_fields_ = genFields(_names, _types)
 
 	def __init__(self):
@@ -232,6 +232,15 @@ class svm_model(Structure):
 		labels = (c_int * nr_class)()
 		libsvm.svm_get_labels(self, labels)
 		return labels[:nr_class]
+
+	def get_sv_indices(self):
+		total_sv = self.get_nr_sv()
+		sv_indices = (c_int * total_sv)()
+		libsvm.svm_get_sv_indices(self, sv_indices)
+		return sv_indices[:total_sv]
+
+	def get_nr_sv(self):
+		return libsvm.svm_get_nr_sv(self)
 
 	def is_probability_model(self):
 		return (libsvm.svm_check_probability_model(self) == 1)
@@ -276,6 +285,8 @@ fillprototype(libsvm.svm_load_model, POINTER(svm_model), [c_char_p])
 fillprototype(libsvm.svm_get_svm_type, c_int, [POINTER(svm_model)])
 fillprototype(libsvm.svm_get_nr_class, c_int, [POINTER(svm_model)])
 fillprototype(libsvm.svm_get_labels, None, [POINTER(svm_model), POINTER(c_int)])
+fillprototype(libsvm.svm_get_sv_indices, None, [POINTER(svm_model), POINTER(c_int)])
+fillprototype(libsvm.svm_get_nr_sv, c_int, [POINTER(svm_model)])
 fillprototype(libsvm.svm_get_svr_probability, c_double, [POINTER(svm_model)])
 
 fillprototype(libsvm.svm_predict_values, c_double, [POINTER(svm_model), POINTER(svm_node), POINTER(c_double)])
