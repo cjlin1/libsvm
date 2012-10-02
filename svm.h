@@ -59,6 +59,7 @@ struct svm_model
 	double *rho;		/* constants in decision functions (rho[k*(k-1)/2]) */
 	double *probA;		/* pariwise probability information */
 	double *probB;
+	int *sv_indices;        /* sv_indices[i], in the range of [1, ..., num_traning_data], shows index of the ith+1 SV in the traning set, and i starts from 0*/
 
 	/* for classification only */
 
@@ -79,6 +80,8 @@ struct svm_model *svm_load_model(const char *model_file_name);
 int svm_get_svm_type(const struct svm_model *model);
 int svm_get_nr_class(const struct svm_model *model);
 void svm_get_labels(const struct svm_model *model, int *label);
+void svm_get_sv_indices(const struct svm_model *model, int *sv_indices);
+int svm_get_nr_sv(const struct svm_model *model);
 double svm_get_svr_probability(const struct svm_model *model);
 
 double svm_predict_values(const struct svm_model *model, const struct svm_node *x, double* dec_values);

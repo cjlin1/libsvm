@@ -444,6 +444,7 @@ to classify new data.
 		double *rho;		/* constants in decision functions (rho[k*(k-1)/2]) */
 		double *probA;		/* pairwise probability information */
 		double *probB;
+		int *sv_indices;        /* sv_indices[i], in the range of [1, ..., num_traning_data], shows index of the ith+1 SV in the traning set */
 
 		/* for classification only */
 
@@ -493,6 +494,9 @@ to classify new data.
     aligned in the order of binary problems:
     1 vs 2, 1 vs 3, ..., 1 vs k, 2 vs 3, ..., 2 vs k, ..., k-1 vs k.
 
+    sv_indices contains the indices in the range of [1, ..., num_traning_data] 
+    to indicate support vectors in the traning set.
+
     label contains labels in the training data.
 
     nSV is the number of support vectors in each class.
@@ -541,6 +545,16 @@ to classify new data.
     For a classification model, this function outputs the name of
     labels into an array called label. For regression and one-class
     models, label is unchanged.
+
+- Function: void svm_get_sv_indices(const struct svm_model *model, int *sv_indices)
+
+    This function outputs indices of support vectors into an array called sv_indices. 
+    The size of sv_indices is the number of support vectors and can be obtained by calling svm_get_nr_sv. 
+    Each sv_indices[i] is in the range of [1, ..., num_traning_data].
+
+- Function: int svm_get_nr_sv(const struct svm_model *model) 
+
+    This function gives the number of total support vector.
 
 - Function: double svm_get_svr_probability(const struct svm_model *model);
 
@@ -660,6 +674,8 @@ public class svm {
 	public static int svm_get_svm_type(svm_model model);
 	public static int svm_get_nr_class(svm_model model);
 	public static void svm_get_labels(svm_model model, int[] label);
+	public static void svm_get_sv_indices(svm_model model, int[] indices);
+	public static int svm_get_nr_sv(svm_model model);
 	public static double svm_get_svr_probability(svm_model model);
 	public static double svm_predict_values(svm_model model, svm_node[] x, double[] dec_values);
 	public static double svm_predict(svm_model model, svm_node[] x);

@@ -216,6 +216,8 @@ LIBSVM shared library:
     >>> nr_class = model.get_nr_class()
     >>> svr_probability = model.get_svr_probability()
     >>> class_labels = model.get_labels()
+    >>> sv_indices = model.get_sv_indices()
+    >>> nr_sv = model.get_nr_sv()
     >>> is_prob_model = model.is_probability_model()
     >>> support_vector_coefficients = model.get_sv_coef()
     >>> support_vectors = model.get_SV() 
