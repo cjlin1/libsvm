@@ -1,7 +1,7 @@
 #ifndef _LIBSVM_H
 #define _LIBSVM_H
 
-#define LIBSVM_VERSION 312
+#define LIBSVM_VERSION 313
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,7 +59,7 @@ struct svm_model
 	double *rho;		/* constants in decision functions (rho[k*(k-1)/2]) */
 	double *probA;		/* pariwise probability information */
 	double *probB;
-	int *sv_indices;        /* sv_indices[i], in the range of [1, ..., num_traning_data], shows index of the ith+1 SV in the traning set, and i starts from 0*/
+	int *sv_indices;        /* sv_indices[0,...,nSV-1] are values in [1,...,num_traning_data] to indicate SVs in the training set */
 
 	/* for classification only */
 
