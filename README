@@ -444,7 +444,7 @@ to classify new data.
 		double *rho;		/* constants in decision functions (rho[k*(k-1)/2]) */
 		double *probA;		/* pairwise probability information */
 		double *probB;
-		int *sv_indices;        /* sv_indices[i], in the range of [1, ..., num_traning_data], shows index of the ith+1 SV in the traning set */
+		int *sv_indices;        /* sv_indices[0,...,nSV-1] are values in [1,...,num_traning_data] to indicate SVs in the training set */
 
 		/* for classification only */
 
@@ -494,8 +494,8 @@ to classify new data.
     aligned in the order of binary problems:
     1 vs 2, 1 vs 3, ..., 1 vs k, 2 vs 3, ..., 2 vs k, ..., k-1 vs k.
 
-    sv_indices contains the indices in the range of [1, ..., num_traning_data] 
-    to indicate support vectors in the traning set.
+    sv_indices[0,...,nSV-1] are values in [1,...,num_traning_data] to
+    indicate support vectors in the training set.
 
     label contains labels in the training data.
 
@@ -668,7 +668,7 @@ You may need to increase maximum Java heap size.
 Library usages are similar to the C version. These functions are available:
 
 public class svm {
-	public static final int LIBSVM_VERSION=312; 
+	public static final int LIBSVM_VERSION=313; 
 	public static svm_model svm_train(svm_problem prob, svm_parameter param);
 	public static void svm_cross_validation(svm_problem prob, svm_parameter param, int nr_fold, double[] target);
 	public static int svm_get_svm_type(svm_model model);
