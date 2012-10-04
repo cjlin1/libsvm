@@ -1292,7 +1292,7 @@ public class svm {
 	//
 	// construct and solve various formulations
 	//
-	public static final int LIBSVM_VERSION=312; 
+	public static final int LIBSVM_VERSION=313; 
 	public static final Random rand = new Random();
 
 	private static svm_print_interface svm_print_stdout = new svm_print_interface()
@@ -2106,7 +2106,7 @@ public class svm {
 			model.sv_indices = new int[nnz];
 			p = 0;
 			for(i=0;i<l;i++)
-				if(nonzero[i]) 
+				if(nonzero[i])
 				{
 					model.SV[p] = x[i];
 					model.sv_indices[p++] = perm[i] + 1;
