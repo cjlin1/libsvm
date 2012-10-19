@@ -17,5 +17,5 @@ try
 		mex CFLAGS="\$CFLAGS -std=c99" -largeArrayDims svmpredict.c ../svm.cpp svm_model_matlab.c
 	end
 catch
-	fprintf('If make.m failes, please check README about detailed instructions.\n');
+	fprintf('If make.m fails, please check README about detailed instructions.\n');
 end
