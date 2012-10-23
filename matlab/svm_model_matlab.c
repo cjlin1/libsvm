@@ -10,7 +10,7 @@ typedef int mwIndex;
 #endif
 #endif
 
-#define NUM_OF_RETURN_FIELD 10
+#define NUM_OF_RETURN_FIELD 11
 
 #define Malloc(type,n) (type *)malloc((n)*sizeof(type))
 
