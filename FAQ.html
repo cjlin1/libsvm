@@ -9,7 +9,7 @@
 <a name="_TOP"><b><h1><a
 href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a>  FAQ </h1></b></a>
 <b>last modified : </b>
-Thu,  1 Mar 2012 14:45:34 GMT
+Tue,  6 Nov 2012 14:26:41 GMT
 <class="categories">
 <li><a
 href="#_TOP">All Questions</a>(77)</li>
@@ -408,7 +408,7 @@ The warning message is like
 <pre>
 svm.cpp:2730: warning: ignoring return value of int fscanf(FILE*, const char*, ...), declared with attribute warn_unused_result
 </pre>
-This is not a problem; see <a href=https://wiki.ubuntu.com/CompilerFlags#-D_FORTIFY_SOURCE=2>for more 
+This is not a problem; see <a href=https://wiki.ubuntu.com/CompilerFlags#-D_FORTIFY_SOURCE=2>this page</a> for more 
 details of ubuntu systems.
 In the future we may modify the code
 so that these messages do not appear.
@@ -1141,6 +1141,10 @@ in mid 2011), you can add
 svm.rand.setSeed(0);
 </pre>
 in the main() function of svm_train.java.
+
+<p>
+If you use CV to select parameters, it is recommended to use identical folds
+under different parameters. In this case, you can consider fixing the seed.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
@@ -1363,32 +1367,26 @@ $(CXX) -lgomp -shared -dynamiclib svm.o -o libsvm.so.$(SHVER)
 <br/>                                                                                
 
 <p>
-It's very simple. Please replace 
+It's very simple. Since version 3.13, you can use the function
 <pre>
-			if(nonzero[i]) model->SV[p++] = x[i];
+void svm_get_sv_indices(const struct svm_model *model, int *sv_indices)
 </pre>
-in svm_train() of svm.cpp with
+to get indices of support vectors. For example, in svm-train.c, after
 <pre>
-			if(nonzero[i]) 
-			{
-				model->SV[p++] = x[i];
-				info("%d\n", perm[i]);
-			}
+		model = svm_train(&amp;prob, &amp;param);
 </pre>
-If there are many requests, we may
-provide a function to return indices
-of support vectors. In the mean time,
-if you need such information in your code,
-you can add the array nonzero to the model
-structure. This array has the same size as
-the number of data, so alternatively you can
-store only indices of support vectors.
+you can add
+<pre>
+		int nr_sv = svm_get_nr_sv(model);
+		int *sv_indices = Malloc(int, nr_sv);
+		svm_get_sv_indices(model, sv_indices);
+		for (int i=0; i&lt;nr_sv; i++)
+			printf("instance %d is a support vector\n", sv_indices[i]);
+</pre>
 
-<p> If you use matlab interface, you can easily
-compare support vectors and training data to know
-the indices:
+<p> If you use matlab interface, you can directly check
 <pre>
-[tmp index]=ismember(model.SVs, training_data,'rows');
+model.sv_indices
 </pre>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
@@ -1811,11 +1809,11 @@ because rho is arranged by 1vs2 1vs3 2vs3.
 <br/>                                                                                
 <p>
 Yes, after libsvm 2.86, the matlab interface
-works on OCTAVE as well. Please type
+works on OCTAVE as well. Please use make.m by typing
 <pre>
-make octave
+>> make 
 </pre>
-for installation.
+under OCTAVE.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
