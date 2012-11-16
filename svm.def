@@ -17,5 +17,5 @@ EXPORTS
 	svm_check_parameter	@15
 	svm_check_probability_model	@16
 	svm_set_print_string_function	@17
-	svm_get_labels	@18
-	svm_get_sv_indices	@19
+	svm_get_sv_indices	@18
+	svm_get_nr_sv	@19
