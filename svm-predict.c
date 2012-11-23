@@ -5,7 +5,7 @@
 #include <errno.h>
 #include "svm.h"
 
-int print_null(const char *s,...) {}
+int print_null(const char *s,...) {return 0;}
 
 static int (*info)(const char *fmt,...) = &printf;
 
