@@ -2973,6 +2973,9 @@ void svm_free_model_content(svm_model* model_ptr)
 	free(model_ptr->probB);
 	model_ptr->probB= NULL;
 
+	free(model_ptr->sv_indices);
+	model_ptr->sv_indices = NULL;
+
 	free(model_ptr->nSV);
 	model_ptr->nSV = NULL;
 }
