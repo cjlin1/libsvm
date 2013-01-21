@@ -2,21 +2,24 @@
 
 from ctypes import *
 from ctypes.util import find_library
+from os import path
 import sys
-import os
 
-# For unix the prefix 'lib' is not considered.
-if find_library('svm'):
-	libsvm = CDLL(find_library('svm'))
-elif find_library('libsvm'):
-	libsvm = CDLL(find_library('libsvm'))
-else:
+
+try:
+	dirname = path.dirname(path.abspath(__file__))
 	if sys.platform == 'win32':
-		libsvm = CDLL(os.path.join(os.path.dirname(__file__),\
-				'../windows/libsvm.dll'))
+		libsvm = CDLL(path.join(dirname, r'..\windows\libsvm.dll'))
 	else:
-		libsvm = CDLL(os.path.join(os.path.dirname(__file__),\
-				'../libsvm.so.2'))
+		libsvm = CDLL(path.join(dirname, '../libsvm.so.2'))
+except:
+# For unix the prefix 'lib' is not considered.
+	if find_library('svm'):
+		libsvm = CDLL(find_library('svm'))
+	elif find_library('libsvm'):
+		libsvm = CDLL(find_library('libsvm'))
+	else:
+		raise Exception('LIBSVM library not found.')
 
 # Construct constants
 SVM_TYPE = ['C_SVC', 'NU_SVC', 'ONE_CLASS', 'EPSILON_SVR', 'NU_SVR' ]
@@ -39,6 +42,9 @@ class svm_node(Structure):
 	_names = ["index", "value"]
 	_types = [c_int, c_double]
 	_fields_ = genFields(_names, _types)
+
+	def __str__(self):
+		return '%d:%g' % (self.index, self.value)
 
 def gen_svm_nodearray(xi, feature_max=None, isKernel=None):
 	if isinstance(xi, dict):
@@ -105,11 +111,15 @@ class svm_parameter(Structure):
 			options = ''
 		self.parse_options(options)
 
-	def show(self):
-		attrs = svm_parameter._names + self.__dict__.keys()
+	def __str__(self):
+		s = ''
+		attrs = svm_parameter._names + list(self.__dict__.keys())
 		values = map(lambda attr: getattr(self, attr), attrs) 
 		for attr, val in zip(attrs, values):
-			print(' %s: %s' % (attr, val))
+			s += (' %s: %s\n' % (attr, val))
+		s = s.strip()
+
+		return s
 
 	def set_to_default_values(self):
 		self.svm_type = C_SVC;
@@ -132,7 +142,12 @@ class svm_parameter(Structure):
 		self.print_func = None
 
 	def parse_options(self, options):
-		argv = options.split()
+		if isinstance(options, list):
+			argv = options
+		elif isinstance(options, str):
+			argv = options.split()
+		else:
+			raise TypeError("arg 1 should be a list or a str.")
 		self.set_to_default_values()
 		self.print_func = cast(None, PRINT_STRING_FUN)
 		weight_label = []

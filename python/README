@@ -133,6 +133,10 @@ LIBSVM shared library:
 
     val: a float indicates the feature value.
 
+    Show the index and the value of a node.
+
+    >>> print(node) 
+
 - Function: gen_svm_nodearray(xi [,feature_max=None [,isKernel=False]])
 
     Generate a feature vector from a Python list/tuple or a dictionary:
@@ -188,7 +192,7 @@ LIBSVM shared library:
 
     Show values of parameters.
 
-    >>> param.show()
+    >>> print(param)
 
 - class svm_model:
 
