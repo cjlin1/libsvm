@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import os, sys
+sys.path = [os.path.dirname(os.path.abspath(__file__))] + sys.path 
 from svm import *
 
 def svm_read_problem(data_file_name):
@@ -76,15 +78,15 @@ def evaluations(ty, pv):
 
 def svm_train(arg1, arg2=None, arg3=None):
 	"""
-	svm_train(y, x [, 'options']) -> model | ACC | MSE 
-	svm_train(prob, [, 'options']) -> model | ACC | MSE 
+	svm_train(y, x [, options]) -> model | ACC | MSE 
+	svm_train(prob [, options]) -> model | ACC | MSE 
 	svm_train(prob, param) -> model | ACC| MSE 
 
 	Train an SVM model from data (y, x) or an svm_problem prob using
 	'options' or an svm_parameter param. 
 	If '-v' is specified in 'options' (i.e., cross validation)
 	either accuracy (ACC) or mean-squared error (MSE) is returned.
-	'options':
+	options:
 	    -s svm_type : set type of SVM (default 0)
 	        0 -- C-SVC		(multi-class classification)
 	        1 -- nu-SVC		(multi-class classification)
@@ -163,10 +165,10 @@ def svm_train(arg1, arg2=None, arg3=None):
 
 def svm_predict(y, x, m, options=""):
 	"""
-	svm_predict(y, x, m [, "options"]) -> (p_labels, p_acc, p_vals)
+	svm_predict(y, x, m [, options]) -> (p_labels, p_acc, p_vals)
 
 	Predict data (y, x) with the SVM model m. 
-	"options": 
+	options: 
 	    -b probability_estimates: whether to predict probability estimates, 
 	        0 or 1 (default 0); for one-class SVM only 0 is supported.
 	    -q : quiet mode (no outputs).
