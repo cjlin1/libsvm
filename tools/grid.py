@@ -248,7 +248,6 @@ class Worker(Thread):
 		self.job_queue = job_queue
 		self.result_queue = result_queue
 		self.options = options
-		self.daemon = True
 		
 	def run(self):
 		while True:
@@ -342,21 +341,22 @@ def find_parameters(dataset_pathname, options=''):
 	def update_param(c,g,rate,best_c,best_g,best_rate,worker,resumed):
 		if (rate > best_rate) or (rate==best_rate and g==best_g and c<best_c):
 			best_rate,best_c,best_g = rate,c,g
-		cg,best_cg = [],[]
+		stdout_str = '[{0}] {1} {2} (best '.format(worker,' '.join(map(str,[c,g])),rate)
+		output_str = ''
 		if c != None:
-			cg += ['log2c={0}'.format(c)]
-			best_cg += ['c={0},'.format(2.0**best_c)]
+			stdout_str += 'c={0}, '.format(2.0**best_c)
+			output_str += 'log2c={0} '.format(c)
 		if g != None:
-			cg += ['log2g={0}'.format(g)]
-			best_cg += ['g={0},'.format(2.0**best_g)]
-		cg,best_cg = ' '.join(cg), ' '.join(best_cg)
-		print('[{0}] {1} rate={2} (best {3} rate={4})'.format \
-				  (worker,re.sub('log2.=','',cg),rate,best_cg,best_rate))
+			stdout_str += 'g={0}, '.format(2.0**best_g)
+			output_str += 'log2g={0} '.format(g)
+		stdout_str += 'rate={0})'.format(best_rate)
+		print(stdout_str)
 		if options.out_pathname and not resumed:
-			result_file.write('{0} rate={1}\n'.format(cg,rate))
+			output_str += 'rate={0}\n'.format(rate)
+			result_file.write(output_str)
 			result_file.flush()
 		
-		return best_c,best_g,best_rate,best_cg
+		return best_c,best_g,best_rate
 		
 	options = GridOption(dataset_pathname, options);
 
@@ -388,8 +388,6 @@ def find_parameters(dataset_pathname, options=''):
  
 	job_queue._put = job_queue.queue.appendleft
 
-	threads = set()
-
 	# fire telnet workers
 
 	if telnet_workers:
@@ -400,7 +398,6 @@ def find_parameters(dataset_pathname, options=''):
 			worker = TelnetWorker(host,job_queue,result_queue,
 					 host,username,password,options)
 			worker.start()
-			threads.add(worker)
 
 	# fire ssh workers
 
@@ -408,14 +405,12 @@ def find_parameters(dataset_pathname, options=''):
 		for host in ssh_workers:
 			worker = SSHWorker(host,job_queue,result_queue,host,options)
 			worker.start()
-			threads.add(worker)
 
 	# fire local workers
 
 	for i in range(nr_local_worker):
 		worker = LocalWorker('local',job_queue,result_queue,options)
 		worker.start()
-		threads.add(worker)
 
 	# gather results
 
@@ -434,50 +429,32 @@ def find_parameters(dataset_pathname, options=''):
 
 	for (c,g) in resumed_jobs:
 		rate = resumed_jobs[(c,g)]
-		best_c,best_g,best_rate,best_cg = update_param(c,g,rate,best_c,best_g,best_rate,'resumed',True)
+		best_c,best_g,best_rate = update_param(c,g,rate,best_c,best_g,best_rate,'resumed',True)
 
-	try:
-		for line in jobs:
-			for (c,g) in line:
-				while (c,g) not in done_jobs:
-					# need to check len(threads) == 0 first,
-					# because result_queue may become nonempty
-					# right after checking empty()! 
-					if len(threads) == 0 and result_queue.empty():
-						raise RuntimeError('Error: all workers died!')
-					
-					if result_queue.empty():
-						time.sleep(0.1)
-						removed_list = []
-						for t in threads:
-							if not t.isAlive():
-								removed_list.append(t) 
-						for t in removed_list:
-							threads.remove(t)
-						continue
-					(worker,c1,g1,rate1) = result_queue.get()
-					done_jobs[(c1,g1)] = rate1
-					if (c1,g1) not in resumed_jobs:
-						best_c,best_g,best_rate,best_cg = update_param(c1,g1,rate1,best_c,best_g,best_rate,worker,False)
-				db.append((c,g,done_jobs[(c,g)]))
-			if gnuplot and options.grid_with_c and options.grid_with_g:
-				redraw(db,[best_c, best_g, best_rate],gnuplot,options)
-				redraw(db,[best_c, best_g, best_rate],gnuplot,options,True)
+	for line in jobs:
+		for (c,g) in line:
+			while (c,g) not in done_jobs:
+				(worker,c1,g1,rate1) = result_queue.get()
+				done_jobs[(c1,g1)] = rate1
+				if (c1,g1) not in resumed_jobs:
+					best_c,best_g,best_rate = update_param(c1,g1,rate1,best_c,best_g,best_rate,worker,False)
+			db.append((c,g,done_jobs[(c,g)]))
+		if gnuplot and options.grid_with_c and options.grid_with_g:
+			redraw(db,[best_c, best_g, best_rate],gnuplot,options)
+			redraw(db,[best_c, best_g, best_rate],gnuplot,options,True)
 
-	except RuntimeError as e:
-		sys.stderr.write(str(e) + '\n')
-		if not job_queue.empty():
-			sys.stderr.write('Warning: some parameters are not tried.\n')
 
 	if options.out_pathname:
 		result_file.close()
 	job_queue.put((WorkerStopToken,None))
-	best_param  = {}
+	best_param, best_cg  = {}, []
 	if best_c != None:
 		best_param['c'] = 2.0**best_c
+		best_cg += [2.0**best_c]
 	if best_g != None:
 		best_param['g'] = 2.0**best_g
-	print('{0} {1}'.format(best_cg, best_rate))
+		best_cg += [2.0**best_g]
+	print('{0} {1}'.format(' '.join(map(str,best_cg)), best_rate))
 
 	return best_rate, best_param
 
@@ -505,7 +482,7 @@ grid_options :
     "null"   -- do not output file
 -png pathname : set graphic output file path and name (default dataset.png)
 -resume [pathname] : resume the grid task using an existing output file (default pathname is dataset.out)
-    Use this option only if some parameters have been checked for the SAME data.
+    This is experimental. Try this option only if some parameters have been checked for the SAME data.
 
 svm_options : additional options for svm-train""")
 		sys.exit(1)
