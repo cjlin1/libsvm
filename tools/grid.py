@@ -341,7 +341,8 @@ def find_parameters(dataset_pathname, options=''):
 	def update_param(c,g,rate,best_c,best_g,best_rate,worker,resumed):
 		if (rate > best_rate) or (rate==best_rate and g==best_g and c<best_c):
 			best_rate,best_c,best_g = rate,c,g
-		stdout_str = '[{0}] {1} {2} (best '.format(worker,' '.join(map(str,[c,g])),rate)
+		stdout_str = '[{0}] {1} {2} (best '.format\
+			(worker,' '.join(str(x) for x in [c,g] if x is not None),rate)
 		output_str = ''
 		if c != None:
 			stdout_str += 'c={0}, '.format(2.0**best_c)
