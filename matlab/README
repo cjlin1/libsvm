@@ -91,6 +91,7 @@ matlab> model = svmtrain(training_label_vector, training_instance_matrix [, 'lib
             A string of training options in the same format as that of LIBSVM.
 
 matlab> [predicted_label, accuracy, decision_values/prob_estimates] = svmpredict(testing_label_vector, testing_instance_matrix, model [, 'libsvm_options']);
+matlab> [predicted_label] = svmpredict(testing_label_vector, testing_instance_matrix, model [, 'libsvm_options']);
 
         -testing_label_vector:
             An m by 1 vector of prediction labels. If labels of test
