@@ -2049,9 +2049,9 @@ static void svm_group_classes(const svm_problem *prob, int *nr_class_ret, int **
 	}
 
 	//
-	//Labels are ordered by their first occurrence in the training set. 
-	//However, for two-class sets with -1/+1 labels and -1 appears first, 
-	//we swap labels to ensure that internally the binary SVM has positive data corresponding to the +1 instances.
+	// Labels are ordered by their first occurrence in the training set. 
+	// However, for two-class sets with -1/+1 labels and -1 appears first, 
+	// we swap labels to ensure that internally the binary SVM has positive data corresponding to the +1 instances.
 	//
 	if (nr_class == 2 && label[0] == -1 && label[1] == 1)
 	{
