@@ -74,7 +74,7 @@ public:
 	// return some position p where [p,len) need to be filled
 	// (p >= len if nothing needs to be filled)
 	int get_data(const int index, Qfloat **data, int len);
-	void swap_index(int i, int j);	
+	void swap_index(int i, int j);
 private:
 	int l;
 	long int size;
@@ -444,7 +444,7 @@ protected:
 	virtual double calculate_rho();
 	virtual void do_shrinking();
 private:
-	bool be_shrunk(int i, double Gmax1, double Gmax2);	
+	bool be_shrunk(int i, double Gmax1, double Gmax2);
 };
 
 void Solver::swap_index(int i, int j)
@@ -833,7 +833,7 @@ int Solver::select_working_set(int &out_i, int &out_j)
 					Gmax2 = G[j];
 				if (grad_diff > 0)
 				{
-					double obj_diff; 
+					double obj_diff;
 					double quad_coef = QD[i]+QD[j]-2.0*y[i]*Q_i[j];
 					if (quad_coef > 0)
 						obj_diff = -(grad_diff*grad_diff)/quad_coef;
@@ -857,7 +857,7 @@ int Solver::select_working_set(int &out_i, int &out_j)
 					Gmax2 = -G[j];
 				if (grad_diff > 0)
 				{
-					double obj_diff; 
+					double obj_diff;
 					double quad_coef = QD[i]+QD[j]+2.0*y[i]*Q_i[j];
 					if (quad_coef > 0)
 						obj_diff = -(grad_diff*grad_diff)/quad_coef;
@@ -1085,7 +1085,7 @@ int Solver_NU::select_working_set(int &out_i, int &out_j)
 					Gmaxp2 = G[j];
 				if (grad_diff > 0)
 				{
-					double obj_diff; 
+					double obj_diff;
 					double quad_coef = QD[ip]+QD[j]-2*Q_ip[j];
 					if (quad_coef > 0)
 						obj_diff = -(grad_diff*grad_diff)/quad_coef;
@@ -1109,7 +1109,7 @@ int Solver_NU::select_working_set(int &out_i, int &out_j)
 					Gmaxn2 = -G[j];
 				if (grad_diff > 0)
 				{
-					double obj_diff; 
+					double obj_diff;
 					double quad_coef = QD[in]+QD[j]-2*Q_in[j];
 					if (quad_coef > 0)
 						obj_diff = -(grad_diff*grad_diff)/quad_coef;
@@ -1641,7 +1641,7 @@ static void solve_nu_svr(
 struct decision_function
 {
 	double *alpha;
-	double rho;	
+	double rho;
 };
 
 static decision_function svm_train_one(
@@ -1722,7 +1722,7 @@ static void sigmoid_train(
 	double *t=Malloc(double,l);
 	double fApB,p,q,h11,h22,h21,g1,g2,det,dA,dB,gd,stepsize;
 	double newA,newB,newf,d1,d2;
-	int iter; 
+	int iter;
 	
 	// Initial Point and Initial Fun Value
 	A=0.0; B=log((prior0+1.0)/(prior1+1.0));
@@ -1961,7 +1961,7 @@ static void svm_binary_svc_probability(
 			struct svm_model *submodel = svm_train(&subprob,&subparam);
 			for(j=begin;j<end;j++)
 			{
-				svm_predict_values(submodel,prob->x[perm[j]],&(dec_values[perm[j]])); 
+				svm_predict_values(submodel,prob->x[perm[j]],&(dec_values[perm[j]]));
 				// ensure +1 -1 order; reason not using CV subroutine
 				dec_values[perm[j]] *= submodel->label[0];
 			}		
@@ -2018,7 +2018,7 @@ static void svm_group_classes(const svm_problem *prob, int *nr_class_ret, int **
 	int nr_class = 0;
 	int *label = Malloc(int,max_nr_class);
 	int *count = Malloc(int,max_nr_class);
-	int *data_label = Malloc(int,l);	
+	int *data_label = Malloc(int,l);
 	int i;
 
 	for(i=0;i<l;i++)
@@ -2394,9 +2394,9 @@ void svm_cross_validation(const svm_problem *prob, const svm_parameter *param, i
 		fold_start[0]=0;
 		for (i=1;i<=nr_fold;i++)
 			fold_start[i] = fold_start[i-1]+fold_count[i-1];
-		free(start);	
+		free(start);
 		free(label);
-		free(count);	
+		free(count);
 		free(index);
 		free(fold_count);
 	}
@@ -2443,7 +2443,7 @@ void svm_cross_validation(const svm_problem *prob, const svm_parameter *param, i
 			double *prob_estimates=Malloc(double,svm_get_nr_class(submodel));
 			for(j=begin;j<end;j++)
 				target[perm[j]] = svm_predict_probability(submodel,prob->x[perm[j]],prob_estimates);
-			free(prob_estimates);			
+			free(prob_estimates);
 		}
 		else
 			for(j=begin;j<end;j++)
@@ -2453,7 +2453,7 @@ void svm_cross_validation(const svm_problem *prob, const svm_parameter *param, i
 		free(subprob.y);
 	}		
 	free(fold_start);
-	free(perm);	
+	free(perm);
 }
 
 
@@ -2621,7 +2621,7 @@ double svm_predict_probability(
 		for(i=0;i<nr_class;i++)
 			free(pairwise_prob[i]);
 		free(dec_values);
-		free(pairwise_prob);	     
+		free(pairwise_prob);
 		return model->label[prob_max_idx];
 	}
 	else 
@@ -2877,7 +2877,7 @@ svm_model *svm_load_model(const char *model_file_name)
 			while(1)
 			{
 				int c = getc(fp);
-				if(c==EOF || c=='\n') break;	
+				if(c==EOF || c=='\n') break;
 			}
 			break;
 		}
