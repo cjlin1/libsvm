@@ -85,8 +85,8 @@ double do_cross_validation()
 			sumyy += y*y;
 			sumvy += v*y;
 		}
-		mexPrintf("Cross Validation Mean squared error = %g\n",total_error/prob.l);
-		mexPrintf("Cross Validation Squared correlation coefficient = %g\n",
+		svm_info("Cross Validation Mean squared error = %g\n",total_error/prob.l);
+		svm_info("Cross Validation Squared correlation coefficient = %g\n",
 			((prob.l*sumvy-sumv*sumy)*(prob.l*sumvy-sumv*sumy))/
 			((prob.l*sumvv-sumv*sumv)*(prob.l*sumyy-sumy*sumy))
 			);
@@ -97,7 +97,7 @@ double do_cross_validation()
 		for(i=0;i<prob.l;i++)
 			if(target[i] == prob.y[i])
 				++total_correct;
-		mexPrintf("Cross Validation Accuracy = %g%%\n",100.0*total_correct/prob.l);
+		svm_info("Cross Validation Accuracy = %g%%\n",100.0*total_correct/prob.l);
 		retval = 100.0*total_correct/prob.l;
 	}
 	free(target);

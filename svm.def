@@ -19,3 +19,4 @@ EXPORTS
 	svm_set_print_string_function	@17
 	svm_get_sv_indices	@18
 	svm_get_nr_sv	@19
+	svm_info @20
