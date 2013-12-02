@@ -5,7 +5,7 @@
 
 ##########################################
 CXX = cl.exe
-CFLAGS = -nologo -O2 -EHsc -I. -D __WIN32__ -D _CRT_SECURE_NO_DEPRECATE
+CFLAGS = /nologo /O2 /EHsc /I. /D _WIN32 /D _CRT_SECURE_NO_DEPRECATE
 TARGET = windows
 
 all: $(TARGET)\svm-train.exe $(TARGET)\svm-predict.exe $(TARGET)\svm-scale.exe $(TARGET)\svm-toy.exe lib
