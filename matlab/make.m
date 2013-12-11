@@ -1,9 +1,8 @@
 % This make.m is for MATLAB and OCTAVE under Windows, Mac, and Unix
 
 try
-	Type = ver;
 	% This part is for OCTAVE
-	if(strcmp(Type(1).Name, 'Octave') == 1)
+	if (exist ("OCTAVE_VERSION", "builtin"))
 		mex libsvmread.c
 		mex libsvmwrite.c
 		mex svmtrain.c ../svm.cpp svm_model_matlab.c
