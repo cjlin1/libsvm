@@ -221,9 +221,8 @@ int parse_command_line(int nrhs, const mxArray *prhs[], char *model_file_name)
 // read in a problem (in svmlight format)
 int read_problem_dense(const mxArray *label_vec, const mxArray *instance_mat)
 {
-	int i,k;
-	int max_index, sc, label_vector_row_num;
-	long int elements, j;
+	int i, j, k;
+	int elements, max_index, sc, label_vector_row_num;
 	double *samples, *labels;
 
 	prob.x = NULL;
@@ -246,14 +245,13 @@ int read_problem_dense(const mxArray *label_vec, const mxArray *instance_mat)
 	}
 
 	if(param.kernel_type == PRECOMPUTED)
-		elements = (long int)prob.l * (sc + 1);
-
+		elements = prob.l * (sc + 1);
 	else
 	{
 		for(i = 0; i < prob.l; i++)
 		{
 			for(k = 0; k < sc; k++)
-				if(samples[(long int)k * prob.l + i] != 0)
+				if(samples[k * prob.l + i] != 0)
 					elements++;
 			// count the '-1' element
 			elements++;
@@ -273,10 +271,10 @@ int read_problem_dense(const mxArray *label_vec, const mxArray *instance_mat)
 
 		for(k = 0; k < sc; k++)
 		{
-			if(param.kernel_type == PRECOMPUTED || samples[(long int)k * prob.l + i] != 0)
+			if(param.kernel_type == PRECOMPUTED || samples[k * prob.l + i] != 0)
 			{
 				x_space[j].index = k + 1;
-				x_space[j].value = samples[(long int)k * prob.l + i];
+				x_space[j].value = samples[k * prob.l + i];
 				j++;
 			}
 		}
@@ -301,10 +299,9 @@ int read_problem_dense(const mxArray *label_vec, const mxArray *instance_mat)
 
 int read_problem_sparse(const mxArray *label_vec, const mxArray *instance_mat)
 {
-	int i;
+	int i, j, k, low, high;
 	mwIndex *ir, *jc;
-	int max_index, label_vector_row_num;
-	long elements, num_samples, j, k, low, high;
+	int elements, max_index, num_samples, label_vector_row_num;
 	double *samples, *labels;
 	mxArray *instance_mat_col; // transposed instance sparse matrix
 
@@ -331,7 +328,7 @@ int read_problem_sparse(const mxArray *label_vec, const mxArray *instance_mat)
 	ir = mxGetIr(instance_mat_col);
 	jc = mxGetJc(instance_mat_col);
 
-	num_samples = (long int)mxGetNzmax(instance_mat_col);
+	num_samples = (int)mxGetNzmax(instance_mat_col);
 
 	// the number of instance
 	prob.l = (int)mxGetN(instance_mat_col);
@@ -355,7 +352,7 @@ int read_problem_sparse(const mxArray *label_vec, const mxArray *instance_mat)
 	{
 		prob.x[i] = &x_space[j];
 		prob.y[i] = labels[i];
-		low = (long int)jc[i], high = (long int)jc[i+1];
+		low = (int)jc[i], high = (int)jc[i+1];
 		for(k=low;k<high;k++)
 		{
 			x_space[j].index = (int)ir[k] + 1;
