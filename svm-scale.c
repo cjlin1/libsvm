@@ -40,7 +40,7 @@ char* readline(FILE *input);
 
 int clean_up(FILE *fp_restore, FILE *fp)
 {
-	fprintf(stderr, "ERROR: invalid restore file format\n");
+	fprintf(stderr, "ERROR: failed to read scaling parameters\n");
 	free(line);
 	free(feature_max);
 	free(feature_min);
