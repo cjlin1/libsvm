@@ -2891,6 +2891,7 @@ svm_model *svm_load_model(const char *model_file_name)
 	// read header
 	if (!read_model_header(fp, model))
 	{
+		fprintf(stderr, "ERROR: fscanf failed to read model\n");
 		setlocale(LC_ALL, old_locale);
 		free(old_locale);
 		free(model->rho);

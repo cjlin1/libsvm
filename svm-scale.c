@@ -37,17 +37,7 @@ long int new_num_nonzeros = 0;
 void output_target(double value);
 void output(int index, double value);
 char* readline(FILE *input);
-
-int clean_up(FILE *fp_restore, FILE *fp)
-{
-	fprintf(stderr, "ERROR: failed to read scaling parameters\n");
-	free(line);
-	free(feature_max);
-	free(feature_min);
-	fclose(fp);
-	fclose(fp_restore);
-	return -1;
-}
+int clean_up(FILE *fp_restore, FILE *fp);
 
 int main(int argc,char **argv)
 {
@@ -390,3 +380,15 @@ void output(int index, double value)
 		new_num_nonzeros++;
 	}
 }
+
+int clean_up(FILE *fp_restore, FILE *fp)
+{
+	fprintf(stderr, "ERROR: failed to read scaling parameters\n");
+	free(line);
+	free(feature_max);
+	free(feature_min);
+	fclose(fp);
+	fclose(fp_restore);
+	return -1;
+}
+
