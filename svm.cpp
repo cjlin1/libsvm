@@ -2754,10 +2754,11 @@ static char* readline(FILE *input)
 }
 
 //
-// FSCANF is a macro reading one variable at a time.
-// FSCANF returns false if fscanf fails.
-// The do-while block is used to avoid ambiguity in 
-// single line if or else-if statements.
+// FSCANF helps to handle fscanf failures.
+// Its do-while block avoids the ambiguity when
+// if (...)
+//    FSCANF();
+// is used
 //
 #define FSCANF(_stream, _format, _var) do{ if (fscanf(_stream, _format, _var) != 1) return false; }while(0)
 bool read_model_header(FILE *fp, svm_model* model)
