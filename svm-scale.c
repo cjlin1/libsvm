@@ -37,7 +37,7 @@ long int new_num_nonzeros = 0;
 void output_target(double value);
 void output(int index, double value);
 char* readline(FILE *input);
-int clean_up(FILE *fp_restore, FILE *fp);
+int clean_up(FILE *fp_restore, FILE *fp, const char *msg);
 
 int main(int argc,char **argv)
 {
@@ -178,7 +178,8 @@ int main(int argc,char **argv)
 		double target;
 		double value;
 
-		sscanf(p,"%lf",&target);
+		if (sscanf(p,"%lf",&target) != 1)
+			return clean_up(fp_restore, fp, "ERROR: failed to read label\n");
 		y_max = max(y_max,target);
 		y_min = min(y_min,target);
 		
@@ -221,7 +222,7 @@ int main(int argc,char **argv)
 		{
 			if(fscanf(fp_restore, "%lf %lf\n", &y_lower, &y_upper) != 2 ||
 			   fscanf(fp_restore, "%lf %lf\n", &y_min, &y_max) != 2)
-				return clean_up(fp_restore, fp);
+				return clean_up(fp_restore, fp, "ERROR: failed to read scaling parameters\n");
 			y_scaling = 1;
 		}
 		else
@@ -230,7 +231,7 @@ int main(int argc,char **argv)
 		if (fgetc(fp_restore) == 'x') 
 		{
 			if(fscanf(fp_restore, "%lf %lf\n", &lower, &upper) != 2)
-				return clean_up(fp_restore, fp);
+				return clean_up(fp_restore, fp, "ERROR: failed to read scaling parameters\n");
 			while(fscanf(fp_restore,"%d %lf %lf\n",&idx,&fmin,&fmax)==3)
 			{
 				for(i = next_index;i<idx;i++)
@@ -291,7 +292,8 @@ int main(int argc,char **argv)
 		double target;
 		double value;
 		
-		sscanf(p,"%lf",&target);
+		if (sscanf(p,"%lf",&target) != 1)
+			return clean_up(NULL, fp, "ERROR: failed to read label\n");
 		output_target(target);
 
 		SKIP_TARGET
@@ -381,14 +383,15 @@ void output(int index, double value)
 	}
 }
 
-int clean_up(FILE *fp_restore, FILE *fp)
+int clean_up(FILE *fp_restore, FILE *fp, const char* msg)
 {
-	fprintf(stderr, "ERROR: failed to read scaling parameters\n");
+	fprintf(stderr,	"%s", msg);
 	free(line);
 	free(feature_max);
 	free(feature_min);
 	fclose(fp);
-	fclose(fp_restore);
+	if (fp_restore)
+		fclose(fp_restore);
 	return -1;
 }
 
