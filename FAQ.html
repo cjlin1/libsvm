@@ -9,29 +9,31 @@
 <a name="_TOP"><b><h1><a
 href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a>  FAQ </h1></b></a>
 <b>last modified : </b>
-Wed, 19 Dec 2012 13:26:34 GMT
+Tue,  4 Mar 2014 22:22:42 GMT
 <class="categories">
 <li><a
-href="#_TOP">All Questions</a>(78)</li>
+href="#_TOP">All Questions</a>(81)</li>
 <ul><b>
 <li><a
-href="#/Q1:_Some_sample_uses_of_libsvm">Q1:_Some_sample_uses_of_libsvm</a>(2)</li>
+href="#/Q01:_Some_sample_uses_of_libsvm">Q01:_Some_sample_uses_of_libsvm</a>(2)</li>
 <li><a
-href="#/Q2:_Installation_and_running_the_program">Q2:_Installation_and_running_the_program</a>(13)</li>
+href="#/Q02:_Installation_and_running_the_program">Q02:_Installation_and_running_the_program</a>(13)</li>
 <li><a
-href="#/Q3:_Data_preparation">Q3:_Data_preparation</a>(7)</li>
+href="#/Q03:_Data_preparation">Q03:_Data_preparation</a>(7)</li>
 <li><a
-href="#/Q4:_Training_and_prediction">Q4:_Training_and_prediction</a>(34)</li>
+href="#/Q04:_Training_and_prediction">Q04:_Training_and_prediction</a>(28)</li>
 <li><a
-href="#/Q5:_Probability_outputs">Q5:_Probability_outputs</a>(3)</li>
+href="#/Q05:_Cross_validation_and_parameter_selection">Q05:_Cross_validation_and_parameter_selection</a>(8)</li>
 <li><a
-href="#/Q6:_Graphic_interface">Q6:_Graphic_interface</a>(3)</li>
+href="#/Q06:_Probability_outputs">Q06:_Probability_outputs</a>(3)</li>
 <li><a
-href="#/Q7:_Java_version_of_libsvm">Q7:_Java_version_of_libsvm</a>(4)</li>
+href="#/Q07:_Graphic_interface">Q07:_Graphic_interface</a>(3)</li>
 <li><a
-href="#/Q8:_Python_interface">Q8:_Python_interface</a>(1)</li>
+href="#/Q08:_Java_version_of_libsvm">Q08:_Java_version_of_libsvm</a>(4)</li>
 <li><a
-href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(11)</li>
+href="#/Q09:_Python_interface">Q09:_Python_interface</a>(1)</li>
+<li><a
+href="#/Q10:_MATLAB_interface">Q10:_MATLAB_interface</a>(12)</li>
 </b></ul>
 </li>
 
@@ -61,7 +63,6 @@ href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(11)</li>
 <li class="headlines_item"><a href="#f401">The output of training C-SVM is like the following. What do they mean?</a></li>
 <li class="headlines_item"><a href="#f402">Can you explain more about the model file?</a></li>
 <li class="headlines_item"><a href="#f403">Should I use float or double to store numbers in the cache ?</a></li>
-<li class="headlines_item"><a href="#f404">How do I choose the kernel?</a></li>
 <li class="headlines_item"><a href="#f405">Does libsvm have special treatments for linear SVM?</a></li>
 <li class="headlines_item"><a href="#f406">The number of free support vectors is large. What should I do?</a></li>
 <li class="headlines_item"><a href="#f407">Should I scale training and testing data in a similar way?</a></li>
@@ -79,19 +80,22 @@ href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(11)</li>
 <li class="headlines_item"><a href="#f417">How do I disable screen output of svm-train?</a></li>
 <li class="headlines_item"><a href="#f418">I would like to use my own kernel. Any example? In svm.cpp, there are two subroutines for kernel evaluations: k_function() and kernel_function(). Which one should I modify ?</a></li>
 <li class="headlines_item"><a href="#f419">What method does libsvm use for multi-class SVM ? Why don't you use the "1-against-the rest" method?</a></li>
-<li class="headlines_item"><a href="#f4191">How does LIBSVM perform parameter selection for multi-class problems? </a></li>
-<li class="headlines_item"><a href="#f420">After doing cross validation, why there is no model file outputted ?</a></li>
-<li class="headlines_item"><a href="#f4201">Why my cross-validation results are different from those in the Practical Guide?</a></li>
-<li class="headlines_item"><a href="#f421">On some systems CV accuracy is the same in several runs. How could I use different data partitions? In other words, how do I set random seed in LIBSVM?</a></li>
 <li class="headlines_item"><a href="#f422">I would like to solve L2-loss SVM (i.e., error term is quadratic). How should I modify the code ?</a></li>
-<li class="headlines_item"><a href="#f424">How do I choose parameters for one-class svm as training data are in only one class?</a></li>
+<li class="headlines_item"><a href="#f425">In one-class SVM, parameter nu should be an upper bound of the training error rate. Why sometimes I get a training error rate bigger than nu?</a></li>
 <li class="headlines_item"><a href="#f427">Why the code gives NaN (not a number) results?</a></li>
-<li class="headlines_item"><a href="#f428">Why on windows sometimes grid.py fails?</a></li>
-<li class="headlines_item"><a href="#f429">Why grid.py/easy.py sometimes generates the following warning message?</a></li>
 <li class="headlines_item"><a href="#f430">Why the sign of predicted labels and decision values are sometimes reversed?</a></li>
 <li class="headlines_item"><a href="#f431">I don't know class labels of test data. What should I put in the first column of the test file?</a></li>
 <li class="headlines_item"><a href="#f432">How can I use OpenMP to parallelize LIBSVM on a multicore/shared-memory computer?</a></li>
 <li class="headlines_item"><a href="#f433">How could I know which training instances are support vectors?</a></li>
+<li class="headlines_item"><a href="#f434">Why sv_indices (indices of support vectors) are not stored in the saved model file?</a></li>
+<li class="headlines_item"><a href="#f501">After doing cross validation, why there is no model file outputted ?</a></li>
+<li class="headlines_item"><a href="#f502">Why my cross-validation results are different from those in the Practical Guide?</a></li>
+<li class="headlines_item"><a href="#f503">On some systems CV accuracy is the same in several runs. How could I use different data partitions? In other words, how do I set random seed in LIBSVM?</a></li>
+<li class="headlines_item"><a href="#f504">Why on windows sometimes grid.py fails?</a></li>
+<li class="headlines_item"><a href="#f505">Why grid.py/easy.py sometimes generates the following warning message?</a></li>
+<li class="headlines_item"><a href="#f506">How do I choose the kernel?</a></li>
+<li class="headlines_item"><a href="#f507">How does LIBSVM perform parameter selection for multi-class problems? </a></li>
+<li class="headlines_item"><a href="#f508">How do I choose parameters for one-class SVM as training data are in only one class?</a></li>
 <li class="headlines_item"><a href="#f425">Why training a probability model (i.e., -b 1) takes a longer time?</a></li>
 <li class="headlines_item"><a href="#f426">Why using the -b option does not give me better accuracy?</a></li>
 <li class="headlines_item"><a href="#f427">Why using svm-predict -b 0 and -b 1 gives different accuracy values?</a></li>
@@ -114,13 +118,14 @@ href="#/Q9:_MATLAB_interface">Q9:_MATLAB_interface</a>(11)</li>
 <li class="headlines_item"><a href="#f806">How to handle the name conflict between svmtrain in the libsvm matlab interface and that in MATLAB bioinformatics toolbox?</a></li>
 <li class="headlines_item"><a href="#f807">On Windows I got an error message "Invalid MEX-file: Specific module not found" when running the pre-built MATLAB interface in the windows sub-directory. What should I do?</a></li>
 <li class="headlines_item"><a href="#f808">LIBSVM supports 1-vs-1 multi-class classification. If instead I would like to use 1-vs-rest, how to implement it using MATLAB interface?</a></li>
+<li class="headlines_item"><a href="#f809">I tried to install matlab interface on mac, but failed. What should I do?</a></li>
 </ul></ul>
 
 
 <hr size="5" noshade />
 <p/>
   
-<a name="/Q1:_Some_sample_uses_of_libsvm"></a>
+<a name="/Q01:_Some_sample_uses_of_libsvm"></a>
 <a name="faq101"><b>Q: Some courses which have used libsvm as a tool</b></a>
 <br/>                                                                                
 <ul>
@@ -158,7 +163,7 @@ summer school, University of Chicago, 2005.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q1:_Some_sample_uses_of_libsvm"></a>
+  <a name="/Q01:_Some_sample_uses_of_libsvm"></a>
 <a name="faq102"><b>Q: Some applications/tools which have used libsvm </b></a>
 <br/>                                                                                
 (and maybe liblinear).
@@ -191,7 +196,7 @@ scikits.learn: machine learning in Python</a>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q2:_Installation_and_running_the_program"></a>
+  <a name="/Q02:_Installation_and_running_the_program"></a>
 <a name="f201"><b>Q: Where can I find documents/videos of libsvm ?</b></a>
 <br/>                                                                                
 <p>
@@ -230,7 +235,7 @@ for windows users.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q2:_Installation_and_running_the_program"></a>
+  <a name="/Q02:_Installation_and_running_the_program"></a>
 <a name="f202"><b>Q: Where are change log and earlier versions?</b></a>
 <br/>                                                                                
 <p>See <a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm/log">the change log</a>.
@@ -240,7 +245,7 @@ for windows users.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q2:_Installation_and_running_the_program"></a>
+  <a name="/Q02:_Installation_and_running_the_program"></a>
 <a name="f203"><b>Q: How to cite LIBSVM?</b></a>
 <br/>                                                                                
 <p>
@@ -267,7 +272,7 @@ The bibtex format is
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q2:_Installation_and_running_the_program"></a>
+  <a name="/Q02:_Installation_and_running_the_program"></a>
 <a name="f204"><b>Q: I would like to use libsvm in my software. Is there any license problem?</b></a>
 <br/>                                                                                
 <p>
@@ -289,7 +294,7 @@ It can also be used in commercial products.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q2:_Installation_and_running_the_program"></a>
+  <a name="/Q02:_Installation_and_running_the_program"></a>
 <a name="f205"><b>Q: Is there a repository of additional tools based on libsvm?</b></a>
 <br/>                                                                                
 <p>
@@ -298,7 +303,7 @@ tools</a>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q2:_Installation_and_running_the_program"></a>
+  <a name="/Q02:_Installation_and_running_the_program"></a>
 <a name="f206"><b>Q: On unix machines, I got "error in loading shared libraries" or "cannot open shared object file." What happened ? </b></a>
 <br/>                                                                                
 
@@ -310,7 +315,7 @@ Try to recompile the program on that machine or use static linking.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q2:_Installation_and_running_the_program"></a>
+  <a name="/Q02:_Installation_and_running_the_program"></a>
 <a name="f207"><b>Q: I have modified the source and would like to build the graphic interface "svm-toy" on MS windows. How should I do it ?</b></a>
 <br/>                                                                                
 
@@ -333,7 +338,7 @@ you may have selected a wrong project type.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q2:_Installation_and_running_the_program"></a>
+  <a name="/Q02:_Installation_and_running_the_program"></a>
 <a name="f208"><b>Q: I am an MS windows user but why only one (svm-toy) of those precompiled .exe actually runs ?  </b></a>
 <br/>                                                                                
 
@@ -344,7 +349,7 @@ Some examples are in README file.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q2:_Installation_and_running_the_program"></a>
+  <a name="/Q02:_Installation_and_running_the_program"></a>
 <a name="f209"><b>Q: What is the difference between "." and "*" outputed during training? </b></a>
 <br/>                                                                                
 
@@ -358,7 +363,7 @@ we reset to use the whole set. See the
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q2:_Installation_and_running_the_program"></a>
+  <a name="/Q02:_Installation_and_running_the_program"></a>
 <a name="f210"><b>Q: Why occasionally the program (including MATLAB or other interfaces) crashes and gives a segmentation fault?</b></a>
 <br/>                                                                                
 
@@ -369,7 +374,7 @@ program still crashes.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q2:_Installation_and_running_the_program"></a>
+  <a name="/Q02:_Installation_and_running_the_program"></a>
 <a name="f211"><b>Q: How to build a dynamic library (.dll file) on MS windows?</b></a>
 <br/>                                                                                
 <p>
@@ -400,7 +405,7 @@ Project->$Project_Name Properties...->Linker->input
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q2:_Installation_and_running_the_program"></a>
+  <a name="/Q02:_Installation_and_running_the_program"></a>
 <a name="f212"><b>Q: On some systems (e.g., Ubuntu), compiling LIBSVM gives many warning messages. Is this a problem and how to disable the warning message?</b></a>
 <br/>                                                                                
 
@@ -425,7 +430,7 @@ in Makefile.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q2:_Installation_and_running_the_program"></a>
+  <a name="/Q02:_Installation_and_running_the_program"></a>
 <a name="f213"><b>Q: In LIBSVM, why you don't use certain C/C++ library functions to make the code shorter?</b></a>
 <br/>                                                                                
 
@@ -437,7 +442,7 @@ we might consider using these newer features.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q3:_Data_preparation"></a>
+  <a name="/Q03:_Data_preparation"></a>
 <a name="f301"><b>Q: Why sometimes not all attributes of a data appear in the training/model files ?</b></a>
 <br/>                                                                                
 <p>
@@ -453,7 +458,7 @@ is represented as
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q3:_Data_preparation"></a>
+  <a name="/Q03:_Data_preparation"></a>
 <a name="f302"><b>Q: What if my data are non-numerical ?</b></a>
 <br/>                                                                                
 <p>
@@ -465,7 +470,7 @@ attribute.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q3:_Data_preparation"></a>
+  <a name="/Q03:_Data_preparation"></a>
 <a name="f303"><b>Q: Why do you consider sparse format ? Will the training of dense data be much slower ?</b></a>
 <br/>                                                                                
 <p>
@@ -480,7 +485,7 @@ the sparse format only.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q3:_Data_preparation"></a>
+  <a name="/Q03:_Data_preparation"></a>
 <a name="f304"><b>Q: Why sometimes the last line of my data is not read by svm-train?</b></a>
 <br/>                                                                                
 
@@ -491,7 +496,7 @@ of your last line.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q3:_Data_preparation"></a>
+  <a name="/Q03:_Data_preparation"></a>
 <a name="f305"><b>Q: Is there a program to check if my data are in the correct format?</b></a>
 <br/>                                                                                
 
@@ -501,12 +506,12 @@ detailed check, after libsvm 2.85, you can use the python script tools/checkdata
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q3:_Data_preparation"></a>
+  <a name="/Q03:_Data_preparation"></a>
 <a name="f306"><b>Q: May I put comments in data files?</b></a>
 <br/>                                                                                
 
 <p>
-We don't officially support this. But, cureently LIBSVM
+We don't officially support this. But, currently LIBSVM
 is able to process data in the following
 format:
 <pre>
@@ -534,7 +539,7 @@ paste -d '#' test.predicts test.comments | sed 's/#/ #/' > test.results
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q3:_Data_preparation"></a>
+  <a name="/Q03:_Data_preparation"></a>
 <a name="f307"><b>Q: How to convert other data formats to LIBSVM format?</b></a>
 <br/>                                                                                
 
@@ -562,7 +567,7 @@ to convert CSV format to libsvm format.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
+  <a name="/Q04:_Training_and_prediction"></a>
 <a name="f401"><b>Q: The output of training C-SVM is like the following. What do they mean?</b></a>
 <br/>                                                                                
 <br>optimization finished, #iter = 219
@@ -583,7 +588,7 @@ libsvm document</a>.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
+  <a name="/Q04:_Training_and_prediction"></a>
 <a name="f402"><b>Q: Can you explain more about the model file?</b></a>
 <br/>                                                                                
 
@@ -630,7 +635,7 @@ MATLAB/OCTAVE.</a>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
+  <a name="/Q04:_Training_and_prediction"></a>
 <a name="f403"><b>Q: Should I use float or double to store numbers in the cache ?</b></a>
 <br/>                                                                                
 
@@ -644,30 +649,7 @@ enough using only float.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
-<a name="f404"><b>Q: How do I choose the kernel?</b></a>
-<br/>                                                                                
-
-<p>
-In general we suggest you to try the RBF kernel first.
-A recent result by Keerthi and Lin
-(<a href=http://www.csie.ntu.edu.tw/~cjlin/papers/limit.pdf>
-download paper here</a>)
-shows that if RBF is used with model selection,
-then there is no need to consider the linear kernel.
-The kernel matrix using sigmoid may not be positive definite
-and in general it's accuracy is not better than RBF.
-(see the paper by Lin and Lin
-(<a href=http://www.csie.ntu.edu.tw/~cjlin/papers/tanh.pdf>
-download paper here</a>).
-Polynomial kernels are ok but if a high degree is used,
-numerical difficulties tend to happen
-(thinking about dth power of (<1) goes to 0
-and (>1) goes to infinity).
-<p align="right">
-<a href="#_TOP">[Go Top]</a>  
-<hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
+  <a name="/Q04:_Training_and_prediction"></a>
 <a name="f405"><b>Q: Does libsvm have special treatments for linear SVM?</b></a>
 <br/>                                                                                
 
@@ -711,7 +693,7 @@ kernels.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
+  <a name="/Q04:_Training_and_prediction"></a>
 <a name="f406"><b>Q: The number of free support vectors is large. What should I do?</b></a>
 <br/>                                                                                
  <p>
@@ -724,7 +706,7 @@ in libsvm.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
+  <a name="/Q04:_Training_and_prediction"></a>
 <a name="f407"><b>Q: Should I scale training and testing data in a similar way?</b></a>
 <br/>                                                                                
 <p>
@@ -736,7 +718,7 @@ Yes, you can do the following:
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
+  <a name="/Q04:_Training_and_prediction"></a>
 <a name="f408"><b>Q: Does it make a big difference  if I scale each attribute to [0,1] instead of [-1,1]?</b></a>
 <br/>                                                                                
 
@@ -767,23 +749,23 @@ may save the time.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
+  <a name="/Q04:_Training_and_prediction"></a>
 <a name="f409"><b>Q: The prediction rate is low. How could I improve it?</b></a>
 <br/>                                                                                
 <p>
-Try to use the model selection tool grid.py in the python
+Try to use the model selection tool grid.py in the tools
 directory find
 out good parameters. To see the importance of model selection,
 please 
-see my  talk:
-<A HREF="http://www.csie.ntu.edu.tw/~cjlin/talks/freiburg.pdf">
+see our guide for beginners:
+<A HREF="http://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf">
 A practical guide to support vector 
 classification 
 </A>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
+  <a name="/Q04:_Training_and_prediction"></a>
 <a name="f410"><b>Q: My data are unbalanced. Could libsvm handle such problems?</b></a>
 <br/>                                                                                
 <p>
@@ -797,7 +779,7 @@ Note that this -w option is for C-SVC only.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
+  <a name="/Q04:_Training_and_prediction"></a>
 <a name="f411"><b>Q: What is the difference between nu-SVC and C-SVC?</b></a>
 <br/>                                                                                
 <p>
@@ -810,7 +792,7 @@ error.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
+  <a name="/Q04:_Training_and_prediction"></a>
 <a name="f412"><b>Q: The program keeps running (without showing any output). What should I do?</b></a>
 <br/>                                                                                
 <p>
@@ -820,7 +802,7 @@ In addition, you have to remove empty lines.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
+  <a name="/Q04:_Training_and_prediction"></a>
 <a name="f413"><b>Q: The program keeps running (with output, i.e. many dots). What should I do?</b></a>
 <br/>                                                                                
 <p>
@@ -844,7 +826,7 @@ can be put in the kernel cache.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
+  <a name="/Q04:_Training_and_prediction"></a>
 <a name="f414"><b>Q: The training time is too long. What should I do?</b></a>
 <br/>                                                                                
 <p>
@@ -866,7 +848,7 @@ See a related question below.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
+  <a name="/Q04:_Training_and_prediction"></a>
 <a name="f4141"><b>Q: Does shrinking always help?</b></a>
 <br/>                                                                                
 <p>
@@ -880,7 +862,7 @@ See the
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
+  <a name="/Q04:_Training_and_prediction"></a>
 <a name="f415"><b>Q: How do I get the decision value(s)?</b></a>
 <br/>                                                                                
 <p>
@@ -917,7 +899,7 @@ decision values correspond to data predicted as +1 (-1).
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
+  <a name="/Q04:_Training_and_prediction"></a>
 <a name="f4151"><b>Q: How do I get the distance between a point and the hyperplane?</b></a>
 <br/>                                                                                
 <p>
@@ -931,7 +913,7 @@ and add a statement to print w^Tw.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
+  <a name="/Q04:_Training_and_prediction"></a>
 <a name="f416"><b>Q: On 32-bit machines, if I use a large cache (i.e. large -m) on a linux machine, why sometimes I get "segmentation fault ?"</b></a>
 <br/>                                                                                
 <p>
@@ -1005,7 +987,7 @@ $ info libc "Malloc Tunable Parameters"
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
+  <a name="/Q04:_Training_and_prediction"></a>
 <a name="f417"><b>Q: How do I disable screen output of svm-train?</b></a>
 <br/>                                                                                
 <p>
@@ -1047,7 +1029,7 @@ void info(const char *fmt,...)
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
+  <a name="/Q04:_Training_and_prediction"></a>
 <a name="f418"><b>Q: I would like to use my own kernel. Any example? In svm.cpp, there are two subroutines for kernel evaluations: k_function() and kernel_function(). Which one should I modify ?</b></a>
 <br/>                                                                                
 <p>
@@ -1069,7 +1051,7 @@ subroutines by replacing any kernel.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
+  <a name="/Q04:_Training_and_prediction"></a>
 <a name="f419"><b>Q: What method does libsvm use for multi-class SVM ? Why don't you use the "1-against-the rest" method?</b></a>
 <br/>                                                                                
 <p>
@@ -1089,109 +1071,7 @@ simply because its training time is shorter.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
-<a name="f4191"><b>Q: How does LIBSVM perform parameter selection for multi-class problems? </b></a>
-<br/>                                                                                
-
-<p>
-LIBSVM implements "one-against-one" multi-class method, so there are 
-k(k-1)/2 binary models, where k is the number of classes.
-
-<p>
-We can consider two ways to conduct parameter selection.
-
-<ol>
-<li>
-For any two classes of data, a parameter selection procedure is conducted. Finally,
-each decision function has its own optimal parameters.
-</li>
-<li>
-The same parameters are used for all k(k-1)/2 binary classification problems.
-We select parameters that achieve the highest overall performance.
-</li>
-</ol>
-
-Each has its own advantages. A
-single parameter set may not be uniformly good for all k(k-1)/2 decision functions.
-However, as the overall accuracy is the final consideration, one parameter set 
-for one decision function may lead to over-fitting. In the paper
-<p>
-Chen, Lin, and Sch&ouml;lkopf,
-<A HREF="../papers/nusvmtutorial.pdf">
-A tutorial on nu-support vector machines.
-</A> 
-Applied Stochastic Models in Business and Industry, 21(2005), 111-136,
-
-<p>
-they have experimentally
-shown that the two methods give similar performance.
-Therefore, currently the parameter selection in LIBSVM
-takes the second approach by considering the same parameters for
-all k(k-1)/2 models.
-<p align="right">
-<a href="#_TOP">[Go Top]</a>  
-<hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
-<a name="f420"><b>Q: After doing cross validation, why there is no model file outputted ?</b></a>
-<br/>                                                                                
-<p>
-Cross validation is used for selecting good parameters.
-After finding them, you want to re-train the whole
-data without the -v option.
-<p align="right">
-<a href="#_TOP">[Go Top]</a>  
-<hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
-<a name="f4201"><b>Q: Why my cross-validation results are different from those in the Practical Guide?</b></a>
-<br/>                                                                                
-<p>
-
-Due to random partitions of
-the data, on different systems CV accuracy values
-may be different.
-<p align="right">
-<a href="#_TOP">[Go Top]</a>  
-<hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
-<a name="f421"><b>Q: On some systems CV accuracy is the same in several runs. How could I use different data partitions? In other words, how do I set random seed in LIBSVM?</b></a>
-<br/>                                                                                
-<p>
-If you use GNU C library,
-the default seed 1 is considered. Thus you always
-get the same result of running svm-train -v.
-To have different seeds, you can add the following code
-in svm-train.c:
-<pre>
-#include &lt;time.h&gt;
-</pre>
-and in the beginning of main(),
-<pre>
-srand(time(0));
-</pre>
-Alternatively, if you are not using GNU C library
-and would like to use a fixed seed, you can have
-<pre>
-srand(1);
-</pre>
-
-<p>
-For Java, the random number generator
-is initialized using the time information.
-So results of two CV runs are different.
-To fix the seed, after version 3.1 (released
-in mid 2011), you can add
-<pre>
-svm.rand.setSeed(0);
-</pre>
-in the main() function of svm_train.java.
-
-<p>
-If you use CV to select parameters, it is recommended to use identical folds
-under different parameters. In this case, you can consider fixing the seed.
-<p align="right">
-<a href="#_TOP">[Go Top]</a>  
-<hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
+  <a name="/Q04:_Training_and_prediction"></a>
 <a name="f422"><b>Q: I would like to solve L2-loss SVM (i.e., error term is quadratic). How should I modify the code ?</b></a>
 <br/>                                                                                
 <p>
@@ -1247,16 +1127,36 @@ For large linear L2-loss SVM, please use
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
-<a name="f424"><b>Q: How do I choose parameters for one-class svm as training data are in only one class?</b></a>
+  <a name="/Q04:_Training_and_prediction"></a>
+<a name="f425"><b>Q: In one-class SVM, parameter nu should be an upper bound of the training error rate. Why sometimes I get a training error rate bigger than nu?</b></a>
 <br/>                                                                                
+
 <p>
-You have pre-specified true positive rate in mind and then search for
-parameters which achieve similar cross-validation accuracy.
+At optimum, some training instances should satisfy
+w^Tx - rho = 0. However, numerically they may be slightly
+smaller than zero
+Then they are wrongly counted
+as training errors. You can use a smaller stopping tolerance
+(by the -e option) to make this problem less serious.
+
+<p> 
+This issue <b>does not occur</b> for nu-SVC for 
+two-class classification.
+We have that
+<ol>
+<li>nu is an upper bound on the ratio of training points
+on the wrong side of the hyperplane, and
+<li>therefore, nu is also an upper bound on the training error rate.
+</ol>
+Numerical issues occur in calculating the first case
+because some training points satisfying y(w^Tx + b) - rho = 0
+become negative. 
+However, we have no numerical  problems for the second case because
+we compare y(w^Tx + b) and 0 for counting training errors.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
+  <a name="/Q04:_Training_and_prediction"></a>
 <a name="f427"><b>Q: Why the code gives NaN (not a number) results?</b></a>
 <br/>                                                                                
 <p>
@@ -1268,72 +1168,37 @@ problem. Please try to close or disconnect the VPN client.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
-<a name="f428"><b>Q: Why on windows sometimes grid.py fails?</b></a>
-<br/>                                                                                
-<p>
-
-This problem shouldn't happen after version
-2.85. If you are using earlier versions,
-please download the latest one.
-
-<!--
-<p>
-If you are using earlier 
-versions, the error message is probably
-<pre>
-Traceback (most recent call last):
-  File "grid.py", line 349, in ?
-    main()
-  File "grid.py", line 344, in main
-    redraw(db)
-  File "grid.py", line 132, in redraw
-    gnuplot.write("set term windows\n")
-IOError: [Errno 22] Invalid argument
-</pre>
-
-<p>Please try to close gnuplot windows and rerun.
-If the problem still occurs, comment the following
-two lines in grid.py by inserting "#" in the beginning:
-<pre>
-        redraw(db)
-        redraw(db,1)
-</pre>
-Then you get accuracy only but not cross validation contours.
--->
-<p align="right">
-<a href="#_TOP">[Go Top]</a>  
-<hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
-<a name="f429"><b>Q: Why grid.py/easy.py sometimes generates the following warning message?</b></a>
-<br/>                                                                                
-<pre>
-Warning: empty z range [62.5:62.5], adjusting to [61.875:63.125]
-Notice: cannot contour non grid data!
-</pre>
-<p>Nothing is wrong and please disregard the 
-message. It is from gnuplot when drawing
-the contour.  
-<p align="right">
-<a href="#_TOP">[Go Top]</a>  
-<hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
+  <a name="/Q04:_Training_and_prediction"></a>
 <a name="f430"><b>Q: Why the sign of predicted labels and decision values are sometimes reversed?</b></a>
 <br/>                                                                                
-<p>Nothing is wrong. Very likely you have two labels +1/-1 and the first instance in your data
-has -1.
-Think about the case of labels +5/+10. Since
-SVM needs to use +1/-1, internally
-we map +5/+10 to +1/-1 according to which
-label appears first.
-Hence a positive decision value implies
-that we should predict the "internal" +1,
-which may not be the +1 in the input file.
+<p>
 
+This situation may occur <b>before version 3.17</b>.
+Nothing is wrong. Very likely you have two labels +1/-1 and the first instance in your data
+has -1. We give the following explanation.
+
+<p>
+Internally class labels are ordered by their first occurrence in the training set. For a k-class data, internally labels
+are 0, ..., k-1, and each two-class SVM considers pair
+(i, j) with i < j. Then class i is treated as positive (+1)
+and j as negative (-1).
+For example, if the data set has labels +5/+10 and +10 appears
+first, then internally the +5 versus +10 SVM problem
+has +10 as positive (+1) and +5 as negative (-1).
+
+<p>
+By this setting, if you have labels +1 and -1,
+it's possible that internally they correspond to -1 and +1,
+respectively. Some new users have been confused about
+this, so <b>after version 3.17</b>, if the data set has only
+two labels +1 and -1,
+internally we ensure +1 to be before -1. Then class +1 
+is always treated as positive in the SVM problem.
+Note that this is for <b>two-class data only.</b>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
+  <a name="/Q04:_Training_and_prediction"></a>
 <a name="f431"><b>Q: I don't know class labels of test data. What should I put in the first column of the test file?</b></a>
 <br/>                                                                                
 <p>Any value is ok. In this situation, what you will use is the output file of svm-predict, which gives predicted class labels.
@@ -1342,7 +1207,7 @@ which may not be the +1 in the input file.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
+  <a name="/Q04:_Training_and_prediction"></a>
 <a name="f432"><b>Q: How can I use OpenMP to parallelize LIBSVM on a multicore/shared-memory computer?</b></a>
 <br/>                                                                                
 
@@ -1405,7 +1270,7 @@ $(CXX) -lgomp -shared -dynamiclib svm.o -o libsvm.so.$(SHVER)
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q4:_Training_and_prediction"></a>
+  <a name="/Q04:_Training_and_prediction"></a>
 <a name="f433"><b>Q: How could I know which training instances are support vectors?</b></a>
 <br/>                                                                                
 
@@ -1434,7 +1299,208 @@ model.sv_indices
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q5:_Probability_outputs"></a>
+  <a name="/Q04:_Training_and_prediction"></a>
+<a name="f434"><b>Q: Why sv_indices (indices of support vectors) are not stored in the saved model file?</b></a>
+<br/>                                                                                
+
+<p>
+Although sv_indices is a member of the model structure
+to 
+indicate support vectors in the training set,
+we do not store its contents in the model file.
+The model file is mainly used in the future for
+prediction, so it is basically <b>independent</b>
+from training data. Thus 
+storing sv_indices is not necessary.
+Users should find support vectors right after
+the training process. See the previous FAQ.
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q05:_Cross_validation_and_parameter_selection"></a>
+<a name="f501"><b>Q: After doing cross validation, why there is no model file outputted ?</b></a>
+<br/>                                                                                
+<p>
+Cross validation is used for selecting good parameters.
+After finding them, you want to re-train the whole
+data without the -v option.
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q05:_Cross_validation_and_parameter_selection"></a>
+<a name="f502"><b>Q: Why my cross-validation results are different from those in the Practical Guide?</b></a>
+<br/>                                                                                
+<p>
+
+Due to random partitions of
+the data, on different systems CV accuracy values
+may be different.
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q05:_Cross_validation_and_parameter_selection"></a>
+<a name="f503"><b>Q: On some systems CV accuracy is the same in several runs. How could I use different data partitions? In other words, how do I set random seed in LIBSVM?</b></a>
+<br/>                                                                                
+<p>
+If you use GNU C library,
+the default seed 1 is considered. Thus you always
+get the same result of running svm-train -v.
+To have different seeds, you can add the following code
+in svm-train.c:
+<pre>
+#include &lt;time.h&gt;
+</pre>
+and in the beginning of main(),
+<pre>
+srand(time(0));
+</pre>
+Alternatively, if you are not using GNU C library
+and would like to use a fixed seed, you can have
+<pre>
+srand(1);
+</pre>
+
+<p>
+For Java, the random number generator
+is initialized using the time information.
+So results of two CV runs are different.
+To fix the seed, after version 3.1 (released
+in mid 2011), you can add
+<pre>
+svm.rand.setSeed(0);
+</pre>
+in the main() function of svm_train.java.
+
+<p>
+If you use CV to select parameters, it is recommended to use identical folds
+under different parameters. In this case, you can consider fixing the seed.
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q05:_Cross_validation_and_parameter_selection"></a>
+<a name="f504"><b>Q: Why on windows sometimes grid.py fails?</b></a>
+<br/>                                                                                
+<p>
+
+This problem shouldn't happen after version
+2.85. If you are using earlier versions,
+please download the latest one.
+
+<!--
+<p>
+If you are using earlier 
+versions, the error message is probably
+<pre>
+Traceback (most recent call last):
+  File "grid.py", line 349, in ?
+    main()
+  File "grid.py", line 344, in main
+    redraw(db)
+  File "grid.py", line 132, in redraw
+    gnuplot.write("set term windows\n")
+IOError: [Errno 22] Invalid argument
+</pre>
+
+<p>Please try to close gnuplot windows and rerun.
+If the problem still occurs, comment the following
+two lines in grid.py by inserting "#" in the beginning:
+<pre>
+        redraw(db)
+        redraw(db,1)
+</pre>
+Then you get accuracy only but not cross validation contours.
+-->
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q05:_Cross_validation_and_parameter_selection"></a>
+<a name="f505"><b>Q: Why grid.py/easy.py sometimes generates the following warning message?</b></a>
+<br/>                                                                                
+<pre>
+Warning: empty z range [62.5:62.5], adjusting to [61.875:63.125]
+Notice: cannot contour non grid data!
+</pre>
+<p>Nothing is wrong and please disregard the 
+message. It is from gnuplot when drawing
+the contour.  
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q05:_Cross_validation_and_parameter_selection"></a>
+<a name="f506"><b>Q: How do I choose the kernel?</b></a>
+<br/>                                                                                
+
+<p>
+In general we suggest you to try the RBF kernel first.
+A recent result by Keerthi and Lin
+(<a href=http://www.csie.ntu.edu.tw/~cjlin/papers/limit.pdf>
+download paper here</a>)
+shows that if RBF is used with model selection,
+then there is no need to consider the linear kernel.
+The kernel matrix using sigmoid may not be positive definite
+and in general it's accuracy is not better than RBF.
+(see the paper by Lin and Lin
+(<a href=http://www.csie.ntu.edu.tw/~cjlin/papers/tanh.pdf>
+download paper here</a>).
+Polynomial kernels are ok but if a high degree is used,
+numerical difficulties tend to happen
+(thinking about dth power of (<1) goes to 0
+and (>1) goes to infinity).
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q05:_Cross_validation_and_parameter_selection"></a>
+<a name="f507"><b>Q: How does LIBSVM perform parameter selection for multi-class problems? </b></a>
+<br/>                                                                                
+
+<p>
+LIBSVM implements "one-against-one" multi-class method, so there are 
+k(k-1)/2 binary models, where k is the number of classes.
+
+<p>
+We can consider two ways to conduct parameter selection.
+
+<ol>
+<li>
+For any two classes of data, a parameter selection procedure is conducted. Finally,
+each decision function has its own optimal parameters.
+</li>
+<li>
+The same parameters are used for all k(k-1)/2 binary classification problems.
+We select parameters that achieve the highest overall performance.
+</li>
+</ol>
+
+Each has its own advantages. A
+single parameter set may not be uniformly good for all k(k-1)/2 decision functions.
+However, as the overall accuracy is the final consideration, one parameter set 
+for one decision function may lead to over-fitting. In the paper
+<p>
+Chen, Lin, and Sch&ouml;lkopf,
+<A HREF="../papers/nusvmtutorial.pdf">
+A tutorial on nu-support vector machines.
+</A> 
+Applied Stochastic Models in Business and Industry, 21(2005), 111-136,
+
+<p>
+they have experimentally
+shown that the two methods give similar performance.
+Therefore, currently the parameter selection in LIBSVM
+takes the second approach by considering the same parameters for
+all k(k-1)/2 models.
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q05:_Cross_validation_and_parameter_selection"></a>
+<a name="f508"><b>Q: How do I choose parameters for one-class SVM as training data are in only one class?</b></a>
+<br/>                                                                                
+<p>
+You have pre-specified true positive rate in mind and then search for
+parameters which achieve similar cross-validation accuracy.
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q06:_Probability_outputs"></a>
 <a name="f425"><b>Q: Why training a probability model (i.e., -b 1) takes a longer time?</b></a>
 <br/>                                                                                
 <p>
@@ -1448,7 +1514,7 @@ together.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q5:_Probability_outputs"></a>
+  <a name="/Q06:_Probability_outputs"></a>
 <a name="f426"><b>Q: Why using the -b option does not give me better accuracy?</b></a>
 <br/>                                                                                
 <p>
@@ -1465,7 +1531,7 @@ set as more differences will be observed.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q5:_Probability_outputs"></a>
+  <a name="/Q06:_Probability_outputs"></a>
 <a name="f427"><b>Q: Why using svm-predict -b 0 and -b 1 gives different accuracy values?</b></a>
 <br/>                                                                                
 <p>
@@ -1478,7 +1544,7 @@ So predictions may be different with -b 0 and 1.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q6:_Graphic_interface"></a>
+  <a name="/Q07:_Graphic_interface"></a>
 <a name="f501"><b>Q: How can I save images drawn by svm-toy?</b></a>
 <br/>                                                                                
 <p>
@@ -1492,7 +1558,7 @@ use the program "xv" or "import" to grab the picture of the svm-toy window.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q6:_Graphic_interface"></a>
+  <a name="/Q07:_Graphic_interface"></a>
 <a name="f502"><b>Q: I press the "load" button to load data points but why svm-toy does not draw them ?</b></a>
 <br/>                                                                                
 <p>
@@ -1505,7 +1571,7 @@ Moreover, class labels must be 1, 2, or 3
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q6:_Graphic_interface"></a>
+  <a name="/Q07:_Graphic_interface"></a>
 <a name="f503"><b>Q: I would like svm-toy to handle more than three classes of data, what should I do ?</b></a>
 <br/>                                                                                
 <p>
@@ -1561,7 +1627,7 @@ data)
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q7:_Java_version_of_libsvm"></a>
+  <a name="/Q08:_Java_version_of_libsvm"></a>
 <a name="f601"><b>Q: What is the difference between Java version and C++ version of libsvm?</b></a>
 <br/>                                                                                
 <p>
@@ -1570,7 +1636,7 @@ in Java.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q7:_Java_version_of_libsvm"></a>
+  <a name="/Q08:_Java_version_of_libsvm"></a>
 <a name="f602"><b>Q: Is the Java version significantly slower than the C++ version?</b></a>
 <br/>                                                                                
 <p>
@@ -1580,7 +1646,7 @@ the C++ code. (though still slower)
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q7:_Java_version_of_libsvm"></a>
+  <a name="/Q08:_Java_version_of_libsvm"></a>
 <a name="f603"><b>Q: While training I get the following error message: java.lang.OutOfMemoryError. What is wrong?</b></a>
 <br/>                                                                                
 <p>
@@ -1593,7 +1659,7 @@ sets the maximum heap size to 2048M.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q7:_Java_version_of_libsvm"></a>
+  <a name="/Q08:_Java_version_of_libsvm"></a>
 <a name="f604"><b>Q: Why you have the main source file svm.m4 and then transform it to svm.java?</b></a>
 <br/>                                                                                
 <p>
@@ -1604,7 +1670,7 @@ However,  we need some macros (see first 3 lines of svm.m4).
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q8:_Python_interface"></a>
+  <a name="/Q09:_Python_interface"></a>
 <a name="f704"><b>Q: Except the python-C++ interface provided, could I use Jython to call libsvm ?</b></a>
 <br/>                                                                                
 <p> Yes, here are some examples:
@@ -1640,7 +1706,7 @@ Total nSV = 2
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q9:_MATLAB_interface"></a>
+  <a name="/Q10:_MATLAB_interface"></a>
 <a name="f801"><b>Q: I compile the MATLAB interface without problem, but why errors occur while running it?</b></a>
 <br/>                                                                                
 <p>
@@ -1657,7 +1723,7 @@ CXX = g++-X.Y
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q9:_MATLAB_interface"></a>
+  <a name="/Q10:_MATLAB_interface"></a>
 <a name="f8011"><b>Q: On 64bit Windows I compile the MATLAB interface without problem, but why errors occur while running it?</b></a>
 <br/>                                                                                
 <p>
@@ -1676,7 +1742,7 @@ See the explanation
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q9:_MATLAB_interface"></a>
+  <a name="/Q10:_MATLAB_interface"></a>
 <a name="f802"><b>Q: Does the MATLAB interface provide a function to do scaling?</b></a>
 <br/>                                                                                
 <p>
@@ -1689,7 +1755,7 @@ of [0,1]:
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q9:_MATLAB_interface"></a>
+  <a name="/Q10:_MATLAB_interface"></a>
 <a name="f803"><b>Q: How could I use MATLAB interface for parameter selection?</b></a>
 <br/>                                                                                
 <p>
@@ -1712,7 +1778,7 @@ You may adjust the parameter range in the above loops.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q9:_MATLAB_interface"></a>
+  <a name="/Q10:_MATLAB_interface"></a>
 <a name="f8031"><b>Q: I use MATLAB parallel programming toolbox on a multi-core environment for parameter selection. Why the program is even slower?</b></a>
 <br/>                                                                                
 <p>
@@ -1724,7 +1790,7 @@ may be solved.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q9:_MATLAB_interface"></a>
+  <a name="/Q10:_MATLAB_interface"></a>
 <a name="f8032"><b>Q: How do I use LIBSVM with OpenMP under MATLAB?</b></a>
 <br/>                                                                                
 <p>
@@ -1750,7 +1816,7 @@ to comments from Ricardo Santiago-mozos):
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q9:_MATLAB_interface"></a>
+  <a name="/Q10:_MATLAB_interface"></a>
 <a name="f804"><b>Q: How could I generate the primal variable w of linear SVM?</b></a>
 <br/>                                                                                
 <p>
@@ -1847,7 +1913,7 @@ because rho is arranged by 1vs2 1vs3 2vs3.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q9:_MATLAB_interface"></a>
+  <a name="/Q10:_MATLAB_interface"></a>
 <a name="f805"><b>Q: Is there an OCTAVE interface for libsvm?</b></a>
 <br/>                                                                                
 <p>
@@ -1860,7 +1926,7 @@ under OCTAVE.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q9:_MATLAB_interface"></a>
+  <a name="/Q10:_MATLAB_interface"></a>
 <a name="f806"><b>Q: How to handle the name conflict between svmtrain in the libsvm matlab interface and that in MATLAB bioinformatics toolbox?</b></a>
 <br/>                                                                                
 <p>
@@ -1871,7 +1937,7 @@ name (e.g., svmtrain2.mexw32).
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q9:_MATLAB_interface"></a>
+  <a name="/Q10:_MATLAB_interface"></a>
 <a name="f807"><b>Q: On Windows I got an error message "Invalid MEX-file: Specific module not found" when running the pre-built MATLAB interface in the windows sub-directory. What should I do?</b></a>
 <br/>                                                                                
 <p>
@@ -1900,7 +1966,7 @@ Microsoft Visual C++ Redistributable Package 2008
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
-  <a name="/Q9:_MATLAB_interface"></a>
+  <a name="/Q10:_MATLAB_interface"></a>
 <a name="f808"><b>Q: LIBSVM supports 1-vs-1 multi-class classification. If instead I would like to use 1-vs-rest, how to implement it using MATLAB interface?</b></a>
 <br/>                                                                                
 
@@ -1930,6 +1996,70 @@ for log2c = -1:2:3,
   end
 end
 </pre>
+<p align="right">
+<a href="#_TOP">[Go Top]</a>  
+<hr/>
+  <a name="/Q10:_MATLAB_interface"></a>
+<a name="f809"><b>Q: I tried to install matlab interface on mac, but failed. What should I do?</b></a>
+<br/>                                                                                
+
+<p>
+We assume that in a matlab command window you change directory to libsvm/matlab and type
+<pre>
+>> make
+</pre>
+We discuss the following situations.
+
+<ol>
+<li>An error message like "libsvmread.c:1:19: fatal error:
+stdio.h: No such file or directory" appears.
+
+<p>
+Reason: "make" looks for a C++ compiler, but 
+no compiler is found. To get one, you can
+<ul>
+<li> Install XCode offered by Apple Inc.
+<li> Install XCode Command Line Tools.
+</ul>
+
+<p>
+<li> On OS X with Xcode 4.2+, I got an error message like "llvm-gcc-4.2:
+command not found." 
+
+<p>
+Reason: Since Apple Inc. only ships llsvm-gcc instead of gcc-4.2, 
+llvm-gcc-4.2 cannot be found.
+
+<p>
+If you are using Xcode 4.2-4.6,
+a related solution is offered at
+<a href=http://www.mathworks.com/matlabcentral/answers/94092>http://www.mathworks.com/matlabcentral/answers/94092</a>.
+
+<p>
+On the other hand, for Xcode 5 (including Xcode 4.2-4.6), in a Matlab command window, enter
+<ul>
+<li> cd (matlabroot)
+<li> cd bin
+<li> Backup your mexopts.sh first
+<li> edit mexopts.sh
+<li> Scroll down to "maci64" section. Change
+<pre>
+		CC='llvm-gcc-4.2'
+		CXX='llvm-g++-4.2'
+</pre>
+to
+<pre>
+		CC='llvm-gcc'
+		CXX='llvm-g++'
+</pre>
+</ul>
+
+Please also ensure that SDKROOT corresponds to the SDK version you are using.
+
+<p>
+<li> Other errors: you may check <a href=http://www.mathworks.com/matlabcentral/answers/94092>http://www.mathworks.com/matlabcentral/answers/94092</a>.
+
+</ol>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
