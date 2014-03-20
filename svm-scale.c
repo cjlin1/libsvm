@@ -219,8 +219,8 @@ int main(int argc,char **argv)
 		
 		if((c = fgetc(fp_restore)) == 'y')
 		{
-			if(fscanf(fp_restore, "%lf %lf\n", &y_lower, &y_upper) != 2 
-				|| fscanf(fp_restore, "%lf %lf\n", &y_min, &y_max) != 2)
+			if(fscanf(fp_restore, "%lf %lf\n", &y_lower, &y_upper) != 2 ||
+			   fscanf(fp_restore, "%lf %lf\n", &y_min, &y_max) != 2)
 				return clean_up(fp_restore, fp);
 			y_scaling = 1;
 		}
