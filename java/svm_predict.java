@@ -158,6 +158,11 @@ class svm_predict {
 			BufferedReader input = new BufferedReader(new FileReader(argv[i]));
 			DataOutputStream output = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(argv[i+2])));
 			svm_model model = svm.svm_load_model(argv[i+1]);
+			if (model == null)
+			{
+				System.err.print("can't open model file "+argv[i+1]+"\n");
+				System.exit(1);
+			}
 			if(predict_probability == 1)
 			{
 				if(svm.svm_check_probability_model(model)==0)
