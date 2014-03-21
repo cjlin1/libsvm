@@ -9,7 +9,7 @@
 <a name="_TOP"><b><h1><a
 href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a>  FAQ </h1></b></a>
 <b>last modified : </b>
-Tue,  4 Mar 2014 22:22:42 GMT
+四, 20  3月 2014 16:05:14 GMT
 <class="categories">
 <li><a
 href="#_TOP">All Questions</a>(81)</li>
@@ -410,15 +410,14 @@ Project->$Project_Name Properties...->Linker->input
 <br/>                                                                                
 
 <p>
-The warning message is like
+If you are using a version before 3.18, probably you see
+a warning message like
 <pre>
 svm.cpp:2730: warning: ignoring return value of int fscanf(FILE*, const char*, ...), declared with attribute warn_unused_result
 </pre>
 This is not a problem; see <a href=https://wiki.ubuntu.com/CompilerFlags#-D_FORTIFY_SOURCE=2>this page</a> for more 
 details of ubuntu systems.
-In the future we may modify the code
-so that these messages do not appear.
-At this moment, to disable the warning message you can replace
+To disable the warning message you can replace
 <pre>
 CFLAGS = -Wall -Wconversion -O3 -fPIC
 </pre>
@@ -427,6 +426,7 @@ with
 CFLAGS = -Wall -Wconversion -O3 -fPIC -U_FORTIFY_SOURCE
 </pre>
 in Makefile.
+<p> After version 3.18, we have a better setting so that such warning messages do not appear.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
