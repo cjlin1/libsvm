@@ -179,7 +179,7 @@ int main(int argc,char **argv)
 		double value;
 
 		if (sscanf(p,"%lf",&target) != 1)
-			return clean_up(fp_restore, fp, "ERROR: failed to read label\n");
+			return clean_up(fp_restore, fp, "ERROR: failed to read labels\n");
 		y_max = max(y_max,target);
 		y_min = min(y_min,target);
 		
@@ -293,7 +293,7 @@ int main(int argc,char **argv)
 		double value;
 		
 		if (sscanf(p,"%lf",&target) != 1)
-			return clean_up(NULL, fp, "ERROR: failed to read label\n");
+			return clean_up(NULL, fp, "ERROR: failed to read labels\n");
 		output_target(target);
 
 		SKIP_TARGET
