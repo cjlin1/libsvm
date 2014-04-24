@@ -1,4 +1,5 @@
 CXX ?= g++
+CPPFLAGS='-DDEBUG'
 CFLAGS = -Wall -Wconversion -O3 -fPIC
 SHVER = 2
 OS = $(shell uname)
