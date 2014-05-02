@@ -277,7 +277,8 @@ void parse_command_line(int argc, char **argv, char *input_file_name, char *mode
 
 void read_problem(const char *filename)
 {
-	int elements, max_index, inst_max_index, i, j;
+	int max_index, inst_max_index, i;
+	long int elements, j;
 	FILE *fp = fopen(filename,"r");
 	char *endptr;
 	char *idx, *val, *label;

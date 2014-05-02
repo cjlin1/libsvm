@@ -56,14 +56,13 @@ static char* readline(FILE *input)
 // read in a problem (in libsvm format)
 void read_problem(const char *filename, int nlhs, mxArray *plhs[])
 {
-	int max_index, min_index, inst_max_index, i;
-	long elements, k;
+	int max_index, min_index, inst_max_index;
+	size_t elements, k, i, l=0;
 	FILE *fp = fopen(filename,"r");
-	int l = 0;
 	char *endptr;
 	mwIndex *ir, *jc;
 	double *labels, *samples;
-	
+
 	if(fp == NULL)
 	{
 		mexPrintf("can't open input file %s\n",filename);

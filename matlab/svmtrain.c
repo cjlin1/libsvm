@@ -221,8 +221,8 @@ int parse_command_line(int nrhs, const mxArray *prhs[], char *model_file_name)
 // read in a problem (in svmlight format)
 int read_problem_dense(const mxArray *label_vec, const mxArray *instance_mat)
 {
-	int i, j, k;
-	int elements, max_index, sc, label_vector_row_num;
+	size_t i, j, k, l;
+	size_t elements, max_index, sc, label_vector_row_num;
 	double *samples, *labels;
 
 	prob.x = NULL;
@@ -231,50 +231,51 @@ int read_problem_dense(const mxArray *label_vec, const mxArray *instance_mat)
 
 	labels = mxGetPr(label_vec);
 	samples = mxGetPr(instance_mat);
-	sc = (int)mxGetN(instance_mat);
+	sc = mxGetN(instance_mat);
 
 	elements = 0;
 	// the number of instance
-	prob.l = (int)mxGetM(instance_mat);
-	label_vector_row_num = (int)mxGetM(label_vec);
+	l = mxGetM(instance_mat);
+	label_vector_row_num = mxGetM(label_vec);
+	prob.l = (int)l;
 
-	if(label_vector_row_num!=prob.l)
+	if(label_vector_row_num!=l)
 	{
 		mexPrintf("Length of label vector does not match # of instances.\n");
 		return -1;
 	}
 
 	if(param.kernel_type == PRECOMPUTED)
-		elements = prob.l * (sc + 1);
+		elements = l * (sc + 1);
 	else
 	{
-		for(i = 0; i < prob.l; i++)
+		for(i = 0; i < l; i++)
 		{
 			for(k = 0; k < sc; k++)
-				if(samples[k * prob.l + i] != 0)
+				if(samples[k * l + i] != 0)
 					elements++;
 			// count the '-1' element
 			elements++;
 		}
 	}
 
-	prob.y = Malloc(double,prob.l);
-	prob.x = Malloc(struct svm_node *,prob.l);
+	prob.y = Malloc(double,l);
+	prob.x = Malloc(struct svm_node *,l);
 	x_space = Malloc(struct svm_node, elements);
 
 	max_index = sc;
 	j = 0;
-	for(i = 0; i < prob.l; i++)
+	for(i = 0; i < l; i++)
 	{
 		prob.x[i] = &x_space[j];
 		prob.y[i] = labels[i];
 
 		for(k = 0; k < sc; k++)
 		{
-			if(param.kernel_type == PRECOMPUTED || samples[k * prob.l + i] != 0)
+			if(param.kernel_type == PRECOMPUTED || samples[k * l + i] != 0)
 			{
-				x_space[j].index = k + 1;
-				x_space[j].value = samples[k * prob.l + i];
+				x_space[j].index = (int)k + 1;
+				x_space[j].value = samples[k * l + i];
 				j++;
 			}
 		}
@@ -282,12 +283,12 @@ int read_problem_dense(const mxArray *label_vec, const mxArray *instance_mat)
 	}
 
 	if(param.gamma == 0 && max_index > 0)
-		param.gamma = 1.0/max_index;
+		param.gamma = (double)(1.0/max_index);
 
 	if(param.kernel_type == PRECOMPUTED)
-		for(i=0;i<prob.l;i++)
+		for(i=0;i<l;i++)
 		{
-			if((int)prob.x[i][0].value <= 0 || (int)prob.x[i][0].value > max_index)
+			if((int)prob.x[i][0].value <= 0 || (int)prob.x[i][0].value > (int)max_index)
 			{
 				mexPrintf("Wrong input format: sample_serial_number out of range\n");
 				return -1;
@@ -299,9 +300,9 @@ int read_problem_dense(const mxArray *label_vec, const mxArray *instance_mat)
 
 int read_problem_sparse(const mxArray *label_vec, const mxArray *instance_mat)
 {
-	int i, j, k, low, high;
-	mwIndex *ir, *jc;
-	int elements, max_index, num_samples, label_vector_row_num;
+	mwIndex *ir, *jc, low, high, k;
+	size_t i, j, l, elements, max_index, label_vector_row_num;
+	mwSize num_samples;
 	double *samples, *labels;
 	mxArray *instance_mat_col; // transposed instance sparse matrix
 
@@ -328,31 +329,32 @@ int read_problem_sparse(const mxArray *label_vec, const mxArray *instance_mat)
 	ir = mxGetIr(instance_mat_col);
 	jc = mxGetJc(instance_mat_col);
 
-	num_samples = (int)mxGetNzmax(instance_mat_col);
+	num_samples = mxGetNzmax(instance_mat_col);
 
 	// the number of instance
-	prob.l = (int)mxGetN(instance_mat_col);
-	label_vector_row_num = (int)mxGetM(label_vec);
+	l = mxGetN(instance_mat_col);
+	label_vector_row_num = mxGetM(label_vec);
+	prob.l = (int) l;
 
-	if(label_vector_row_num!=prob.l)
+	if(label_vector_row_num!=l)
 	{
 		mexPrintf("Length of label vector does not match # of instances.\n");
 		return -1;
 	}
 
-	elements = num_samples + prob.l;
-	max_index = (int)mxGetM(instance_mat_col);
+	elements = num_samples + l;
+	max_index = mxGetM(instance_mat_col);
 
-	prob.y = Malloc(double,prob.l);
-	prob.x = Malloc(struct svm_node *,prob.l);
+	prob.y = Malloc(double,l);
+	prob.x = Malloc(struct svm_node *,l);
 	x_space = Malloc(struct svm_node, elements);
 
 	j = 0;
-	for(i=0;i<prob.l;i++)
+	for(i=0;i<l;i++)
 	{
 		prob.x[i] = &x_space[j];
 		prob.y[i] = labels[i];
-		low = (int)jc[i], high = (int)jc[i+1];
+		low = jc[i], high = jc[i+1];
 		for(k=low;k<high;k++)
 		{
 			x_space[j].index = (int)ir[k] + 1;
@@ -363,7 +365,7 @@ int read_problem_sparse(const mxArray *label_vec, const mxArray *instance_mat)
 	}
 
 	if(param.gamma == 0 && max_index > 0)
-		param.gamma = 1.0/max_index;
+		param.gamma = (double)(1.0/max_index);
 
 	return 0;
 }

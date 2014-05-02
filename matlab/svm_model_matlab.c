@@ -323,7 +323,7 @@ struct svm_model *matlab_matrix_to_model(const mxArray *matlab_struct, const cha
 
 	// SV
 	{
-		int sr, sc, elements;
+		int sr, elements;
 		int num_samples;
 		mwIndex *ir, *jc;
 		mxArray *pprhs[1], *pplhs[1];
@@ -339,7 +339,6 @@ struct svm_model *matlab_matrix_to_model(const mxArray *matlab_struct, const cha
 		rhs[id] = pplhs[0];
 
 		sr = (int)mxGetN(rhs[id]);
-		sc = (int)mxGetM(rhs[id]);
 
 		ptr = mxGetPr(rhs[id]);
 		ir = mxGetIr(rhs[id]);
