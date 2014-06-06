@@ -277,7 +277,7 @@ class Worker(Thread):
 
 	def get_cmd(self,c,g):
 		options=self.options
-		cmdline = options.svmtrain_pathname
+		cmdline = '"' + options.svmtrain_pathname + '"'
 		if options.grid_with_c: 
 			cmdline += ' -c {0} '.format(c)
 		if options.grid_with_g: 

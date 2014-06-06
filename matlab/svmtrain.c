@@ -400,8 +400,16 @@ void mexFunction( int nlhs, mxArray *plhs[],
 	{
 		int err;
 
-		if(!mxIsDouble(prhs[0]) || !mxIsDouble(prhs[1])) {
+		if(!mxIsDouble(prhs[0]) || !mxIsDouble(prhs[1]))
+		{
 			mexPrintf("Error: label vector and instance matrix must be double\n");
+			fake_answer(nlhs, plhs);
+			return;
+		}
+
+		if(mxIsSparse(prhs[0]))
+		{
+			mexPrintf("Error: label vector should not be in sparse format\n");
 			fake_answer(nlhs, plhs);
 			return;
 		}
