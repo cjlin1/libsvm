@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Example</title>
+		<script src="libsvm-js-interfaces.js" ></script>
+		<script src="libsvm-js-interfaces-wrapper.js"></script>
+		<script src="svm-toy.js"></script>
+		<style>
+		#features {
+			border-style: solid;
+			border-width: 1px;
+			border-color: white;
+			background-color: black;
+		}
+   </style>															
+ 
+	</head>
+	<body onLoad="init()">
+		<canvas id="features" width="500" height="500"></canvas><br/>
+		<button id='color' onclick="nextColor()" >Change</button>
+		<button id="run" onclick="drawModel()" >Run</button>
+		<button id="clear" onclick="clearScreenAndData()" >Clear</button>
+		<input id="param" value="-t 2 -c 100" />
+	</body>
+</html>
