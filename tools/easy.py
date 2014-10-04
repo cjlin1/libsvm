@@ -12,10 +12,11 @@ if len(sys.argv) <= 1:
 
 is_win32 = (sys.platform == 'win32')
 if not is_win32:
-	svmscale_exe = "../svm-scale"
-	svmtrain_exe = "../svm-train"
-	svmpredict_exe = "../svm-predict"
-	grid_py = "./grid.py"
+	dirpath = os.path.dirname(os.path.realpath(sys.argv[0])) + "/"
+	svmscale_exe = dirpath + "../svm-scale"
+	svmtrain_exe = dirpath + "../svm-train"
+	svmpredict_exe = dirpath + "../svm-predict"
+	grid_py = dirpath + "./grid.py"
 	gnuplot_exe = "/usr/bin/gnuplot"
 else:
         # example for windows
