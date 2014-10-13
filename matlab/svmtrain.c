@@ -221,6 +221,7 @@ int parse_command_line(int nrhs, const mxArray *prhs[], char *model_file_name)
 // read in a problem (in svmlight format)
 int read_problem_dense(const mxArray *label_vec, const mxArray *instance_mat)
 {
+	// using size_t due to the output type of matlab functions
 	size_t i, j, k, l;
 	size_t elements, max_index, sc, label_vector_row_num;
 	double *samples, *labels;
@@ -234,7 +235,7 @@ int read_problem_dense(const mxArray *label_vec, const mxArray *instance_mat)
 	sc = mxGetN(instance_mat);
 
 	elements = 0;
-	// the number of instance
+	// number of instances
 	l = mxGetM(instance_mat);
 	label_vector_row_num = mxGetM(label_vec);
 	prob.l = (int)l;
@@ -301,6 +302,7 @@ int read_problem_dense(const mxArray *label_vec, const mxArray *instance_mat)
 int read_problem_sparse(const mxArray *label_vec, const mxArray *instance_mat)
 {
 	mwIndex *ir, *jc, low, high, k;
+	// using size_t due to the output type of matlab functions
 	size_t i, j, l, elements, max_index, label_vector_row_num;
 	mwSize num_samples;
 	double *samples, *labels;
@@ -331,7 +333,7 @@ int read_problem_sparse(const mxArray *label_vec, const mxArray *instance_mat)
 
 	num_samples = mxGetNzmax(instance_mat_col);
 
-	// the number of instance
+	// number of instances
 	l = mxGetN(instance_mat_col);
 	label_vector_row_num = mxGetM(label_vec);
 	prob.l = (int) l;
