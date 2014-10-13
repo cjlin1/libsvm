@@ -116,6 +116,7 @@ totalSV, rho, Label, ProbA, ProbB, nSV, sv_coef, SVs]:
         -totalSV: total #SV
         -rho: -b of the decision function(s) wx+b
         -Label: label of each class; empty for regression/one-class SVM
+        -sv_indices: values in [1,...,num_traning_data] to indicate SVs in the training set
         -ProbA: pairwise probability information; empty if -b 0 or in one-class SVM
         -ProbB: pairwise probability information; empty if -b 0 or in one-class SVM
         -nSV: number of SVs for each class; empty for regression/one-class SVM
