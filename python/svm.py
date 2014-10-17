@@ -6,10 +6,10 @@ from os import path
 import sys
 
 __all__ = ['libsvm', 'svm_problem', 'svm_parameter',
-            'toPyModel', 'gen_svm_nodearray', 'print_null', 'svm_node', 'C_SVC',
-            'EPSILON_SVR', 'LINEAR', 'NU_SVC', 'NU_SVR', 'ONE_CLASS',
-            'POLY', 'PRECOMPUTED', 'PRINT_STRING_FUN', 'RBF',
-            'SIGMOID', 'c_double']
+           'toPyModel', 'gen_svm_nodearray', 'print_null', 'svm_node', 'C_SVC',
+           'EPSILON_SVR', 'LINEAR', 'NU_SVC', 'NU_SVR', 'ONE_CLASS',
+           'POLY', 'PRECOMPUTED', 'PRINT_STRING_FUN', 'RBF',
+           'SIGMOID', 'c_double', 'svm_model']
 
 try:
 	dirname = path.dirname(path.abspath(__file__))
