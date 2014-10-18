@@ -3,10 +3,11 @@
 import os
 import sys
 from svm import *
+from svm import __all__ as svm_all
 
 
 __all__ = ['evaluations', 'svm_load_model', 'svm_predict', 'svm_read_problem',
-           'svm_save_model', 'svm_train']
+           'svm_save_model', 'svm_train'] + svm_all
 
 sys.path = [os.path.dirname(os.path.abspath(__file__))] + sys.path
 
