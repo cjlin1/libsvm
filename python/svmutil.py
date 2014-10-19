@@ -1,8 +1,15 @@
 #!/usr/bin/env python
 
-import os, sys
-sys.path = [os.path.dirname(os.path.abspath(__file__))] + sys.path 
+import os
+import sys
 from svm import *
+from svm import __all__ as svm_all
+
+
+__all__ = ['evaluations', 'svm_load_model', 'svm_predict', 'svm_read_problem',
+           'svm_save_model', 'svm_train'] + svm_all
+
+sys.path = [os.path.dirname(os.path.abspath(__file__))] + sys.path
 
 def svm_read_problem(data_file_name):
 	"""
@@ -29,11 +36,11 @@ def svm_read_problem(data_file_name):
 def svm_load_model(model_file_name):
 	"""
 	svm_load_model(model_file_name) -> model
-	
+
 	Load a LIBSVM model from model_file_name and return.
 	"""
 	model = libsvm.svm_load_model(model_file_name.encode())
-	if not model: 
+	if not model:
 		print("can't open model file %s" % model_file_name)
 		return None
 	model = toPyModel(model)
@@ -59,14 +66,14 @@ def evaluations(ty, pv):
 	total_correct = total_error = 0
 	sumv = sumy = sumvv = sumyy = sumvy = 0
 	for v, y in zip(pv, ty):
-		if y == v: 
+		if y == v:
 			total_correct += 1
 		total_error += (v-y)*(v-y)
 		sumv += v
 		sumy += y
 		sumvv += v*v
 		sumyy += y*y
-		sumvy += v*y 
+		sumvy += v*y
 	l = len(ty)
 	ACC = 100.0*total_correct/l
 	MSE = total_error/l
@@ -78,12 +85,12 @@ def evaluations(ty, pv):
 
 def svm_train(arg1, arg2=None, arg3=None):
 	"""
-	svm_train(y, x [, options]) -> model | ACC | MSE 
-	svm_train(prob [, options]) -> model | ACC | MSE 
-	svm_train(prob, param) -> model | ACC| MSE 
+	svm_train(y, x [, options]) -> model | ACC | MSE
+	svm_train(prob [, options]) -> model | ACC | MSE
+	svm_train(prob, param) -> model | ACC| MSE
 
 	Train an SVM model from data (y, x) or an svm_problem prob using
-	'options' or an svm_parameter param. 
+	'options' or an svm_parameter param.
 	If '-v' is specified in 'options' (i.e., cross validation)
 	either accuracy (ACC) or mean-squared error (MSE) is returned.
 	options:
@@ -136,7 +143,7 @@ def svm_train(arg1, arg2=None, arg3=None):
 			if val <= 0 or val > prob.n:
 				raise ValueError('Wrong input format: sample_serial_number out of range')
 
-	if param.gamma == 0 and prob.n > 0: 
+	if param.gamma == 0 and prob.n > 0:
 		param.gamma = 1.0 / prob.n
 	libsvm.svm_set_print_string_function(param.print_func)
 	err_msg = libsvm.svm_check_parameter(prob, param)
@@ -146,7 +153,7 @@ def svm_train(arg1, arg2=None, arg3=None):
 	if param.cross_validation:
 		l, nr_fold = prob.l, param.nr_fold
 		target = (c_double * l)()
-		libsvm.svm_cross_validation(prob, param, nr_fold, target)	
+		libsvm.svm_cross_validation(prob, param, nr_fold, target)
 		ACC, MSE, SCC = evaluations(prob.y[:l], target[:l])
 		if param.svm_type in [EPSILON_SVR, NU_SVR]:
 			print("Cross Validation Mean squared error = %g" % MSE)
@@ -167,17 +174,17 @@ def svm_predict(y, x, m, options=""):
 	"""
 	svm_predict(y, x, m [, options]) -> (p_labels, p_acc, p_vals)
 
-	Predict data (y, x) with the SVM model m. 
-	options: 
-	    -b probability_estimates: whether to predict probability estimates, 
+	Predict data (y, x) with the SVM model m.
+	options:
+	    -b probability_estimates: whether to predict probability estimates,
 	        0 or 1 (default 0); for one-class SVM only 0 is supported.
 	    -q : quiet mode (no outputs).
 
 	The return tuple contains
 	p_labels: a list of predicted labels
-	p_acc: a tuple including  accuracy (for classification), mean-squared 
+	p_acc: a tuple including  accuracy (for classification), mean-squared
 	       error, and squared correlation coefficient (for regression).
-	p_vals: a list of decision values or probability estimates (if '-b 1' 
+	p_vals: a list of decision values or probability estimates (if '-b 1'
 	        is specified). If k is the number of classes, for decision values,
 	        each element includes results of predicting k(k-1)/2 binary-class
 	        SVMs. For probabilities, each element contains k values indicating
@@ -235,9 +242,9 @@ def svm_predict(y, x, m, options=""):
 		for xi in x:
 			xi, idx = gen_svm_nodearray(xi, isKernel=(m.param.kernel_type == PRECOMPUTED))
 			label = libsvm.svm_predict_values(m, xi, dec_values)
-			if(nr_class == 1): 
+			if(nr_class == 1):
 				values = [1]
-			else: 
+			else:
 				values = dec_values[:nr_classifier]
 			pred_labels += [label]
 			pred_values += [values]
@@ -251,4 +258,5 @@ def svm_predict(y, x, m, options=""):
 		info("Accuracy = %g%% (%d/%d) (classification)" % (ACC, int(l*ACC/100), l))
 
 	return pred_labels, (ACC, MSE, SCC), pred_values
+
 

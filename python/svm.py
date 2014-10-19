@@ -5,6 +5,11 @@ from ctypes.util import find_library
 from os import path
 import sys
 
+__all__ = ['libsvm', 'svm_problem', 'svm_parameter',
+           'toPyModel', 'gen_svm_nodearray', 'print_null', 'svm_node', 'C_SVC',
+           'EPSILON_SVR', 'LINEAR', 'NU_SVC', 'NU_SVR', 'ONE_CLASS',
+           'POLY', 'PRECOMPUTED', 'PRINT_STRING_FUN', 'RBF',
+           'SIGMOID', 'c_double', 'svm_model']
 
 try:
 	dirname = path.dirname(path.abspath(__file__))
@@ -21,20 +26,26 @@ except:
 	else:
 		raise Exception('LIBSVM library not found.')
 
-# Construct constants
-SVM_TYPE = ['C_SVC', 'NU_SVC', 'ONE_CLASS', 'EPSILON_SVR', 'NU_SVR' ]
-KERNEL_TYPE = ['LINEAR', 'POLY', 'RBF', 'SIGMOID', 'PRECOMPUTED']
-for i, s in enumerate(SVM_TYPE): exec("%s = %d" % (s , i))
-for i, s in enumerate(KERNEL_TYPE): exec("%s = %d" % (s , i))
+C_SVC = 0
+NU_SVC = 1
+ONE_CLASS = 2
+EPSILON_SVR = 3
+NU_SVR = 4
+
+LINEAR = 0
+POLY = 1
+RBF = 2
+SIGMOID = 3
+PRECOMPUTED = 4
 
 PRINT_STRING_FUN = CFUNCTYPE(None, c_char_p)
-def print_null(s): 
-	return 
+def print_null(s):
+	return
 
-def genFields(names, types): 
+def genFields(names, types):
 	return list(zip(names, types))
 
-def fillprototype(f, restype, argtypes): 
+def fillprototype(f, restype, argtypes):
 	f.restype = restype
 	f.argtypes = argtypes
 
@@ -59,7 +70,7 @@ def gen_svm_nodearray(xi, feature_max=None, isKernel=None):
 	if feature_max:
 		assert(isinstance(feature_max, int))
 		index_range = filter(lambda j: j <= feature_max, index_range)
-	if not isKernel: 
+	if not isKernel:
 		index_range = filter(lambda j:xi[j] != 0, index_range)
 
 	index_range = sorted(index_range)
@@ -69,7 +80,7 @@ def gen_svm_nodearray(xi, feature_max=None, isKernel=None):
 		ret[idx].index = j
 		ret[idx].value = xi[j]
 	max_idx = 0
-	if index_range: 
+	if index_range:
 		max_idx = index_range[-1]
 	return ret, max_idx
 
@@ -94,14 +105,14 @@ class svm_problem(Structure):
 		self.y = (c_double * l)()
 		for i, yi in enumerate(y): self.y[i] = yi
 
-		self.x = (POINTER(svm_node) * l)() 
+		self.x = (POINTER(svm_node) * l)()
 		for i, xi in enumerate(self.x_space): self.x[i] = xi
 
 class svm_parameter(Structure):
 	_names = ["svm_type", "kernel_type", "degree", "gamma", "coef0",
-			"cache_size", "eps", "C", "nr_weight", "weight_label", "weight", 
+			"cache_size", "eps", "C", "nr_weight", "weight_label", "weight",
 			"nu", "p", "shrinking", "probability"]
-	_types = [c_int, c_int, c_int, c_double, c_double, 
+	_types = [c_int, c_int, c_int, c_double, c_double,
 			c_double, c_double, c_double, c_int, POINTER(c_int), POINTER(c_double),
 			c_double, c_double, c_int, c_int]
 	_fields_ = genFields(_names, _types)
@@ -114,7 +125,7 @@ class svm_parameter(Structure):
 	def __str__(self):
 		s = ''
 		attrs = svm_parameter._names + list(self.__dict__.keys())
-		values = map(lambda attr: getattr(self, attr), attrs) 
+		values = map(lambda attr: getattr(self, attr), attrs)
 		for attr, val in zip(attrs, values):
 			s += (' %s: %s\n' % (attr, val))
 		s = s.strip()
@@ -212,7 +223,7 @@ class svm_parameter(Structure):
 		libsvm.svm_set_print_string_function(self.print_func)
 		self.weight_label = (c_int*self.nr_weight)()
 		self.weight = (c_double*self.nr_weight)()
-		for i in range(self.nr_weight): 
+		for i in range(self.nr_weight):
 			self.weight[i] = weight[i]
 			self.weight_label[i] = weight_label[i]
 
@@ -268,7 +279,7 @@ class svm_model(Structure):
 		result = []
 		for sparse_sv in self.SV[:self.l]:
 			row = dict()
-			
+
 			i = 0
 			while True:
 				row[sparse_sv[i].index] = sparse_sv[i].value
