@@ -162,7 +162,7 @@ of svmtrain or svmpredict.
 
 A matlab function libsvmwrite writes Matlab matrix to a file in LIBSVM format:
 
-libsvmwrite('data.txt', label_vector, instance_matrix]
+libsvmwrite('data.txt', label_vector, instance_matrix)
 
 The instance_matrix must be a sparse matrix. (type must be double)
 For 32bit and 64bit MATLAB on Windows, pre-built binary files are ready 
