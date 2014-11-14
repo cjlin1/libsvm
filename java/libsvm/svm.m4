@@ -1293,7 +1293,7 @@ public class svm {
 	//
 	// construct and solve various formulations
 	//
-	public static final int LIBSVM_VERSION=319; 
+	public static final int LIBSVM_VERSION=320; 
 	public static final Random rand = new Random();
 
 	private static svm_print_interface svm_print_stdout = new svm_print_interface()
