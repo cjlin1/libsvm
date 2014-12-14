@@ -1345,7 +1345,7 @@ public class svm {
 	}
 
 	private static void solve_nu_svc(svm_problem prob, svm_parameter param,
-					double[] alpha, Solver.SolutionInfo si)
+					double[] alpha, Solver.SolutionInfo si, double Cp, double Cn)
 	{
 		int i;
 		int l = prob.l;
@@ -1365,12 +1365,12 @@ public class svm {
 		for(i=0;i<l;i++)
 			if(y[i] == +1)
 			{
-				alpha[i] = Math.min(1.0,sum_pos);
+				alpha[i] = Math.min(Cp,sum_pos);
 				sum_pos -= alpha[i];
 			}
 			else
 			{
-				alpha[i] = Math.min(1.0,sum_neg);
+				alpha[i] = Math.min(Cn,sum_neg);
 				sum_neg -= alpha[i];
 			}
 
@@ -1381,7 +1381,7 @@ public class svm {
 
 		Solver_NU s = new Solver_NU();
 		s.Solve(l, new SVC_Q(prob,param,y), zeros, y,
-			alpha, 1.0, 1.0, param.eps, si, param.shrinking);
+			alpha, Cp, Cn, param.eps, si, param.shrinking);
 		double r = si.r;
 
 		svm.info("C = "+1/r+"\n");
@@ -1510,7 +1510,7 @@ public class svm {
 				solve_c_svc(prob,param,alpha,si,Cp,Cn);
 				break;
 			case svm_parameter.NU_SVC:
-				solve_nu_svc(prob,param,alpha,si);
+				solve_nu_svc(prob,param,alpha,si,Cp,Cn);
 				break;
 			case svm_parameter.ONE_CLASS:
 				solve_one_class(prob,param,alpha,si);

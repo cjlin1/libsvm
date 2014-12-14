@@ -1474,7 +1474,7 @@ static void solve_c_svc(
 
 static void solve_nu_svc(
 	const svm_problem *prob, const svm_parameter *param,
-	double *alpha, Solver::SolutionInfo* si)
+	double *alpha, Solver::SolutionInfo* si, double Cp, double Cn)
 {
 	int i;
 	int l = prob->l;
@@ -1494,12 +1494,12 @@ static void solve_nu_svc(
 	for(i=0;i<l;i++)
 		if(y[i] == +1)
 		{
-			alpha[i] = min(1.0,sum_pos);
+			alpha[i] = min(Cp,sum_pos);
 			sum_pos -= alpha[i];
 		}
 		else
 		{
-			alpha[i] = min(1.0,sum_neg);
+			alpha[i] = min(Cn,sum_neg);
 			sum_neg -= alpha[i];
 		}
 
@@ -1510,7 +1510,7 @@ static void solve_nu_svc(
 
 	Solver_NU s;
 	s.Solve(l, SVC_Q(*prob,*param,y), zeros, y,
-		alpha, 1.0, 1.0, param->eps, si,  param->shrinking);
+		alpha, Cp, Cn, param->eps, si,  param->shrinking);
 	double r = si->r;
 
 	info("C = %f\n",1/r);
@@ -1656,7 +1656,7 @@ static decision_function svm_train_one(
 			solve_c_svc(prob,param,alpha,&si,Cp,Cn);
 			break;
 		case NU_SVC:
-			solve_nu_svc(prob,param,alpha,&si);
+			solve_nu_svc(prob,param,alpha,&si,Cp,Cn);
 			break;
 		case ONE_CLASS:
 			solve_one_class(prob,param,alpha,&si);

@@ -82,10 +82,31 @@ class svm_train {
 		}
 		else
 		{
+            int countp = 0;
+            int countn = 0;
+            int correctp = 0;
+            int correctn = 0;
+
 			for(i=0;i<prob.l;i++)
+            {
 				if(target[i] == prob.y[i])
 					++total_correct;
-			System.out.print("Cross Validation Accuracy = "+100.0*total_correct/prob.l+"%\n");
+
+                if(prob.y[i] > 0.0)
+                {
+                    countp++;
+                    if(target[i] == prob.y[i])
+                        correctp++;
+                }
+                else
+                {
+                    countn++;
+                    if(target[i] == prob.y[i])
+                        correctn++;
+                }
+            }
+            System.out.print("Positive Cross Validation Accuracy = "+100.0*correctp/countp+"%\n");
+            System.out.print("Negative Cross Validation Accuracy = "+100.0*correctn/countn+"%\n");
 		}
 	}
 	
