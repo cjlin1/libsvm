@@ -4,3 +4,4 @@ svm-scale
 svm-train
 svm.o
 *.class
+*.jar
