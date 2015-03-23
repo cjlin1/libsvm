@@ -1,0 +1,6 @@
+libsvm.so.2
+svm-predict
+svm-scale
+svm-train
+svm.o
+*.class
