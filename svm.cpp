@@ -10,6 +10,7 @@
 #include "svm.h"
 int libsvm_version = LIBSVM_VERSION;
 typedef float Qfloat;
+typedef double InputData_t;
 typedef signed char schar;
 #ifndef min
 template <class T> static inline T min(T x,T y) { return (x<y)?x:y; }
@@ -236,7 +237,7 @@ private:
 	// optimizations for dense vectors
 	const int n_vec;
 	bool dense;
-	Qfloat **dense_x;
+	InputData_t **dense_x;
 	int *dense_len;
 
 	static double dot(const svm_node *px, const svm_node *py);
@@ -253,9 +254,9 @@ private:
 
 	double dense_dot(int i, int j) const {
 		int len = min(dense_len[i], dense_len[j]);
-		Qfloat *x = dense_x[i];
-		Qfloat *y = dense_x[j];
-		Qfloat sum = 0;
+		InputData_t *x = dense_x[i];
+		InputData_t *y = dense_x[j];
+		InputData_t sum = 0;
 		for (int i = 0; i < len; i += 4) {
 			sum += 
 				x[i + 0] * y[i + 0] + 
@@ -263,7 +264,7 @@ private:
 				x[i + 2] * y[i + 2] + 
 				x[i + 3] * y[i + 3];
 		}
-		return sum;
+		return (double) sum;
 	}
 
 	double kernel_linear(int i, int j) const
@@ -322,14 +323,14 @@ Kernel::Kernel(int l, svm_node * const * x_, const svm_parameter& param)
 	// ... empirical, however I hope it could work.
 	dense = (x_density() >= 0.5);
 	if (dense) {
+		// convert input data x_ to dense form
 		dot_x = &Kernel::dense_dot;
 		dense_len = new int[l];
-		dense_x = new Qfloat*[l];
+		dense_x = new InputData_t*[l];
 		for (int i = 0; i < l; i++) {
-			svm_node *sparse_vec = x_[i];
-
 			// a pre-scan to figure out the length of sparse_vec. NOTE: we round up
 			// len to multiple of 4 for easier loop-unrolling in dense_dot
+			svm_node *sparse_vec = x_[i];
 			int len = 0;
 			for (svm_node *px = sparse_vec; px->index != -1; px++) {
 				len = max(len, px->index);
@@ -338,10 +339,10 @@ Kernel::Kernel(int l, svm_node * const * x_, const svm_parameter& param)
 			dense_len[i] = len;
 			
 			// allocate space for dense vector and stuff sparse_vec to dense[i]
-			Qfloat *dx = dense_x[i] = new Qfloat[len];
-			memset(dx, 0, sizeof(Qfloat) * len);
+			InputData_t *dx = dense_x[i] = new InputData_t[len];
+			memset(dx, 0, sizeof(InputData_t) * len);
 			for (svm_node *px = sparse_vec; px->index != -1; px++) {
-				dx[px->index - 1] = (Qfloat) px->value;
+				dx[px->index - 1] = (InputData_t) px->value;
 			}
 		}
 	}
