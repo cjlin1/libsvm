@@ -199,6 +199,8 @@ public:
 	virtual ~QMatrix() {}
 };
 
+
+
 class Kernel: public QMatrix {
 public:
 	Kernel(int l, svm_node * const * x, const svm_parameter& param);
@@ -212,9 +214,13 @@ public:
 	{
 		swap(x[i],x[j]);
 		if(x_square) swap(x_square[i],x_square[j]);
+		if (dense) {
+			swap(dense_x[i], dense_x[j]);
+			swap(dense_len[i], dense_len[j]);
+		}
 	}
-protected:
 
+protected:
 	double (Kernel::*kernel_function)(int i, int j) const;
 
 private:
@@ -227,22 +233,54 @@ private:
 	const double gamma;
 	const double coef0;
 
+	// optimizations for dense vectors
+	const int n_vec;
+	bool dense;
+	Qfloat **dense_x;
+	int *dense_len;
+
 	static double dot(const svm_node *px, const svm_node *py);
+
+	// an estimation on the density of training data
+	bool is_dense(void) const;
+
+	// the specially-optimized variant of dot function
+	double (Kernel::*dot_x)(int i, int j) const;
+
+	double sparse_dot(int i, int j) const {
+		return dot(x[i], x[j]);
+	}
+
+	double dense_dot(int i, int j) const {
+		int len = min(dense_len[i], dense_len[j]);
+		Qfloat *x = dense_x[i];
+		Qfloat *y = dense_x[j];
+		Qfloat sum = 0;
+		for (int i = 0; i < len; i += 4) {
+			sum += 
+				x[i + 0] * y[i + 0] + 
+				x[i + 1] * y[i + 1] + 
+				x[i + 2] * y[i + 2] + 
+				x[i + 3] * y[i + 3];
+		}
+		return sum;
+	}
+
 	double kernel_linear(int i, int j) const
 	{
-		return dot(x[i],x[j]);
+		return (this->*dot_x)(i, j);
 	}
 	double kernel_poly(int i, int j) const
 	{
-		return powi(gamma*dot(x[i],x[j])+coef0,degree);
+		return powi(gamma*(this->*dot_x)(i,j)+coef0,degree);
 	}
 	double kernel_rbf(int i, int j) const
 	{
-		return exp(-gamma*(x_square[i]+x_square[j]-2*dot(x[i],x[j])));
+		return exp(-gamma*(x_square[i]+x_square[j]-2*(this->*dot_x)(i,j)));
 	}
 	double kernel_sigmoid(int i, int j) const
 	{
-		return tanh(gamma*dot(x[i],x[j])+coef0);
+		return tanh(gamma*(this->*dot_x)(i,j)+coef0);
 	}
 	double kernel_precomputed(int i, int j) const
 	{
@@ -250,9 +288,14 @@ private:
 	}
 };
 
+
+
 Kernel::Kernel(int l, svm_node * const * x_, const svm_parameter& param)
-:kernel_type(param.kernel_type), degree(param.degree),
- gamma(param.gamma), coef0(param.coef0)
+	: kernel_type(param.kernel_type), 
+	  degree(param.degree),
+	  gamma(param.gamma), 
+	  coef0(param.coef0),
+	  n_vec(l)
 {
 	switch(kernel_type)
 	{
@@ -275,11 +318,43 @@ Kernel::Kernel(int l, svm_node * const * x_, const svm_parameter& param)
 
 	clone(x,x_,l);
 
+	dense = is_dense();
+	if (dense) {
+		dot_x = &Kernel::dense_dot;
+		dense_len = new int[l];
+		dense_x = new Qfloat*[l];
+		for (int i = 0; i < l; i++) {
+			svm_node *sparse_vec = x_[i];
+
+			// a pre-scan to figure out the length of sparse_vec. NOTE: we round up
+			// len to multiple of 4 for easier loop-unrolling in dense_dot
+			int len = 0;
+			for (svm_node *px = sparse_vec; px->index != -1; px++) {
+				len = max(len, px->index);
+			}
+			len = (len + 3) & (~3); // round up to next multiple of 4
+			dense_len[i] = len;
+			
+			// allocate space for dense vector and stuff sparse_vec to dense[i]
+			Qfloat *dx = dense_x[i] = new Qfloat[len];
+			memset(dx, 0, sizeof(Qfloat) * len);
+			for (svm_node *px = sparse_vec; px->index != -1; px++) {
+				dx[px->index - 1] = (Qfloat) px->value;
+			}
+		}
+	}
+	else {
+		dot_x = &Kernel::sparse_dot;
+		dense_x = NULL;
+		dense_len = NULL;
+	}
+
 	if(kernel_type == RBF)
 	{
 		x_square = new double[l];
-		for(int i=0;i<l;i++)
-			x_square[i] = dot(x[i],x[i]);
+		for(int i=0;i<l;i++) {
+			x_square[i] = (this->*dot_x)(i, i);
+		}
 	}
 	else
 		x_square = 0;
@@ -289,6 +364,36 @@ Kernel::~Kernel()
 {
 	delete[] x;
 	delete[] x_square;
+	if (dense) {
+		for (int i = 0; i < n_vec; i++) delete[] dense_x[i];
+		delete[] dense_x;
+		delete[] dense_len;
+	}
+}
+
+
+bool Kernel::is_dense(void) const
+{
+	int maximum_gap = 0;
+	int n_total = 0, d_total = 0;
+
+	// scan the training data and detect some spatial characteristics
+	for (int i = 0; i < n_vec; i++)
+	{
+		const svm_node *sparse_vec = x[i];
+		int prevind = sparse_vec->index;
+		for (const svm_node *px = sparse_vec; px->index != -1; px++) {
+			int gap = px->index - prevind;
+			d_total += gap;
+			n_total += 1;
+			maximum_gap = max(maximum_gap, gap);
+			prevind = px->index;
+		}
+	}
+
+	// the criterial for determining if the training dataset is dense is quite
+	// ... empirical, however I hope it could work.
+	return ((double) n_total / (double) d_total < 1.5 && maximum_gap < 100);
 }
 
 double Kernel::dot(const svm_node *px, const svm_node *py)
