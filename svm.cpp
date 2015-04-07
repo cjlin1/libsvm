@@ -8,9 +8,15 @@
 #include <limits.h>
 #include <locale.h>
 #include "svm.h"
+
+#if defined(__amd64__) || defined (__x86_64__) || defined(__i386__)
+#define SSE_INTRINSINC
+#include <xmmintrin.h>
+#endif
+
 int libsvm_version = LIBSVM_VERSION;
 typedef float Qfloat;
-typedef double InputData_t;
+typedef float InputData_t;
 typedef signed char schar;
 #ifndef min
 template <class T> static inline T min(T x,T y) { return (x<y)?x:y; }
@@ -252,20 +258,8 @@ private:
 		return dot(x[i], x[j]);
 	}
 
-	double dense_dot(int i, int j) const {
-		int len = min(dense_len[i], dense_len[j]);
-		InputData_t *x = dense_x[i];
-		InputData_t *y = dense_x[j];
-		InputData_t sum = 0;
-		for (int i = 0; i < len; i += 4) {
-			sum += 
-				x[i + 0] * y[i + 0] + 
-				x[i + 1] * y[i + 1] + 
-				x[i + 2] * y[i + 2] + 
-				x[i + 3] * y[i + 3];
-		}
-		return (double) sum;
-	}
+	template <typename _input_t>
+	double dense_dot(int i, int j) const;
 
 	double kernel_linear(int i, int j) const
 	{
@@ -289,6 +283,72 @@ private:
 	}
 };
 
+
+template <> double Kernel::dense_dot<double>(int i, int j) const
+{
+	int len = min(dense_len[i], dense_len[j]);
+	double *x = (double *) dense_x[i];
+	double *y = (double *) dense_x[j];
+	double sum = 0;
+
+#ifdef SSE_INTRINSINC
+	__m128d aa, bb, cc, dd, ee, ff, ss;
+	double s[2] = {0, 0};
+	ss = _mm_set1_pd(0);
+	for (int i = 0; i < len; i += 4) {
+		aa = _mm_load_pd(x + i);
+		bb = _mm_load_pd(y + i);
+		dd = _mm_load_pd(x + i + 2);
+		ee = _mm_load_pd(y + i + 2);
+		cc = _mm_mul_pd(aa, bb);
+		ff = _mm_mul_pd(dd, ee);
+		ss = _mm_add_pd(ss, cc);
+		ss = _mm_add_pd(ss, ff);
+	}
+	_mm_store_pd(s, ss);
+	sum = s[0] + s[1];
+#else
+	for (int i = 0; i < len; i += 4) {
+		sum += 
+			x[i + 0] * y[i + 0] + 
+			x[i + 1] * y[i + 1] + 
+			x[i + 2] * y[i + 2] + 
+			x[i + 3] * y[i + 3];
+	}
+#endif
+	return sum;
+}
+
+template <> double Kernel::dense_dot<float>(int i, int j) const
+{
+	int len = min(dense_len[i], dense_len[j]);
+	float *x = (float *) dense_x[i];
+	float *y = (float *) dense_x[j];
+	float sum = 0;
+
+#ifdef SSE_INTRINSINC
+	__m128 aa, bb, cc, ss;
+	float s[4] = {0, 0, 0, 0};
+	ss = _mm_set1_ps(0);
+	for (int i = 0; i < len; i += 4) {
+		aa = _mm_load_ps(x + i);
+		bb = _mm_load_ps(y + i);
+		cc = _mm_mul_ps(aa, bb);
+		ss = _mm_add_ps(ss, cc);
+	}
+	_mm_store_ps(s, ss);
+	sum = s[0] + s[1] + s[2] + s[3];
+#else
+	for (int i = 0; i < len; i += 4) {
+		sum += 
+			x[i + 0] * y[i + 0] + 
+			x[i + 1] * y[i + 1] + 
+			x[i + 2] * y[i + 2] + 
+			x[i + 3] * y[i + 3];
+	}
+#endif
+	return sum;
+}
 
 
 Kernel::Kernel(int l, svm_node * const * x_, const svm_parameter& param)
@@ -324,7 +384,7 @@ Kernel::Kernel(int l, svm_node * const * x_, const svm_parameter& param)
 	dense = (x_density() >= 0.5);
 	if (dense) {
 		// convert input data x_ to dense form
-		dot_x = &Kernel::dense_dot;
+		dot_x = &Kernel::dense_dot<InputData_t>;
 		dense_len = new int[l];
 		dense_x = new InputData_t*[l];
 		for (int i = 0; i < l; i++) {
@@ -339,7 +399,12 @@ Kernel::Kernel(int l, svm_node * const * x_, const svm_parameter& param)
 			dense_len[i] = len;
 			
 			// allocate space for dense vector and stuff sparse_vec to dense[i]
-			InputData_t *dx = dense_x[i] = new InputData_t[len];
+			InputData_t *dx = dense_x[i] = (InputData_t *) 
+#ifdef SSE_INTRINSINC
+				_mm_malloc(len * sizeof(double), 16); // new InputData_t[len];
+#else
+				malloc(len * sizeof(double));
+#endif
 			memset(dx, 0, sizeof(InputData_t) * len);
 			for (svm_node *px = sparse_vec; px->index != -1; px++) {
 				dx[px->index - 1] = (InputData_t) px->value;
@@ -368,7 +433,13 @@ Kernel::~Kernel()
 	delete[] x;
 	delete[] x_square;
 	if (dense) {
-		for (int i = 0; i < n_vec; i++) delete[] dense_x[i];
+		for (int i = 0; i < n_vec; i++) {
+#ifdef SSE_INTRINSINC
+			_mm_free(dense_x[i]);
+#else
+			free(dense_x[i]);
+#endif
+		}
 		delete[] dense_x;
 		delete[] dense_len;
 	}
