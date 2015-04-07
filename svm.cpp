@@ -242,7 +242,7 @@ private:
 	static double dot(const svm_node *px, const svm_node *py);
 
 	// an estimation on the density of training data
-	bool is_dense(void) const;
+	double x_density(void) const;
 
 	// the specially-optimized variant of dot function
 	double (Kernel::*dot_x)(int i, int j) const;
@@ -318,7 +318,9 @@ Kernel::Kernel(int l, svm_node * const * x_, const svm_parameter& param)
 
 	clone(x,x_,l);
 
-	dense = is_dense();
+	// the criterial for determining if the training dataset is dense is quite
+	// ... empirical, however I hope it could work.
+	dense = (x_density() >= 0.5);
 	if (dense) {
 		dot_x = &Kernel::dense_dot;
 		dense_len = new int[l];
@@ -372,28 +374,23 @@ Kernel::~Kernel()
 }
 
 
-bool Kernel::is_dense(void) const
+double Kernel::x_density(void) const
 {
-	int maximum_gap = 0;
-	int n_total = 0, d_total = 0;
+	int n_total = 0, n_data = 0;
 
 	// scan the training data and detect some spatial characteristics
 	for (int i = 0; i < n_vec; i++)
 	{
 		const svm_node *sparse_vec = x[i];
-		int prevind = sparse_vec->index;
+		int dim = 0;
 		for (const svm_node *px = sparse_vec; px->index != -1; px++) {
-			int gap = px->index - prevind;
-			d_total += gap;
-			n_total += 1;
-			maximum_gap = max(maximum_gap, gap);
-			prevind = px->index;
+			dim = max(dim, px->index);
+			n_data += 1;
 		}
+		n_total += dim;
 	}
 
-	// the criterial for determining if the training dataset is dense is quite
-	// ... empirical, however I hope it could work.
-	return ((double) n_total / (double) d_total < 1.5 && maximum_gap < 100);
+	return ((double) n_data / (double) n_total);
 }
 
 double Kernel::dot(const svm_node *px, const svm_node *py)
