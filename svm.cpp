@@ -254,11 +254,14 @@ private:
 	// the specially-optimized variant of dot function
 	double (Kernel::*dot_x)(int i, int j) const;
 
+	template <typename _float_ty>
+	static _float_ty *sparse_to_dense(const svm_node *sparse_vec, int &len);
+
 	double sparse_dot(int i, int j) const {
 		return dot(x[i], x[j]);
 	}
 
-	template <typename _input_t>
+	template <typename _float_ty>
 	double dense_dot(int i, int j) const;
 
 	double kernel_linear(int i, int j) const
@@ -282,6 +285,39 @@ private:
 		return x[i][(int)(x[j][0].value)].value;
 	}
 };
+
+
+// 
+// Convert sparse vector to its dense representation
+// 
+template <typename _float_ty>
+_float_ty *Kernel::sparse_to_dense(const svm_node *sparse_vec, int &out_len)
+{
+	// a pre-scan to figure out the length of sparse_vec. NOTE: we round up
+	// len to multiple of 4 for easier loop-unrolling in dense_dot
+	int len = 0;
+	for (const svm_node *px = sparse_vec; px->index != -1; px++) {
+		len = max(len, px->index);
+	}
+	out_len = len;				// actual length
+	len = (len + 3) & (~3);		// round up to next multiple of 4
+
+	// allocate space for dense vector and stuff sparse_vec to it
+	_float_ty *dx = (_float_ty *)
+#ifdef SSE_INTRINSINC
+		_mm_malloc(len * sizeof(_float_ty), 16)
+#else
+		Malloc(_float_ty, len)
+#endif
+		;
+	memset(dx, 0, sizeof(_float_ty) * len);
+	for (const svm_node *px = sparse_vec; px->index != -1; px++) {
+		dx[px->index - 1] = (InputData_t) px->value;
+	}
+
+	// done
+	return dx;
+}
 
 
 template <> double Kernel::dense_dot<double>(int i, int j) const
@@ -388,29 +424,10 @@ Kernel::Kernel(int l, svm_node * const * x_, const svm_parameter& param)
 		dot_x = &Kernel::dense_dot<InputData_t>;
 		dense_len = new int[l];
 		dense_x = new InputData_t*[l];
-
 		for (int i = 0; i < l; i++) {
-			// a pre-scan to figure out the length of sparse_vec. NOTE: we round up
-			// len to multiple of 4 for easier loop-unrolling in dense_dot
-			svm_node *sparse_vec = x_[i];
-			int len = 0;
-			for (svm_node *px = sparse_vec; px->index != -1; px++) {
-				len = max(len, px->index);
-			}
-			len = (len + 3) & (~3); // round up to next multiple of 4
+			int len;
+			dense_x[i] = sparse_to_dense<InputData_t>(x_[i], len);
 			dense_len[i] = len;
-			
-			// allocate space for dense vector and stuff sparse_vec to dense[i]
-			InputData_t *dx = dense_x[i] = (InputData_t *) 
-#ifdef SSE_INTRINSINC
-				_mm_malloc(len * sizeof(double), 16); // new InputData_t[len];
-#else
-				malloc(len * sizeof(double));
-#endif
-			memset(dx, 0, sizeof(InputData_t) * len);
-			for (svm_node *px = sparse_vec; px->index != -1; px++) {
-				dx[px->index - 1] = (InputData_t) px->value;
-			}
 		}
 	}
 	else {
@@ -2672,6 +2689,11 @@ double svm_get_svr_probability(const svm_model *model)
 		fprintf(stderr,"Model doesn't contain information for SVR probability inference\n");
 		return 0;
 	}
+}
+
+void svm_model_densify(struct svm_model *model)
+{
+	
 }
 
 double svm_predict_values(const svm_model *model, const svm_node *x, double* dec_values)

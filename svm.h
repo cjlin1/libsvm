@@ -69,6 +69,17 @@ struct svm_model
 	/* XXX */
 	int free_sv;		/* 1 if svm_model is created by svm_load_model*/
 				/* 0 if svm_model is created by svm_train */
+
+	/* The k_function routine utilized by prediction depends on the value of dense.
+	 *
+	 * -1: undetermined
+	 * 0: svm_model is sparse, use regular k_function for prediction
+	 * 1: svm_model is dense, in this case we would run specially optimized routine
+	 *    when evaluating k_function 
+	 */
+	int dense;
+	double **dense_SV;
+	int **k_dense_SV;
 };
 
 struct svm_model *svm_train(const struct svm_problem *prob, const struct svm_parameter *param);
@@ -83,6 +94,7 @@ void svm_get_labels(const struct svm_model *model, int *label);
 void svm_get_sv_indices(const struct svm_model *model, int *sv_indices);
 int svm_get_nr_sv(const struct svm_model *model);
 double svm_get_svr_probability(const struct svm_model *model);
+void svm_model_densify(struct svm_model *model);
 
 double svm_predict_values(const struct svm_model *model, const struct svm_node *x, double* dec_values);
 double svm_predict(const struct svm_model *model, const struct svm_node *x);
