@@ -213,6 +213,7 @@ int main(int argc, char **argv)
 		fprintf(stderr,"can't open model file %s\n",argv[i+1]);
 		exit(1);
 	}
+	svm_model_densify(model);
 
 	x = (struct svm_node *) malloc(max_nr_attr*sizeof(struct svm_node));
 	if(predict_probability)

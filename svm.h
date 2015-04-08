@@ -79,7 +79,7 @@ struct svm_model
 	 */
 	int dense;
 	double **dense_SV;
-	int **k_dense_SV;
+	int *l_dense_SV;
 };
 
 struct svm_model *svm_train(const struct svm_problem *prob, const struct svm_parameter *param);

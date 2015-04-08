@@ -45,6 +45,14 @@ static inline double powi(double base, int times)
 #define TAU 1e-12
 #define Malloc(type,n) (type *)malloc((n)*sizeof(type))
 
+#ifdef SSE_INTRINSINC
+#define MM_Malloc(type, n) (type *) _mm_malloc((n)*sizeof(type), 16)
+#define MM_Free _mm_free
+#else
+#define MM_Malloc Malloc
+#define MM_Free   free
+#endif
+
 static void print_string_stdout(const char *s)
 {
 	fputs(s,stdout);
@@ -215,6 +223,10 @@ public:
 
 	static double k_function(const svm_node *x, const svm_node *y,
 				 const svm_parameter& param);
+	static double k_function_dense(
+		const double *x, int len_x, const double *y, int len_y,
+		const svm_parameter &param);
+
 	virtual Qfloat *get_Q(int column, int len) const = 0;
 	virtual double *get_QD() const = 0;
 	virtual void swap_index(int i, int j) const	// no so const...
@@ -247,6 +259,12 @@ private:
 	int *dense_len;
 
 	static double dot(const svm_node *px, const svm_node *py);
+	static double dense_dot(
+		const double *x, int len_x,
+		const double *y, int len_y);
+	static double dense_dot(
+		const float *x, int len_x,
+		const float *y, int len_y);
 
 	// an estimation on the density of training data
 	double x_density(void) const;
@@ -254,15 +272,13 @@ private:
 	// the specially-optimized variant of dot function
 	double (Kernel::*dot_x)(int i, int j) const;
 
-	template <typename _float_ty>
-	static _float_ty *sparse_to_dense(const svm_node *sparse_vec, int &len);
-
-	double sparse_dot(int i, int j) const {
+	double sparse_dot_x(int i, int j) const {
 		return dot(x[i], x[j]);
 	}
-
-	template <typename _float_ty>
-	double dense_dot(int i, int j) const;
+	double dense_dot_x(int i, int j) const {
+		return dense_dot(
+			dense_x[i], dense_len[i], dense_x[j], dense_len[j]);
+	}
 
 	double kernel_linear(int i, int j) const
 	{
@@ -291,7 +307,7 @@ private:
 // Convert sparse vector to its dense representation
 // 
 template <typename _float_ty>
-_float_ty *Kernel::sparse_to_dense(const svm_node *sparse_vec, int &out_len)
+_float_ty *sparse_to_dense(const svm_node *sparse_vec, int &out_len)
 {
 	// a pre-scan to figure out the length of sparse_vec. NOTE: we round up
 	// len to multiple of 4 for easier loop-unrolling in dense_dot
@@ -303,16 +319,10 @@ _float_ty *Kernel::sparse_to_dense(const svm_node *sparse_vec, int &out_len)
 	len = (len + 3) & (~3);		// round up to next multiple of 4
 
 	// allocate space for dense vector and stuff sparse_vec to it
-	_float_ty *dx = (_float_ty *)
-#ifdef SSE_INTRINSINC
-		_mm_malloc(len * sizeof(_float_ty), 16)
-#else
-		Malloc(_float_ty, len)
-#endif
-		;
+	_float_ty *dx = MM_Malloc(_float_ty, len);
 	memset(dx, 0, sizeof(_float_ty) * len);
 	for (const svm_node *px = sparse_vec; px->index != -1; px++) {
-		dx[px->index - 1] = (InputData_t) px->value;
+		dx[px->index - 1] = (_float_ty) px->value;
 	}
 
 	// done
@@ -320,11 +330,11 @@ _float_ty *Kernel::sparse_to_dense(const svm_node *sparse_vec, int &out_len)
 }
 
 
-template <> double Kernel::dense_dot<double>(int i, int j) const
+double Kernel::dense_dot(
+	const double *x, int len_x,
+	const double *y, int len_y)
 {
-	int len = min(dense_len[i], dense_len[j]);
-	double *x = (double *) dense_x[i];
-	double *y = (double *) dense_x[j];
+	int len = min(len_x, len_y);
 	double sum = 0;
 
 #ifdef SSE_INTRINSINC
@@ -355,11 +365,11 @@ template <> double Kernel::dense_dot<double>(int i, int j) const
 	return sum;
 }
 
-template <> double Kernel::dense_dot<float>(int i, int j) const
+double Kernel::dense_dot(
+	const float *x, int len_x,
+	const float *y, int len_y)
 {
-	int len = min(dense_len[i], dense_len[j]);
-	float *x = (float *) dense_x[i];
-	float *y = (float *) dense_x[j];
+	int len = min(len_x, len_y);
 	float sum = 0;
 
 #ifdef SSE_INTRINSINC
@@ -421,7 +431,7 @@ Kernel::Kernel(int l, svm_node * const * x_, const svm_parameter& param)
 	if (dense)
 	{
 		// convert input data x_ to dense form
-		dot_x = &Kernel::dense_dot<InputData_t>;
+		dot_x = &Kernel::dense_dot_x;
 		dense_len = new int[l];
 		dense_x = new InputData_t*[l];
 		for (int i = 0; i < l; i++) {
@@ -431,7 +441,7 @@ Kernel::Kernel(int l, svm_node * const * x_, const svm_parameter& param)
 		}
 	}
 	else {
-		dot_x = &Kernel::sparse_dot;
+		dot_x = &Kernel::sparse_dot_x;
 		dense_x = NULL;
 		dense_len = NULL;
 	}
@@ -452,13 +462,7 @@ Kernel::~Kernel()
 	delete[] x;
 	delete[] x_square;
 	if (dense) {
-		for (int i = 0; i < n_vec; i++) {
-#ifdef SSE_INTRINSINC
-			_mm_free(dense_x[i]);
-#else
-			free(dense_x[i]);
-#endif
-		}
+		for (int i = 0; i < n_vec; i++) MM_Free(dense_x[i]);
 		delete[] dense_x;
 		delete[] dense_len;
 	}
@@ -564,6 +568,43 @@ double Kernel::k_function(const svm_node *x, const svm_node *y,
 			return 0;  // Unreachable 
 	}
 }
+
+double Kernel::k_function_dense(
+	const double *x, int len_x, const double *y, int len_y,
+	const svm_parameter &param)
+{
+	switch(param.kernel_type)
+	{
+		case LINEAR:
+			return dense_dot(x, len_x, y, len_y);
+		case POLY:
+			return powi(
+				param.gamma*dense_dot(x, len_x, y, len_y) + param.coef0, 
+				param.degree);
+		case RBF:
+		{
+			double sum = 0;
+			int dim = min(len_x, len_y), i = 0;
+			for ( ; i < dim; i += 4) {
+				double d0 = x[i + 0] - y[i + 0];
+				double d1 = x[i + 1] - y[i + 1];
+				double d2 = x[i + 2] - y[i + 2];
+				double d3 = x[i + 3] - y[i + 3];
+				sum += (d0 * d0 + d1 * d1 + d2 * d2 + d3 * d3);
+			}
+			for ( ; i < len_x; i++) sum += x[i] * x[i];
+			for ( ; i < len_y; i++) sum += y[i] * y[i];
+			return exp(-param.gamma * sum);
+		}
+		case SIGMOID:
+			return tanh(param.gamma*dense_dot(x, len_x, y, len_y)+param.coef0);
+		case PRECOMPUTED:  //x: test (validation), y: SV
+			return x[(int)*y];
+		default:
+			return 0;  // Unreachable 
+	}
+}
+
 
 // An SMO algorithm in Fan et al., JMLR 6(2005), p. 1889--1918
 // Solves:
@@ -2152,6 +2193,7 @@ static void svm_binary_svc_probability(
 			subparam.weight[0]=Cp;
 			subparam.weight[1]=Cn;
 			struct svm_model *submodel = svm_train(&subprob,&subparam);
+			svm_model_densify(submodel);
 			for(j=begin;j<end;j++)
 			{
 				svm_predict_values(submodel,prob->x[perm[j]],&(dec_values[perm[j]]));
@@ -2286,6 +2328,9 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 {
 	svm_model *model = Malloc(svm_model,1);
 	model->param = *param;
+	model->dense = -1;
+	model->dense_SV = NULL;
+	model->l_dense_SV = NULL;
 	model->free_sv = 0;	// XXX
 
 	if(param->svm_type == ONE_CLASS ||
@@ -2634,13 +2679,16 @@ void svm_cross_validation(const svm_problem *prob, const svm_parameter *param, i
 		   (param->svm_type == C_SVC || param->svm_type == NU_SVC))
 		{
 			double *prob_estimates=Malloc(double,svm_get_nr_class(submodel));
+			svm_model_densify(submodel);
 			for(j=begin;j<end;j++)
 				target[perm[j]] = svm_predict_probability(submodel,prob->x[perm[j]],prob_estimates);
 			free(prob_estimates);
 		}
-		else
+		else {
+			svm_model_densify(submodel);
 			for(j=begin;j<end;j++)
 				target[perm[j]] = svm_predict(submodel,prob->x[perm[j]]);
+		}
 		svm_free_and_destroy_model(&submodel);
 		free(subprob.x);
 		free(subprob.y);
@@ -2693,7 +2741,29 @@ double svm_get_svr_probability(const svm_model *model)
 
 void svm_model_densify(struct svm_model *model)
 {
-	
+	// calculate the density of support vectors in svm model
+	int n_elem = 0, n_denses = 0, n_sv = model->l;
+	for (int i = 0; i < n_sv; i++) {
+		int dim = 0;
+		for (const struct svm_node *sv = model->SV[i]; 
+			 sv->index != -1; sv++) {
+			dim = max(dim, sv->index);
+			n_elem += 1;
+		}
+		n_denses += dim;
+	}
+
+	model->dense = ((double)n_elem / (double)n_denses >= 0.5);
+	if (model->dense) {
+		// precalculate this model's dense representation
+		model->dense_SV = Malloc(double *, n_sv);
+		model->l_dense_SV = Malloc(int, n_sv);
+		for (int i = 0; i < n_sv; i++) {
+			int l_denseSV;
+			model->dense_SV[i] = sparse_to_dense<double>(model->SV[i], l_denseSV);
+			model->l_dense_SV[i] = l_denseSV;
+		}
+	}
 }
 
 double svm_predict_values(const svm_model *model, const svm_node *x, double* dec_values)
@@ -2705,8 +2775,23 @@ double svm_predict_values(const svm_model *model, const svm_node *x, double* dec
 	{
 		double *sv_coef = model->sv_coef[0];
 		double sum = 0;
-		for(i=0;i<model->l;i++)
-			sum += sv_coef[i] * Kernel::k_function(x,model->SV[i],model->param);
+
+		if (model->dense == 1) {
+			int veclen;
+			double *dx = sparse_to_dense<double>(x, veclen);
+			for (i = 0; i < model->l; i++) {
+				sum += sv_coef[i] * Kernel::k_function_dense(
+					dx, veclen, 
+					model->dense_SV[i], model->l_dense_SV[i], 
+					model->param);
+			}
+			MM_Free(dx);
+		}
+		else {
+			for(i=0;i<model->l;i++)
+				sum += sv_coef[i] * Kernel::k_function(x,model->SV[i],model->param);
+		}
+
 		sum -= model->rho[0];
 		*dec_values = sum;
 
@@ -2721,8 +2806,21 @@ double svm_predict_values(const svm_model *model, const svm_node *x, double* dec
 		int l = model->l;
 		
 		double *kvalue = Malloc(double,l);
-		for(i=0;i<l;i++)
-			kvalue[i] = Kernel::k_function(x,model->SV[i],model->param);
+		if (model->dense == 1) {
+			int veclen;
+			double *dx = sparse_to_dense<double>(x, veclen);
+			for (i = 0; i < l; i++) {
+				kvalue[i] = Kernel::k_function_dense(
+					dx, veclen, 
+					model->dense_SV[i], model->l_dense_SV[i], 
+					model->param);
+			}
+			MM_Free(dx);
+		}
+		else {
+			for(i=0;i<l;i++)
+				kvalue[i] = Kernel::k_function(x,model->SV[i],model->param);
+		}
 
 		int *start = Malloc(int,nr_class);
 		start[0] = 0;
@@ -3085,6 +3183,10 @@ svm_model *svm_load_model(const char *model_file_name)
 	model->sv_indices = NULL;
 	model->label = NULL;
 	model->nSV = NULL;
+	model->dense = -1;
+	model->dense_SV = NULL;
+	model->l_dense_SV = NULL;
+
 	
 	// read header
 	if (!read_model_header(fp, model))
@@ -3206,6 +3308,15 @@ void svm_free_model_content(svm_model* model_ptr)
 
 	free(model_ptr->nSV);
 	model_ptr->nSV = NULL;
+
+	if (model_ptr->dense == 1) {
+		int n_sv = model_ptr->l;
+		for (int i = 0; i < n_sv; i++) MM_Free(model_ptr->dense_SV[i]);
+		free(model_ptr->dense_SV);
+		free(model_ptr->l_dense_SV);
+		model_ptr->dense_SV = NULL;
+		model_ptr->l_dense_SV = NULL;
+	}
 }
 
 void svm_free_and_destroy_model(svm_model** model_ptr_ptr)
