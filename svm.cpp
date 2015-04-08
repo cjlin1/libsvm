@@ -382,11 +382,13 @@ Kernel::Kernel(int l, svm_node * const * x_, const svm_parameter& param)
 	// the criterial for determining if the training dataset is dense is quite
 	// ... empirical, however I hope it could work.
 	dense = (x_density() >= 0.5);
-	if (dense) {
+	if (dense)
+	{
 		// convert input data x_ to dense form
 		dot_x = &Kernel::dense_dot<InputData_t>;
 		dense_len = new int[l];
 		dense_x = new InputData_t*[l];
+
 		for (int i = 0; i < l; i++) {
 			// a pre-scan to figure out the length of sparse_vec. NOTE: we round up
 			// len to multiple of 4 for easier loop-unrolling in dense_dot
