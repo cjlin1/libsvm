@@ -9,7 +9,7 @@
 #include <locale.h>
 #include "svm.h"
 
-#if defined(__amd64__) || defined (__x86_64__) || defined(__i386__)
+#if defined(__SSE__) || defined(_M_IX86_FP)
 #define SSE_INTRINSINC
 #include <xmmintrin.h>
 #endif
