@@ -16,7 +16,7 @@
 
 int libsvm_version = LIBSVM_VERSION;
 typedef float Qfloat;
-typedef float InputData_t;
+typedef double InputData_t;
 typedef signed char schar;
 #ifndef min
 template <class T> static inline T min(T x,T y) { return (x<y)?x:y; }
@@ -337,7 +337,8 @@ double Kernel::dense_dot(
 	int len = min(len_x, len_y);
 	double sum = 0;
 
-#ifdef SSE_INTRINSINC
+// #ifdef SSE_INTRINSINC
+#if 0
 	__m128d aa, bb, cc, dd, ee, ff, ss;
 	double s[2] = {0, 0};
 	ss = _mm_set1_pd(0);
