@@ -266,9 +266,6 @@ private:
 		const float *x, int len_x,
 		const float *y, int len_y);
 
-	// an estimation on the density of training data
-	double x_density(void) const;
-
 	// the specially-optimized variant of dot function
 	double (Kernel::*dot_x)(int i, int j) const;
 
@@ -303,6 +300,27 @@ private:
 };
 
 
+// Calculate the density of specified dataset
+static double density(const svm_node * const *x, int n_vec)
+{
+	int n_total = 0, n_data = 0;
+	
+	// scan the training data and detect some spatial characteristics
+	for (int i = 0; i < n_vec; i++)
+	{
+		const svm_node *sparse_vec = x[i];
+		int dim = 0;
+		for (const svm_node *px = sparse_vec; px->index != -1; px++) {
+			dim = max(dim, px->index);
+			n_data += 1;
+		}
+		n_total += dim;
+	}
+
+	return ((double) n_data / (double) n_total);
+}
+
+
 // 
 // Convert sparse vector to its dense representation
 // 
@@ -328,7 +346,6 @@ _float_ty *sparse_to_dense(const svm_node *sparse_vec, int &out_len)
 	// done
 	return dx;
 }
-
 
 double Kernel::dense_dot(
 	const double *x, int len_x,
@@ -428,7 +445,7 @@ Kernel::Kernel(int l, svm_node * const * x_, const svm_parameter& param)
 
 	// the criterial for determining if the training dataset is dense is quite
 	// ... empirical, however I hope it could work.
-	dense = (x_density() >= 0.5);
+	dense = (density(x, l) >= 0.5);
 	if (dense)
 	{
 		// convert input data x_ to dense form
@@ -469,25 +486,6 @@ Kernel::~Kernel()
 	}
 }
 
-
-double Kernel::x_density(void) const
-{
-	int n_total = 0, n_data = 0;
-
-	// scan the training data and detect some spatial characteristics
-	for (int i = 0; i < n_vec; i++)
-	{
-		const svm_node *sparse_vec = x[i];
-		int dim = 0;
-		for (const svm_node *px = sparse_vec; px->index != -1; px++) {
-			dim = max(dim, px->index);
-			n_data += 1;
-		}
-		n_total += dim;
-	}
-
-	return ((double) n_data / (double) n_total);
-}
 
 double Kernel::dot(const svm_node *px, const svm_node *py)
 {
@@ -2741,20 +2739,9 @@ double svm_get_svr_probability(const svm_model *model)
 }
 
 void svm_model_densify(struct svm_model *model)
-{
-	// calculate the density of support vectors in svm model
-	int n_elem = 0, n_denses = 0, n_sv = model->l;
-	for (int i = 0; i < n_sv; i++) {
-		int dim = 0;
-		for (const struct svm_node *sv = model->SV[i]; 
-			 sv->index != -1; sv++) {
-			dim = max(dim, sv->index);
-			n_elem += 1;
-		}
-		n_denses += dim;
-	}
-
-	model->dense = ((double)n_elem / (double)n_denses >= 0.5);
+{	
+	int n_sv = model->l;
+	model->dense = (density(model->SV, n_sv) >= 0.5);
 	if (model->dense) {
 		// precalculate this model's dense representation
 		model->dense_SV = Malloc(double *, n_sv);
