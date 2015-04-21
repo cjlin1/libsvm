@@ -58,7 +58,7 @@ void predict(FILE *input, FILE *output)
 	double *prob_estimates=NULL;
 	int j;
 
-	if(predict_probability)
+	if (predict_probability)
 	{
 		if (svm_type==NU_SVR || svm_type==EPSILON_SVR)
         {
@@ -78,7 +78,7 @@ void predict(FILE *input, FILE *output)
 
 	max_line_len = 1024;
 	line = (char *)malloc(max_line_len*sizeof(char));
-	while(readline(input) != NULL)
+	while (readline(input) != NULL)
 	{
 		int i = 0;
 		double target_label, predict_label;
@@ -86,20 +86,20 @@ void predict(FILE *input, FILE *output)
 		int inst_max_index = -1; // strtol gives 0 if wrong format, and precomputed kernel has <index> start from 0
 
 		label = strtok(line," \t\n");
-		if(label == NULL) // empty line
+		if (label == NULL) // empty line
         {
 			exit_input_error(total+1);
         }
 
 		target_label = strtod(label,&endptr);
-		if(endptr == label || *endptr != '\0')
+		if (endptr == label || *endptr != '\0')
         {
 			exit_input_error(total+1);
         }
 
-		while(1)
+		while (1)
 		{
-			if(i>=max_nr_attr-1)	// need one more for index = -1
+			if (i>=max_nr_attr-1)	// need one more for index = -1
 			{
 				max_nr_attr *= 2;
 				x = (struct svm_node *) realloc(x,max_nr_attr*sizeof(struct svm_node));
@@ -108,13 +108,13 @@ void predict(FILE *input, FILE *output)
 			idx = strtok(NULL,":");
 			val = strtok(NULL," \t");
 
-			if(val == NULL)
+			if (val == NULL)
             {
 				break;
             }
 			errno = 0;
 			x[i].index = (int) strtol(idx,&endptr,10);
-			if(endptr == idx || errno != 0 || *endptr != '\0' || x[i].index <= inst_max_index)
+			if (endptr == idx || errno != 0 || *endptr != '\0' || x[i].index <= inst_max_index)
             {
 				exit_input_error(total+1);
             } else
@@ -124,7 +124,7 @@ void predict(FILE *input, FILE *output)
 
 			errno = 0;
 			x[i].value = strtod(val,&endptr);
-			if(endptr == val || errno != 0 || (*endptr != '\0' && !isspace(*endptr)))
+			if (endptr == val || errno != 0 || (*endptr != '\0' && !isspace(*endptr)))
             {
 				exit_input_error(total+1);
             }
@@ -137,8 +137,10 @@ void predict(FILE *input, FILE *output)
 		{
 			predict_label = svm_predict_probability(model,x,prob_estimates);
 			fprintf(output,"%g",predict_label);
-			for(j=0;j<nr_class;j++)
+			for (j=0;j<nr_class;j++)
+            {
 				fprintf(output," %g",prob_estimates[j]);
+            }
 			fprintf(output,"\n");
 		}
 		else
@@ -147,7 +149,7 @@ void predict(FILE *input, FILE *output)
 			fprintf(output,"%g\n",predict_label);
 		}
 
-		if(predict_label == target_label)
+		if (predict_label == target_label)
         {
 			++correct;
         }
@@ -169,9 +171,12 @@ void predict(FILE *input, FILE *output)
 			);
 	}
 	else
+    {
 		info("Accuracy = %g%% (%d/%d) (classification)\n",
 			(double)correct/total*100,correct,total);
-	if(predict_probability)
+    }
+
+	if (predict_probability)
     {
 		free(prob_estimates);
     }
@@ -193,11 +198,11 @@ int main(int argc, char **argv)
 	FILE *input, *output;
 	int i;
 	// parse options
-	for(i=1;i<argc;i++)
+	for (i=1; i<argc; i++)
 	{
-		if(argv[i][0] != '-') break;
+		if (argv[i][0] != '-') break;
 		++i;
-		switch(argv[i-1][1])
+		switch (argv[i-1][1])
 		{
 			case 'b':
 				predict_probability = atoi(argv[i]);
@@ -212,35 +217,35 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if(i>=argc-2)
+	if (i>=argc-2)
     {
 		exit_with_help();
     }
 
 	input = fopen(argv[i],"r");
-	if(input == NULL)
+	if (input == NULL)
 	{
 		fprintf(stderr,"can't open input file %s\n",argv[i]);
 		exit(1);
 	}
 
 	output = fopen(argv[i+2],"w");
-	if(output == NULL)
+	if (output == NULL)
 	{
 		fprintf(stderr,"can't open output file %s\n",argv[i+2]);
 		exit(1);
 	}
 
-	if((model=svm_load_model(argv[i+1]))==0)
+	if ((model=svm_load_model(argv[i+1]))==0)
 	{
 		fprintf(stderr,"can't open model file %s\n",argv[i+1]);
 		exit(1);
 	}
 
 	x = (struct svm_node *) malloc(max_nr_attr*sizeof(struct svm_node));
-	if(predict_probability)
+	if (predict_probability)
 	{
-		if(svm_check_probability_model(model)==0)
+		if (svm_check_probability_model(model)==0)
 		{
 			fprintf(stderr,"Model does not support probabiliy estimates\n");
 			exit(1);
@@ -248,7 +253,7 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		if(svm_check_probability_model(model)!=0)
+		if (svm_check_probability_model(model)!=0)
         {
 			info("Model supports probability estimates, but disabled in prediction.\n");
         }
