@@ -23,7 +23,9 @@ static char* readline(FILE *input)
 	int len;
 
 	if(fgets(line,max_line_len,input) == NULL)
+    {
 		return NULL;
+    }
 
 	while(strrchr(line,'\n') == NULL)
 	{
@@ -31,7 +33,9 @@ static char* readline(FILE *input)
 		line = (char *) realloc(line,max_line_len);
 		len = (int) strlen(line);
 		if(fgets(line+len,max_line_len-len,input) == NULL)
+        {
 			break;
+        }
 	}
 	return line;
 }
@@ -57,8 +61,9 @@ void predict(FILE *input, FILE *output)
 	if(predict_probability)
 	{
 		if (svm_type==NU_SVR || svm_type==EPSILON_SVR)
+        {
 			info("Prob. model for test data: target value = predicted value + z,\nz: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma=%g\n",svm_get_svr_probability(model));
-		else
+        } else
 		{
 			int *labels=(int *) malloc(nr_class*sizeof(int));
 			svm_get_labels(model,labels);
@@ -82,11 +87,15 @@ void predict(FILE *input, FILE *output)
 
 		label = strtok(line," \t\n");
 		if(label == NULL) // empty line
+        {
 			exit_input_error(total+1);
+        }
 
 		target_label = strtod(label,&endptr);
 		if(endptr == label || *endptr != '\0')
+        {
 			exit_input_error(total+1);
+        }
 
 		while(1)
 		{
@@ -100,18 +109,25 @@ void predict(FILE *input, FILE *output)
 			val = strtok(NULL," \t");
 
 			if(val == NULL)
+            {
 				break;
+            }
 			errno = 0;
 			x[i].index = (int) strtol(idx,&endptr,10);
 			if(endptr == idx || errno != 0 || *endptr != '\0' || x[i].index <= inst_max_index)
+            {
 				exit_input_error(total+1);
-			else
+            } else
+            {
 				inst_max_index = x[i].index;
+            }
 
 			errno = 0;
 			x[i].value = strtod(val,&endptr);
 			if(endptr == val || errno != 0 || (*endptr != '\0' && !isspace(*endptr)))
+            {
 				exit_input_error(total+1);
+            }
 
 			++i;
 		}
@@ -132,7 +148,10 @@ void predict(FILE *input, FILE *output)
 		}
 
 		if(predict_label == target_label)
+        {
 			++correct;
+        }
+
 		error += (predict_label-target_label)*(predict_label-target_label);
 		sump += predict_label;
 		sumt += target_label;
@@ -153,7 +172,9 @@ void predict(FILE *input, FILE *output)
 		info("Accuracy = %g%% (%d/%d) (classification)\n",
 			(double)correct/total*100,correct,total);
 	if(predict_probability)
+    {
 		free(prob_estimates);
+    }
 }
 
 void exit_with_help()
@@ -192,7 +213,9 @@ int main(int argc, char **argv)
 	}
 
 	if(i>=argc-2)
+    {
 		exit_with_help();
+    }
 
 	input = fopen(argv[i],"r");
 	if(input == NULL)
@@ -226,7 +249,9 @@ int main(int argc, char **argv)
 	else
 	{
 		if(svm_check_probability_model(model)!=0)
+        {
 			info("Model supports probability estimates, but disabled in prediction.\n");
+        }
 	}
 
 	predict(input,output);

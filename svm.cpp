@@ -2978,7 +2978,9 @@ svm_model *svm_load_model(const char *model_file_name)
 void svm_free_model_content(svm_model* model_ptr)
 {
 	if(model_ptr->free_sv && model_ptr->l > 0 && model_ptr->SV != NULL)
+    {
 		free((void *)(model_ptr->SV[0]));
+    }
 	if(model_ptr->sv_coef)
 	{
 		for(int i=0;i<model_ptr->nr_class-1;i++)
@@ -3036,7 +3038,9 @@ const char *svm_check_parameter(const svm_problem *prob, const svm_parameter *pa
 	   svm_type != ONE_CLASS &&
 	   svm_type != EPSILON_SVR &&
 	   svm_type != NU_SVR)
+    {
 		return "unknown svm type";
+    }
 	
 	// kernel_type, degree
 	
@@ -3049,46 +3053,72 @@ const char *svm_check_parameter(const svm_problem *prob, const svm_parameter *pa
 		return "unknown kernel type";
 
 	if(param->gamma < 0)
+    {
 		return "gamma < 0";
+    }    
 
 	if(param->degree < 0)
+    {
 		return "degree of polynomial kernel < 0";
+    }
 
 	// cache_size,eps,C,nu,p,shrinking
 
 	if(param->cache_size <= 0)
+    {
 		return "cache_size <= 0";
+    
 
 	if(param->eps <= 0)
+    {
 		return "eps <= 0";
+    }
 
 	if(svm_type == C_SVC ||
 	   svm_type == EPSILON_SVR ||
 	   svm_type == NU_SVR)
+    {
 		if(param->C <= 0)
+        {
 			return "C <= 0";
+        }
+    }
 
 	if(svm_type == NU_SVC ||
 	   svm_type == ONE_CLASS ||
 	   svm_type == NU_SVR)
+    {
 		if(param->nu <= 0 || param->nu > 1)
+        {
 			return "nu <= 0 or nu > 1";
+        }
+    }
 
 	if(svm_type == EPSILON_SVR)
+    {
 		if(param->p < 0)
+        {
 			return "p < 0";
+        }
+    }
 
 	if(param->shrinking != 0 &&
 	   param->shrinking != 1)
+    {
 		return "shrinking != 0 and shrinking != 1";
+    }
 
 	if(param->probability != 0 &&
 	   param->probability != 1)
+    {
 		return "probability != 0 and probability != 1";
+    }
 
 	if(param->probability == 1 &&
 	   svm_type == ONE_CLASS)
+    {
 		return "one-class SVM probability output not supported yet";
+    }
 
 
 	// check whether nu-svc is feasible
