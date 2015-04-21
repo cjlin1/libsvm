@@ -3053,9 +3053,9 @@ const char *svm_check_parameter(const svm_problem *prob, const svm_parameter *pa
 	   svm_type != ONE_CLASS &&
 	   svm_type != EPSILON_SVR &&
 	   svm_type != NU_SVR)
-    {
+        {
 		return "unknown svm type";
-    }
+        }
 	
 	// kernel_type, degree
 	
@@ -3065,7 +3065,9 @@ const char *svm_check_parameter(const svm_problem *prob, const svm_parameter *pa
 	   kernel_type != RBF &&
 	   kernel_type != SIGMOID &&
 	   kernel_type != PRECOMPUTED)
+        {
 		return "unknown kernel type";
+        }
 
 	if(param->gamma < 0)
     {
@@ -3080,65 +3082,66 @@ const char *svm_check_parameter(const svm_problem *prob, const svm_parameter *pa
 	// cache_size,eps,C,nu,p,shrinking
 
 	if(param->cache_size <= 0)
-    {
+        {
 		return "cache_size <= 0";
+        }
     
 
 	if(param->eps <= 0)
-    {
+        {
 		return "eps <= 0";
-    }
+        }
 
 	if(svm_type == C_SVC ||
 	   svm_type == EPSILON_SVR ||
 	   svm_type == NU_SVR)
-    {
-		if(param->C <= 0)
         {
+		if(param->C <= 0)
+                {
 			return "C <= 0";
+                }
         }
-    }
 
 	if(svm_type == NU_SVC ||
 	   svm_type == ONE_CLASS ||
 	   svm_type == NU_SVR)
-    {
-		if(param->nu <= 0 || param->nu > 1)
         {
+		if(param->nu <= 0 || param->nu > 1)
+                {
 			return "nu <= 0 or nu > 1";
+                }
         }
-    }
 
 	if(svm_type == EPSILON_SVR)
-    {
-		if(param->p < 0)
         {
+		if(param->p < 0)
+                {
 			return "p < 0";
+                }
         }
-    }
 
 	if(param->shrinking != 0 &&
 	   param->shrinking != 1)
-    {
+        {
 		return "shrinking != 0 and shrinking != 1";
-    }
+        }
 
-	if(param->probability != 0 &&
+	if (param->probability != 0 &&
 	   param->probability != 1)
-    {
+        {
 		return "probability != 0 and probability != 1";
-    }
+        }
 
-	if(param->probability == 1 &&
+	if (param->probability == 1 &&
 	   svm_type == ONE_CLASS)
-    {
+        {
 		return "one-class SVM probability output not supported yet";
-    }
+        }
 
 
 	// check whether nu-svc is feasible
 	
-	if(svm_type == NU_SVC)
+	if (svm_type == NU_SVC)
 	{
 		int l = prob->l;
 		int max_nr_class = 16;
@@ -3147,19 +3150,21 @@ const char *svm_check_parameter(const svm_problem *prob, const svm_parameter *pa
 		int *count = Malloc(int,max_nr_class);
 
 		int i;
-		for(i=0;i<l;i++)
+		for (i=0;i<l;i++)
 		{
 			int this_label = (int)prob->y[i];
 			int j;
-			for(j=0;j<nr_class;j++)
-				if(this_label == label[j])
+			for (j=0;j<nr_class;j++)
+                        {
+				if (this_label == label[j])
 				{
 					++count[j];
 					break;
 				}
-			if(j == nr_class)
+                        }
+			if (j == nr_class)
 			{
-				if(nr_class == max_nr_class)
+				if (nr_class == max_nr_class)
 				{
 					max_nr_class *= 2;
 					label = (int *)realloc(label,max_nr_class*sizeof(int));
@@ -3171,13 +3176,13 @@ const char *svm_check_parameter(const svm_problem *prob, const svm_parameter *pa
 			}
 		}
 	
-		for(i=0;i<nr_class;i++)
+		for (i=0;i<nr_class;i++)
 		{
 			int n1 = count[i];
-			for(int j=i+1;j<nr_class;j++)
+			for (int j=i+1;j<nr_class;j++)
 			{
 				int n2 = count[j];
-				if(param->nu*(n1+n2)/2 > min(n1,n2))
+				if (param->nu*(n1+n2)/2 > min(n1,n2))
 				{
 					free(label);
 					free(count);
