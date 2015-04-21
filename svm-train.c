@@ -67,9 +67,9 @@ static char* readline(FILE *input)
 	int len;
 	
 	if(fgets(line,max_line_len,input) == NULL)
-    {
+        {
 		return NULL;
-    }
+        }
 
 	while(strrchr(line,'\n') == NULL)
 	{
@@ -77,9 +77,9 @@ static char* readline(FILE *input)
 		line = (char *) realloc(line,max_line_len);
 		len = (int) strlen(line);
 		if(fgets(line+len,max_line_len-len,input) == NULL)
-        {
+                {
 			break;
-        }
+                }
 	}
 	return line;
 }
@@ -94,13 +94,13 @@ int main(int argc, char **argv)
 	read_problem(input_file_name);
 	error_msg = svm_check_parameter(&prob,&param);
 
-	if(error_msg)
+	if (error_msg)
 	{
 		fprintf(stderr,"ERROR: %s\n",error_msg);
 		exit(1);
 	}
 
-	if(cross_validation)
+	if (cross_validation)
 	{
 		do_cross_validation();
 	}
@@ -132,7 +132,7 @@ void do_cross_validation()
 	double *target = Malloc(double,prob.l);
 
 	svm_cross_validation(&prob,&param,nr_fold,target);
-	if(param.svm_type == EPSILON_SVR ||
+	if (param.svm_type == EPSILON_SVR ||
 	   param.svm_type == NU_SVR)
 	{
 		for (i=0;i<prob.l;i++)
@@ -155,12 +155,12 @@ void do_cross_validation()
 	else
 	{
 		for (i=0;i<prob.l;i++)
-        {
-			if(target[i] == prob.y[i])
-            {
+                {
+			if (target[i] == prob.y[i])
+                        {
 				++total_correct;
-            }
-        }
+                        }
+                }
 		printf("Cross Validation Accuracy = %g%%\n",100.0*total_correct/prob.l);
 	}
 	free(target);
@@ -192,11 +192,11 @@ void parse_command_line(int argc, char **argv, char *input_file_name, char *mode
 	// parse options
 	for (i=1;i<argc;i++)
 	{
-		if(argv[i][0] != '-') break;
-		if(++i>=argc)
-        {
+		if (argv[i][0] != '-') break;
+		if (++i>=argc)
+                {
 			exit_with_help();
-        }
+                }
 		switch (argv[i-1][1])
 		{
 			case 's':
@@ -265,26 +265,28 @@ void parse_command_line(int argc, char **argv, char *input_file_name, char *mode
 
 	// determine filenames
 
-	if(i>=argc)
+	if (i>=argc)
+        {
 		exit_with_help();
+        }
 
 	strcpy(input_file_name, argv[i]);
 
-	if(i<argc-1)
-    {
-		strcpy(model_file_name,argv[i+1]);
-    } else
-	{
-		char *p = strrchr(argv[i],'/');
-		if(p==NULL)
+	if (i<argc-1)
         {
-			p = argv[i];
+		strcpy(model_file_name,argv[i+1]);
         } else
         {
+		char *p = strrchr(argv[i],'/');
+		if(p==NULL)
+                {
+			p = argv[i];
+                } else
+                {
 			++p;
-        }
+                }
 		sprintf(model_file_name,"%s.model",p);
-	}
+        }
 }
 
 // read in a problem (in svmlight format)
@@ -338,15 +340,15 @@ void read_problem(const char *filename)
 		prob.x[i] = &x_space[j];
 		label = strtok(line," \t\n");
 		if(label == NULL) // empty line
-        {
+                {
 			exit_input_error(i+1);
-        }
+                }
 
 		prob.y[i] = strtod(label,&endptr);
 		if(endptr == label || *endptr != '\0')
-        {
+                {
 			exit_input_error(i+1);
-        }
+                }
 
 		while(1)
 		{
@@ -354,39 +356,44 @@ void read_problem(const char *filename)
 			val = strtok(NULL," \t");
 
 			if(val == NULL)
-            {
+                        {
 				break;
-            }
+                        }
 
 			errno = 0;
 			x_space[j].index = (int) strtol(idx,&endptr,10);
 			if (endptr == idx || errno != 0 || *endptr != '\0' || x_space[j].index <= inst_max_index)
-            {
+                        {
 				exit_input_error(i+1);
-            } else
-            {
-				inst_max_index = x_space[j].index;
-            }
+                        } else
+                        {
+			        inst_max_index = x_space[j].index;
+                        }
 
 			errno = 0;
 			x_space[j].value = strtod(val,&endptr);
 			if (endptr == val || errno != 0 || (*endptr != '\0' && !isspace(*endptr)))
-            {
+                        {
 				exit_input_error(i+1);
-            }
+                        }
 
 			++j;
 		}
 
 		if (inst_max_index > max_index)
+                {
 			max_index = inst_max_index;
+                }
 		x_space[j++].index = -1;
 	}
 
 	if (param.gamma == 0 && max_index > 0)
+        {
 		param.gamma = 1.0/max_index;
+        }
 
 	if (param.kernel_type == PRECOMPUTED)
+        {
 		for (i=0;i<prob.l;i++)
 		{
 			if (prob.x[i][0].index != 0)
@@ -400,6 +407,7 @@ void read_problem(const char *filename)
 				exit(1);
 			}
 		}
+        }
 
 	fclose(fp);
 }

@@ -155,23 +155,24 @@ int Cache::get_data(const int index, Qfloat **data, int len)
 
 void Cache::swap_index(int i, int j)
 {
-	if(i==j) return;
+	if (i==j) return;
 
-	if(head[i].len) lru_delete(&head[i]);
-	if(head[j].len) lru_delete(&head[j]);
+	if (head[i].len) lru_delete(&head[i]);
+	if (head[j].len) lru_delete(&head[j]);
 	swap(head[i].data,head[j].data);
 	swap(head[i].len,head[j].len);
-	if(head[i].len) lru_insert(&head[i]);
-	if(head[j].len) lru_insert(&head[j]);
+	if (head[i].len) lru_insert(&head[i]);
+	if (head[j].len) lru_insert(&head[j]);
 
 	if(i>j) swap(i,j);
-	for(head_t *h = lru_head.next; h!=&lru_head; h=h->next)
+	for (head_t *h = lru_head.next; h!=&lru_head; h=h->next)
 	{
-		if(h->len > i)
+		if (h->len > i)
 		{
-			if(h->len > j)
+			if (h->len > j)
+                        {
 				swap(h->data[i],h->data[j]);
-			else
+                        } else
 			{
 				// give up
 				lru_delete(h);
@@ -211,7 +212,7 @@ public:
 	virtual void swap_index(int i, int j) const	// no so const...
 	{
 		swap(x[i],x[j]);
-		if(x_square) swap(x_square[i],x_square[j]);
+		if (x_square) swap(x_square[i],x_square[j]);
 	}
 protected:
 
@@ -254,7 +255,7 @@ Kernel::Kernel(int l, svm_node * const * x_, const svm_parameter& param)
 :kernel_type(param.kernel_type), degree(param.degree),
  gamma(param.gamma), coef0(param.coef0)
 {
-	switch(kernel_type)
+	switch (kernel_type)
 	{
 		case LINEAR:
 			kernel_function = &Kernel::kernel_linear;
@@ -275,14 +276,15 @@ Kernel::Kernel(int l, svm_node * const * x_, const svm_parameter& param)
 
 	clone(x,x_,l);
 
-	if(kernel_type == RBF)
+	if (kernel_type == RBF)
 	{
 		x_square = new double[l];
 		for(int i=0;i<l;i++)
 			x_square[i] = dot(x[i],x[i]);
-	}
-	else
+	} else
+        {
 		x_square = 0;
+        }
 }
 
 Kernel::~Kernel()
@@ -294,20 +296,22 @@ Kernel::~Kernel()
 double Kernel::dot(const svm_node *px, const svm_node *py)
 {
 	double sum = 0;
-	while(px->index != -1 && py->index != -1)
+	while (px->index != -1 && py->index != -1)
 	{
-		if(px->index == py->index)
+		if (px->index == py->index)
 		{
 			sum += px->value * py->value;
 			++px;
 			++py;
-		}
-		else
-		{
+		} else
+                {
 			if(px->index > py->index)
+                        {
 				++py;
-			else
+                        } else
+                        {
 				++px;
+                        }
 		}			
 	}
 	return sum;
@@ -316,7 +320,7 @@ double Kernel::dot(const svm_node *px, const svm_node *py)
 double Kernel::k_function(const svm_node *x, const svm_node *y,
 			  const svm_parameter& param)
 {
-	switch(param.kernel_type)
+	switch (param.kernel_type)
 	{
 		case LINEAR:
 			return dot(x,y);
@@ -325,9 +329,9 @@ double Kernel::k_function(const svm_node *x, const svm_node *y,
 		case RBF:
 		{
 			double sum = 0;
-			while(x->index != -1 && y->index !=-1)
+			while (x->index != -1 && y->index !=-1)
 			{
-				if(x->index == y->index)
+				if (x->index == y->index)
 				{
 					double d = x->value - y->value;
 					sum += d*d;
@@ -336,7 +340,7 @@ double Kernel::k_function(const svm_node *x, const svm_node *y,
 				}
 				else
 				{
-					if(x->index > y->index)
+					if (x->index > y->index)
 					{	
 						sum += y->value * y->value;
 						++y;
@@ -349,13 +353,13 @@ double Kernel::k_function(const svm_node *x, const svm_node *y,
 				}
 			}
 
-			while(x->index != -1)
+			while (x->index != -1)
 			{
 				sum += x->value * x->value;
 				++x;
 			}
 
-			while(y->index != -1)
+			while (y->index != -1)
 			{
 				sum += y->value * y->value;
 				++y;
@@ -430,10 +434,15 @@ protected:
 	void update_alpha_status(int i)
 	{
 		if(alpha[i] >= get_C(i))
+                {
 			alpha_status[i] = UPPER_BOUND;
-		else if(alpha[i] <= 0)
+                } else if(alpha[i] <= 0)
+                {
 			alpha_status[i] = LOWER_BOUND;
-		else alpha_status[i] = FREE;
+                } else
+                {
+                        alpha_status[i] = FREE;
+                }
 	}
 	bool is_upper_bound(int i) { return alpha_status[i] == UPPER_BOUND; }
 	bool is_lower_bound(int i) { return alpha_status[i] == LOWER_BOUND; }
@@ -463,19 +472,25 @@ void Solver::reconstruct_gradient()
 {
 	// reconstruct inactive elements of G from G_bar and free variables
 
-	if(active_size == l) return;
+	if (active_size == l) return;
 
 	int i,j;
 	int nr_free = 0;
 
-	for(j=active_size;j<l;j++)
+	for (j=active_size;j<l;j++)
+        {
 		G[j] = G_bar[j] + p[j];
+        }
 
-	for(j=0;j<active_size;j++)
+	for (j=0;j<active_size;j++)
+        {
 		if(is_free(j))
+                {
 			nr_free++;
+                }
+        }
 
-	if(2*nr_free < active_size)
+	if (2*nr_free < active_size)
 		info("\nWARNING: using -h 0 may be faster\n");
 
 	if (nr_free*l > 2*active_size*(l-active_size))
