@@ -238,7 +238,7 @@ All kernel values including ZEROs must be explicitly provided.  Any permutation 
 
 **Note**: *the format is slightly different from the precomputed kernel package released in libsvmtools earlier.*
 
-Examples:
+***Examples***:
 
 	Assume the original training data has three four-feature
 	instances and testing data has one instance:
@@ -281,7 +281,7 @@ Before you classify test data, you need to construct an **SVM model** (`svm_mode
 struct svm_model *svm_train(const struct svm_problem *prob,
 					const struct svm_parameter *param);
 ```
-This function constructs and returns an SVM model according to the given training data and parameters.
+This function constructs and returns an **SVM model** according to the given training data and parameters.
 
 struct `svm_problem` describes the problem:
 ```c++
@@ -293,17 +293,20 @@ struct svm_problem
 };
 ```
 
-where `l` is the number of training data, and `y` is an array containing their target values. (integers in classification, real numbers in regression) `x` is an array of pointers, each of which points to a sparse representation (array of svm_node) of one training vector. 
+where  
+> `l` is the number of training data,  
+> `y` is an array containing their target values. (integers in classification, real numbers in regression)  
+> `x` is an array of pointers, each of which points to a sparse representation (array of svm_node) of one training vector.  
 
 For example, if we have the following training data:
 ```
-LABEL	ATTR1	ATTR2	ATTR3	ATTR4	ATTR5
------	-----	-----	-----	-----	-----
-  1		  0	  0.1	  0.2	  0	  0
-  2		  0	  0.1	  0.3	 -1.2	  0
-  1		  0.4	  0	  0	  0	  0
-  2		  0	  0.1	  0	  1.4	  0.5
-  3		 -0.1	 -0.2	  0.1	  1.1	  0.1
+LABEL    ATTR1    ATTR2    ATTR3    ATTR4    ATTR5
+-----    -----    -----    -----    -----    -----
+  1       0        0.1      0.2        0        0
+  2       0        0.1      0.3     -1.2        0
+  1       0.4        0      0          0        0
+  2       0        0.1      0        1.4      0.5
+  3      -0.1     -0.2      0.1      1.1      0.1
 ```
 then the components of **svm_problem** are:
 ```
@@ -327,7 +330,7 @@ struct svm_node
 ```
 index = **-1** indicates the end of one vector. Note that indices must be in **ASCENDING** order.
  
-struct `svm_parameter` describes the parameters of an SVM model:
+struct `svm_parameter` describes the parameters of an **SVM model**:
 ```C++
 struct svm_parameter
 {
@@ -379,7 +382,7 @@ If you do not want to change penalty for any of the classes,just set nr_weight t
 
 ***NOTE*** To avoid wrong parameters, `svm_check_parameter()` should be called before `svm_train()`.
 
-struct `svm_model` stores the model obtained from the training procedure. It is not recommended to directly access entries in this structure. Programmers should use the interface functions to get the values.
+struct `svm_model` stores the model obtained from the training procedure. **It is not recommended to directly access entries in this structure**. Programmers should use the **interface functions** to get the values.
 ```C++
 struct svm_model
 {
@@ -448,7 +451,7 @@ double svm_predict(const struct svm_model *model, const struct svm_node *x);
 
 This function does classification or regression on a test vector x given a model.
 
-For a classification model, the predicted class for x is returned. For a regression model, the function value of x calculated using the model is returned. For an one-class model, +1 or -1 is returned.
+For a classification model, **the predicted class for x is returned**. For a regression model, **the function value of x calculated using the model is returned**. For an one-class model, +1 or -1 is returned.
 
 <h3 id="svm_cross_validation">function svm_cross_validation</h3>
 
@@ -658,12 +661,14 @@ VC++ or where it is installed.
 
 3. (optional) To build shared library libsvm.dll, type
 
-    nmake -f Makefile.win lib
+        nmake -f Makefile.win lib
 
 4. (optional) To build 64-bit windows binaries, you must 
     1. Run vcvars64.bat instead of vcvars32.bat. Note that
 	vcvars64.bat is located at
-        C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\amd64\
+
+            C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\amd64\
+
 	2. Change CFLAGS in Makefile.win: `/D _WIN32` to `/D _WIN64`
 
 Another way is to build them from Visual C++ environment. See details in libsvm FAQ.
@@ -678,7 +683,7 @@ Please check the file [README.md](./matlab/README.md) in the directory `matlab`.
 
 <h2 id="PythonInterface">Python Interface</h2>
 
-See the [README](./python/README.md) file in python directory.
+See the [README.md](./python/README.md) file in python directory.
 
 <h2 id="AdditionalInfo">Additional Information</h2>
 
