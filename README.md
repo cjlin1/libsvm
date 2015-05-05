@@ -46,15 +46,13 @@ If you are new to SVM and if the data is not large, please go to `tools` directo
 
     Usage: easy.py training_file [testing_file]
 
-More information about parameter selection can be found in
-
-    tools/README.md   
+More information about parameter selection can be found in [tools/README.md](./tools/README.md)
 
 <h2 id="InstallationAdDataFormat">Installation and Data Format</h2>
 
 On Unix systems, type `make` to build the `svm-train` and `svm-predict`programs. Run them without arguments to show the usages of them.  
 
-On other systems, consult `Makefile` to build them (e.g., see ***Building Windows binaries*** in this file) or use the `pre-built` binaries (Windows binaries are in the directory `windows`).
+On other systems, consult `Makefile` to build them (e.g., see [Building Windows Binaries](#BuildingWindowsBinaries)) or use the `pre-built` binaries (Windows binaries are in the directory [windows](./windows)).
 
 The **format** of training and testing data file is:
 ```
@@ -64,19 +62,27 @@ The **format** of training and testing data file is:
 .
 ```
 Each line contains an instance and is ended by a **'\n'** character.  
-**`<label>`**
 
-1. For classification, `<label>` is an integer indicating the class label (multi-class is supported). 
-2. For regression, `<label> ` is the target value which can be any real number. 
-3. For one-class SVM, it's not used so can be any number.
-  
-**`<index>:<value>`**
-The pair `<index>:<value>` gives a **feature(attribute) value**.  
-`<index>` is an integer starting from 1 and `<value>` is a real number. The only exception of `<index>` is the precomputed kernel, where <index> starts from 0; see the section of precomputed kernels. Indices must be in **ASCENDING** order. Labels in the testing file are only used to calculate accuracy or errors. If they are unknown, just fill the first column with any numbers.
+***`<label>:`***
 
-A sample classification data included in this package is [`heart_scale`](./heart_scale). To check if your data is in a correct form, use [`tools/checkdata.py`](./tools/checkdata.py)(details in [`tools/README`](./tools/README)).
+> 1. For classification, `<label>` is an integer indicating the class label (multi-class is supported). 
+> 2. For regression, `<label> ` is the target value which can be any real number. 
+> 3. For one-class SVM, it's not used so can be any number.
+>   
 
-Type `svm-train heart_scale`, and the program will read the training data and output the model file `heart_scale.model`. If you have a test set called heart_scale.t, then use **svm-predict** to see the prediction accuracy. 
+***`<index>:<value>:`***  
+> The pair `<index>:<value>` gives a **feature(attribute) value**.  
+>
+> `<index>` is an integer starting from 1 and `<value>` is a real number. The only exception of `<index>` is the precomputed kernel, where `<index>` starts from 0 (see the section of [precomputed kernels](#PrecomputedKernels)).
+> Indices must be in **ASCENDING** order. Labels in the testing file are only used to calculate accuracy or errors. If they are unknown, just fill the first column with any numbers.
+
+A sample classification data included in this package is [`heart_scale`](./heart_scale). To check if your data is in a correct form, use [`tools/checkdata.py`](./tools/checkdata.py)(details in [`tools/README.md`](./tools/README.md)).
+
+Type
+
+    svm-train heart_scale
+
+and the program will read the training data and output the model file **heart_scale.model**. If you have a test set called **heart_scale.t**, then use **svm-predict** to see the prediction accuracy. 
 
     svm-predict heart_scale.t heart_scale.model output
 
@@ -174,43 +180,43 @@ See libsvm **FAQ** for the meaning of outputs.
 -s save_filename : save scaling parameters to save_filename
 -r restore_filename : restore scaling parameters from restore_filename
 ```
-See 'Examples' in this file for examples.
+See [Examples](#Examples) in this file for examples.
 
 <h2 id="Tips">Tips on Practical Use</h2>
 
-* Scale your data. For example, scale each attribute to [0,1] or [-1,+1].
-* For C-SVC, consider using the model selection tool in the tools directory.
-* nu in nu-SVC/one-class-SVM/nu-SVR approximates the fraction of training errors and support vectors.
-* If data for classification are unbalanced (e.g. many positive and few negative), try different penalty parameters C by -wi (see examples below).
-* Specify larger cache size (i.e., larger -m) for huge problems.
+1. Scale your data. For example, scale each attribute to [0,1] or [-1,+1].
+2. For C-SVC, consider using the model selection tool in the tools directory.
+3. nu in nu-SVC/one-class-SVM/nu-SVR approximates the fraction of training errors and support vectors.
+4. If data for classification are unbalanced (e.g. many positive and few negative), try different penalty parameters C by -wi (see examples below).
+5. Specify larger cache size (i.e., larger -m) for huge problems.
 
 <h2 id="Examples">Examples</h2>
 
-    svm-scale -l -1 -u 1 -s range train > train.scale
-    svm-scale -r range test > test.scale
+1. Scale each feature of the training data to be in [-1,1]. Scaling factors are stored in the file range and then used for scaling the test data.  
 
-Scale each feature of the training data to be in [-1,1]. Scaling factors are stored in the file range and then used for scaling the test data.
+        svm-scale -l -1 -u 1 -s range train > train.scale
+        svm-scale -r range test > test.scale
 
-    svm-train -s 0 -c 5 -t 2 -g 0.5 -e 0.1 data_file 
+2. Train a classifier with **RBF kernel** `exp(-0.5|u-v|^2)`, C=10, and stopping tolerance 0.1.    
 
-Train a classifier with RBF kernel `exp(-0.5|u-v|^2), C=10`, and stopping tolerance 0.1.
+        svm-train -s 0 -c 5 -t 2 -g 0.5 -e 0.1 data_file 
 
-    svm-train -s 3 -p 0.1 -t 0 data_file
+3. Solve SVM regression with linear kernel u'v and epsilon=0.1 in the loss function.
 
-Solve SVM regression with linear kernel u'v and epsilon=0.1 in the loss function.
+        svm-train -s 3 -p 0.1 -t 0 data_file
 
-    svm-train -c 10 -w1 1 -w-2 5 -w4 2 data_file
+4. Train a classifier with penalty `10 = 1 * 10` for class 1, penalty `50 = 5 * 10` for class -2, and penalty `20 = 2 * 10` for class 4.
 
-Train a classifier with penalty `10 = 1 * 10` for class 1, penalty `50 = 5 * 10` for class -2, and penalty `20 = 2 * 10` for class 4.
+        svm-train -c 10 -w1 1 -w-2 5 -w4 2 data_file
 
-    svm-train -s 0 -c 100 -g 0.1 -v 5 data_file
+5. Do five-fold cross validation for the classifier using the parameters C = 100 and gamma = 0.1
 
-Do five-fold cross validation for the classifier using the parameters C = 100 and gamma = 0.1
+        svm-train -s 0 -c 100 -g 0.1 -v 5 data_file
 
-    svm-train -s 0 -b 1 data_file
-    svm-predict -b 1 test_file data_file.model output_file
+6. Obtain a model with probability information and predict test data with probability estimates
 
-Obtain a model with probability information and predict test data with probability estimates
+        svm-train -s 0 -b 1 data_file
+        svm-predict -b 1 test_file data_file.model output_file
 
 <h2 id="PrecomputedKernels">Precomputed Kernels</h2>
 
@@ -226,7 +232,7 @@ New testing instance for any `x`:
 
     <label> 0:? 1:K(x,x1) ... L:K(x,xL) 
 
-That is, in the training file the first column must be the "ID" of `xi`. In testing, `?` can be any value.
+That is, in the training file the first column must be the "**ID**" of `xi`. In testing, `?` can be any value.
 
 All kernel values including ZEROs must be explicitly provided.  Any permutation or random subsets of the training/testing files are also valid (see examples below).
 
@@ -277,7 +283,7 @@ struct svm_model *svm_train(const struct svm_problem *prob,
 ```
 This function constructs and returns an SVM model according to the given training data and parameters.
 
-struct svm_problem describes the problem:
+struct `svm_problem` describes the problem:
 ```c++
 struct svm_problem
 {
@@ -299,7 +305,7 @@ LABEL	ATTR1	ATTR2	ATTR3	ATTR4	ATTR5
   2		  0	  0.1	  0	  1.4	  0.5
   3		 -0.1	 -0.2	  0.1	  1.1	  0.1
 ```
-then the components of svm_problem are:
+then the components of **svm_problem** are:
 ```
 l = 5
 
@@ -321,7 +327,7 @@ struct svm_node
 ```
 index = **-1** indicates the end of one vector. Note that indices must be in **ASCENDING** order.
  
-struct svm_parameter describes the parameters of an SVM model:
+struct `svm_parameter` describes the parameters of an SVM model:
 ```C++
 struct svm_parameter
 {
@@ -360,13 +366,12 @@ RBF:	        exp(-gamma*|u-v|^2)
 SIGMOID:	    tanh(gamma*u'*v + coef0)
 PRECOMPUTED:    kernel values in training_set_file
 ```
-`cache_size` is the size of the kernel cache, specified in megabytes.
-`C` is the cost of constraints violation. 
-`eps` is the stopping criterion. (we usually use 0.00001 in nu-SVC,0.001 in others). nu is the parameter in nu-SVM, nu-SVR, and one-class-SVM. p is the epsilon in epsilon-insensitive loss function of epsilon-SVM regression. shrinking = 1 means shrinking is conducted; = 0 otherwise. probability = 1 means model with probability information is obtained; = 0 otherwise.
+`cache_size` is the size of the kernel cache, specified in megabytes.  
+`eps` is the stopping criterion. (we usually use 0.00001 in nu-SVC,0.001 in others). nu is the parameter in nu-SVM, nu-SVR, and one-class-SVM. p is the epsilon in epsilon-insensitive loss function of epsilon-SVM regression. shrinking = 1 means shrinking is conducted; = 0 otherwise. probability = 1 means model with probability information is obtained; = 0 otherwise.  
+`C` is the cost of constraints violation.   
+`nr_weight`, `weight_label`, and `weight` are used to change the penalty for some classes (If the weight for a class is not changed, it is set to 1). This is useful for training classifier using unbalanced input data or with asymmetric misclassification cost.  
 
-`nr_weight`, `weight_label`, and `weight` are used to change the penalty for some classes (If the weight for a class is not changed, it is set to 1). This is useful for training classifier using unbalanced input data or with asymmetric misclassification cost.
-
-`nr_weight` is the number of elements in the array weight_label and weight. Each weight[i] corresponds to weight_label[i], meaning that the penalty of class weight_label[i] is scaled by a factor of weight[i].
+`nr_weight` is the number of elements in the array weight_label and weight. Each weight[i] corresponds to weight_label[i], meaning that the penalty of class weight_label[i] is scaled by a factor of weight[i].  
     
 If you do not want to change penalty for any of the classes,just set nr_weight to 0.
 
@@ -641,23 +646,24 @@ Windows binaries are in the directory `windows`. To build them via Visual C++, u
 
 1. Open a DOS command box (or Visual Studio Command Prompt) and change to libsvm directory. If environment variables of VC++ have not been
 set, type
-```
-C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\vcvars32.bat
-```
-You may have to modify the above command according which version of
+
+        C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\vcvars32.bat
+
+    You may have to modify the above command according which version of
 VC++ or where it is installed.
 
 2. Type
-```
-nmake -f Makefile.win clean all
-```
+
+        nmake -f Makefile.win clean all
+
 3. (optional) To build shared library libsvm.dll, type
-```
-nmake -f Makefile.win lib
-```
+
+    nmake -f Makefile.win lib
+
 4. (optional) To build 64-bit windows binaries, you must 
     1. Run vcvars64.bat instead of vcvars32.bat. Note that
-	vcvars64.bat is located at `C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\amd64\`
+	vcvars64.bat is located at
+        C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\amd64\
 	2. Change CFLAGS in Makefile.win: `/D _WIN32` to `/D _WIN64`
 
 Another way is to build them from Visual C++ environment. See details in libsvm FAQ.
