@@ -697,7 +697,9 @@ LIBSVM implementation document is available at http://www.csie.ntu.edu.tw/~cjlin
 For any questions and comments, please email cjlin@csie.ntu.edu.tw
 
 **Acknowledgments**:
-This work was supported in part by the National Science Council of Taiwan via the grant NSC 89-2213-E-002-013.  
+This work was supported in part by  
+> the National Science Council of Taiwan via the grant NSC 89-2213-E-002-013.  
+
 The authors thank their group members and users for many helpful discussions and comments.They are listed in  
 http://www.csie.ntu.edu.tw/~cjlin/libsvm/acknowledgements
 
