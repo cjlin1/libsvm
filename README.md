@@ -15,6 +15,7 @@ Please read the COPYRIGHT file before using libsvm.
 -   [Examples](#Examples)
 -   [Precomputed Kernels ](#PrecomputedKernels)
 -   [Library Usage](#LibraryUsage)
+    -   [function svm_train](#svm_train)
     -   [function svm_predict](#svm_predict)
     -   [function svm_cross_validation](#svm_cross_validation)
     -   [function svm_get_svm_type](#svm_get_svm_type)
@@ -153,7 +154,7 @@ The **k** in the **-g** option means the number of attributes in the input data.
 
 option **-v** randomly splits the data into n parts and calculates cross validation accuracy/mean squared error on them.
 
-See libsvm **FAQ** for the meaning of outputs.
+See libsvm [FAQ](http://www.csie.ntu.edu.tw/~cjlin/libsvm/faq.html) for the meaning of outputs.
 
 <h2 id="SvmPredictUsage">svm-predict Usage</h2>
 
@@ -184,7 +185,7 @@ See [Examples](#Examples) in this file for examples.
 
 <h2 id="Tips">Tips on Practical Use</h2>
 
-1. Scale your data. For example, scale each attribute to [0,1] or [-1,+1].
+1. Scale your data. For example, scale each attribute to `[0,1]` or `[-1,+1].`
 2. For C-SVC, consider using the model selection tool in the tools directory.
 3. nu in nu-SVC/one-class-SVM/nu-SVR approximates the fraction of training errors and support vectors.
 4. If data for classification are unbalanced (e.g. many positive and few negative), try different penalty parameters C by -wi (see examples below).
@@ -671,7 +672,7 @@ VC++ or where it is installed.
 
 	2. Change CFLAGS in Makefile.win: `/D _WIN32` to `/D _WIN64`
 
-Another way is to build them from Visual C++ environment. See details in libsvm FAQ.
+Another way is to build them from Visual C++ environment. See details in libsvm [FAQ](http://www.csie.ntu.edu.tw/~cjlin/libsvm/faq.html).
 
 <h2 id="AdditionalTools">Additional Tools: Sub-sampling, Parameter Selection, Format checking, etc.</h2>
 
