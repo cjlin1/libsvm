@@ -45,7 +45,7 @@ Example:
 	matlab>> make
 ```
 
-On Unix systems, if neither make.m nor `mex -setup` works, please use Makefile and type `make` in a command window. Note that we assume your MATLAB is installed in `/usr/local/matlab`. If not, please change MATLABDIR in Makefile.
+On Unix systems, if `neither` make.m nor `mex -setup` works, please use Makefile and type `make` in a command window. Note that we assume your MATLAB is installed in `/usr/local/matlab`. If not, please change MATLABDIR in Makefile.
 
 Example:
 
@@ -57,7 +57,7 @@ Example:
 
 	linux> make octave
 
-For a list of supported/compatible compilers for MATLAB, please check the following page:
+For a list of *supported/compatible* compilers for MATLAB, please check the following page:
 
 http://www.mathworks.com/support/compilers/current_release/
 
@@ -119,10 +119,11 @@ More details about this model can be found in [LIBSVM FAQ](http://www.csie.ntu.e
 ## Result of Prediction
 
 The function `svmpredict` has three outputs.  
-The first one, **predictd_label**, is a vector of predicted labels.  
-The second output, **accuracy**, is a vector including accuracy (for classification), mean squared error, and squared correlation coefficient (for regression).   
-The third is a **matrix** containing decision values or probability estimates (if `-b 1` is specified).  
-If `k` is the number of classes in training data, for decision values, each row includes results of predicting `k(k-1)/2` binary-class SVMs. For classification, `k = 1` is a special case. Decision value +1 is returned for each testing instance, instead of an empty vector. For probabilities, each row contains `k` values indicating the probability that the testing instance is in each class. Note that the order of classes here is the same as 'Label' field in the model structure.
+> The first one, **predictd_label**, is a vector of predicted labels.  
+> The second output, **accuracy**, is a vector including accuracy (for classification), mean squared error, and squared correlation coefficient (for regression).   
+> The third is a **matrix** containing decision values or probability estimates (if `-b 1` is specified).  
+
+If `k` is the number of classes in training data, for decision values, each row includes results of predicting `k(k-1)/2` binary-class SVMs. For classification, `k = 1` is a special case. Decision value +1 is returned for each testing instance, instead of an empty vector. For probabilities, each row contains `k` values indicating the probability that the testing instance is in each class. Note that the order of classes here is the same as `Label` field in the model structure.
 
 ## Other Utilities
 
