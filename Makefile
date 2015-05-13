@@ -3,24 +3,28 @@ CFLAGS = -Wall -Wconversion -O3 -fPIC
 SHVER = 2
 OS := $(shell uname)
 
-all: svm-train svm-predict svm-scale
+all: svm-train svm-predict svm-scale lib
 
 ifeq ($(OS),Darwin)
-  LIBEXT := dylib
+  DLLEXT := dylib
   SHARED_LIB_FLAG = -dynamiclib
 else
-  LIBEXT := so
+  DLLEXT := so
   SHARED_LIB_FLAG = -shared
 endif
 
-libsvm.$(LIBEXT): svm.o
+libsvm.$(DLLEXT): svm.o
 	$(CXX) $(SHARED_LIB_FLAG) $^ -o $@
 
-libsvm.$(LIBEXT).$(SHVER): libsvm.$(LIBEXT)
-	ln $< $@ 
+libsvm.$(DLLEXT).$(SHVER): libsvm.$(DLLEXT)
+	ln $< $@
+
+libsvm.a: svm.o
+	ar rc $@ $^ 
+	ranlib $@ 
 
 .PHONY: lib
-lib: libsvm.$(LIBEXT).$(SHVER)
+lib: libsvm.$(DLLEXT).$(SHVER) libsvm.a
 
 svm-predict: svm-predict.c svm.o
 	$(CXX) $(CFLAGS) $^ -o $@ -lm
@@ -31,4 +35,4 @@ svm-scale: svm-scale.c
 svm.o: svm.cpp svm.h
 	$(CXX) $(CFLAGS) -c $<
 clean:
-	rm -f *~ svm.o svm-train svm-predict svm-scale libsvm.$(LIBEXT).$(SHVER)
+	rm -f *~ svm.o svm-train svm-predict svm-scale libsvm.$(DLLEXT).$(SHVER) libsvm.a
