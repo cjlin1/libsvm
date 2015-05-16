@@ -25,11 +25,8 @@ $(TARGET)\svm-toy.exe: svm.h svm.obj svm-toy\windows\svm-toy.cpp
 svm.obj: svm.cpp svm.h
 	$(CXX) $(CFLAGS) -c svm.cpp
 
-$(TARGET)\svm.dll $(TARGET)\svm.lib $(TARGET)\svm.exp: svm.cpp svm.h svm.def
-	$(CXX) $(CFLAGS) -LD svm.obj -Fe$(TARGET)\svm -link -DEF:svm.def 
-
-.PHONY: lib
-lib: $(TARGET)\svm.dll $(TARGET)\svm.lib $(TARGET)\svm.exp
+lib: svm.cpp svm.h svm.def
+	$(CXX) $(CFLAGS) -LD svm.cpp -Fe$(TARGET)\libsvm -link -DEF:svm.def 
 
 clean:
 	-erase /Q *.obj $(TARGET)\.
