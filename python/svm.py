@@ -395,9 +395,9 @@ class svm_model(Structure):
 
 			i = 0
 			while True:
-				row[sparse_sv[i].index] = sparse_sv[i].value
 				if sparse_sv[i].index == -1:
 					break
+				row[sparse_sv[i].index] = sparse_sv[i].value
 				i += 1
 
 			result.append(row)
