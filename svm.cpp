@@ -874,7 +874,7 @@ int Solver::select_working_set(int &out_i, int &out_j)
 		}
 	}
 
-	if(Gmax+Gmax2 < eps)
+	if(Gmax+Gmax2 < eps || Gmin_idx == -1)
 		return 1;
 
 	out_i = Gmax_idx;
