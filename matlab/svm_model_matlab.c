@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-#include "../svm.h"
+#include "svm.h"
 
 #include "mex.h"
 

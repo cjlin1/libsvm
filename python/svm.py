@@ -146,8 +146,8 @@ class svm_parameter(Structure):
 		self.shrinking = 1
 		self.probability = 0
 		self.nr_weight = 0
-		self.weight_label = (c_int*0)()
-		self.weight = (c_double*0)()
+		self.weight_label = None
+		self.weight = None
 		self.cross_validation = False
 		self.nr_fold = 0
 		self.print_func = cast(None, PRINT_STRING_FUN)
@@ -213,7 +213,6 @@ class svm_parameter(Structure):
 			elif argv[i].startswith("-w"):
 				i = i + 1
 				self.nr_weight += 1
-				nr_weight = self.nr_weight
 				weight_label += [int(argv[i-1][2:])]
 				weight += [float(argv[i])]
 			else:

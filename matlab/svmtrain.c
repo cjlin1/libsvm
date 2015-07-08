@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "../svm.h"
+#include "svm.h"
 
 #include "mex.h"
 #include "svm_model_matlab.h"
