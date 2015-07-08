@@ -318,8 +318,8 @@ int main(int argc,char **argv)
 	if (new_num_nonzeros > num_nonzeros)
 		fprintf(stderr, 
 			"WARNING: original #nonzeros %ld\n"
-			"         new      #nonzeros %ld\n"
-			"Use -l 0 if many original feature values are zeros\n",
+			"       > new      #nonzeros %ld\n"
+			"If feature values are non-negative and sparse, use -l 0 rather than the default -l -1\n",
 			num_nonzeros, new_num_nonzeros);
 
 	free(line);
