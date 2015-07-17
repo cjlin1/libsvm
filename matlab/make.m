@@ -1,5 +1,5 @@
 % This make.m is for MATLAB and OCTAVE under Windows, Mac, and Unix
-
+function make()
 try
 	% This part is for OCTAVE
 	if (exist ('OCTAVE_VERSION', 'builtin'))
@@ -15,6 +15,8 @@ try
 		mex CFLAGS="\$CFLAGS -std=c99" -I.. -largeArrayDims svmtrain.c ../svm.cpp svm_model_matlab.c
 		mex CFLAGS="\$CFLAGS -std=c99" -I.. -largeArrayDims svmpredict.c ../svm.cpp svm_model_matlab.c
 	end
-catch
-	fprintf('If make.m fails, please check README about detailed instructions.\n');
+catch err
+	fprintf('Error: %s failed (line %d)\n', err.stack(1).file, err.stack(1).line);
+	disp(err.message);
+	fprintf('=> Please check README for detailed instructions.\n');
 end
