@@ -3,7 +3,19 @@ CFLAGS = -Wall -Wconversion -O3 -fPIC
 SHVER = 2
 OS = $(shell uname)
 
+LIB = /usr/local/lib
+CP 	= cp
+LN 	= ln -sf
+
 all: svm-train svm-predict svm-scale
+
+install: lib
+	if [ ! -w $(LIB) ]; then  \
+		CP='sudo cp'; \
+		LN='sudo ln -sf'; \
+	fi; \
+	$(CP) libsvm.so.2 $(LIB)
+	$(LN) $(LIB)/libsvm.so.$(SHVER) $(LIB)/libsvm.so
 
 lib: svm.o
 	if [ "$(OS)" = "Darwin" ]; then \
