@@ -13,6 +13,10 @@ lib: svm.o
 	fi; \
 	$(CXX) $${SHARED_LIB_FLAG} svm.o -o libsvm.so.$(SHVER)
 
+slib: svm.o
+	ar rcs libsvm.a svm.o
+
+
 svm-predict: svm-predict.c svm.o
 	$(CXX) $(CFLAGS) svm-predict.c svm.o -o svm-predict -lm
 svm-train: svm-train.c svm.o
