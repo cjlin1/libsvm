@@ -2732,25 +2732,84 @@ int svm_save_model(const char *model_file_name, const svm_model *model)
 	else return 0;
 }
 
-static char *line = NULL;
-static int max_line_len;
-
-static char* readline(FILE *input)
+static char* readline(FILE *input, char **line, int *max_line_len)
 {
 	int len;
 
-	if(fgets(line,max_line_len,input) == NULL)
+	if(fgets(*line,*max_line_len,input) == NULL)
 		return NULL;
 
-	while(strrchr(line,'\n') == NULL)
+	while(strrchr(*line,'\n') == NULL)
 	{
-		max_line_len *= 2;
-		line = (char *) realloc(line,max_line_len);
-		len = (int) strlen(line);
-		if(fgets(line+len,max_line_len-len,input) == NULL)
+		*max_line_len *= 2;
+		*line = (char *) realloc(*line,*max_line_len);
+		len = (int) strlen(*line);
+		if(fgets(*line+len,*max_line_len-len,input) == NULL)
 			break;
 	}
-	return line;
+	return *line;
+}
+
+// These explicit tokenization functions are much faster than strtok(),
+// strtok_r(), and strsep().  Their behaviour is similar to strsep(), but empty
+// tokens are skipped like strtok().
+
+static char *tokenize(char **stringp, char delim)
+{
+	char *string = *stringp;
+	if (!string) {
+		return NULL;
+	}
+
+	// Skip leading delimiters, like strtok()
+	while (*string && *string == delim) {
+		++string;
+	}
+
+	// Find the next delimiter
+	char *end = string;
+	while (*end && *end != delim) {
+		++end;
+	}
+
+	// Overwrite the delimiter with \0
+	if (*end) {
+		*end = '\0';
+		*stringp = end + 1;
+	} else {
+		*stringp = NULL;
+	}
+
+	return string;
+}
+
+static char *tokenize(char **stringp, char delim1, char delim2)
+{
+	char *string = *stringp;
+	if (!string) {
+		return NULL;
+	}
+
+	// Skip leading delimiters, like strtok()
+	while (*string && (*string == delim1 || *string == delim2)) {
+		++string;
+	}
+
+	// Find the next delimiter
+	char *end = string;
+	while (*end && *end != delim1 && *end != delim2) {
+		++end;
+	}
+
+	// Overwrite the delimiter with \0
+	if (*end) {
+		*end = '\0';
+		*stringp = end + 1;
+	} else {
+		*stringp = NULL;
+	}
+
+	return string;
 }
 
 //
@@ -2906,16 +2965,17 @@ svm_model *svm_load_model(const char *model_file_name)
 	int elements = 0;
 	long pos = ftell(fp);
 
-	max_line_len = 1024;
-	line = Malloc(char,max_line_len);
-	char *p,*endptr,*idx,*val;
+	int max_line_len = 1024;
+	char *line = Malloc(char,max_line_len);
+	char *p,*next,*endptr,*idx,*val;
 
-	while(readline(fp)!=NULL)
+	while(readline(fp,&line,&max_line_len)!=NULL)
 	{
-		p = strtok(line,":");
+		next = line;
+		p = tokenize(&next,':');
 		while(1)
 		{
-			p = strtok(NULL,":");
+			p = tokenize(&next,':');
 			if(p == NULL)
 				break;
 			++elements;
@@ -2938,21 +2998,22 @@ svm_model *svm_load_model(const char *model_file_name)
 	int j=0;
 	for(i=0;i<l;i++)
 	{
-		readline(fp);
+		readline(fp,&line,&max_line_len);
 		model->SV[i] = &x_space[j];
 
-		p = strtok(line, " \t");
+		next = line;
+		p = tokenize(&next, ' ', '\t');
 		model->sv_coef[0][i] = strtod(p,&endptr);
 		for(int k=1;k<m;k++)
 		{
-			p = strtok(NULL, " \t");
+			p = tokenize(&next, ' ', '\t');
 			model->sv_coef[k][i] = strtod(p,&endptr);
 		}
 
 		while(1)
 		{
-			idx = strtok(NULL, ":");
-			val = strtok(NULL, " \t");
+			idx = tokenize(&next, ':');
+			val = tokenize(&next, ' ', '\t');
 
 			if(val == NULL)
 				break;
