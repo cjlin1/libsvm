@@ -29,5 +29,5 @@ lib: svm.cpp svm.h svm.def
 	$(CXX) $(CFLAGS) -LD svm.cpp -Fe$(TARGET)\libsvm -link -DEF:svm.def 
 
 clean:
-	-erase /Q *.obj $(TARGET)\.
+	-erase /Q *.obj $(TARGET)\*.exe $(TARGET)\*.dll $(TARGET)\*.exp $(TARGET)\*.lib
 
