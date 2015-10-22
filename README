@@ -704,8 +704,8 @@ Users can specify their output format by
 Building Windows Binaries
 =========================
 
-Windows binaries are in the directory `windows'. To build them via
-Visual C++, use the following steps:
+Windows binaries are available in the directory `windows'. To re-build
+them via Visual C++, use the following steps:
 
 1. Open a DOS command box (or Visual Studio Command Prompt) and change
 to libsvm directory. If environment variables of VC++ have not been
