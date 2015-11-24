@@ -22,13 +22,15 @@ struct svm_problem
 	struct svm_node **x;
 };
 
-enum { C_SVC, NU_SVC, ONE_CLASS, EPSILON_SVR, NU_SVR };	/* svm_type */
-enum { LINEAR, POLY, RBF, SIGMOID, PRECOMPUTED }; /* kernel_type */
+enum SVM_TYPE { C_SVC, NU_SVC, ONE_CLASS, EPSILON_SVR, NU_SVR };	/* svm_type */
+enum KERNEL_TYPE { LINEAR, POLY, RBF, SIGMOID, PRECOMPUTED, TANIMOTO }; /* kernel_type */
+enum DOT_TYPE { DEFAULT, DENSE, SPARSE, SPARSE_BIN }; /* dot_type */
 
 struct svm_parameter
 {
 	int svm_type;
 	int kernel_type;
+	int dot_type;
 	int degree;	/* for poly */
 	double gamma;	/* for poly/rbf/sigmoid */
 	double coef0;	/* for poly/sigmoid */
@@ -69,6 +71,7 @@ struct svm_model
 	/* XXX */
 	int free_sv;		/* 1 if svm_model is created by svm_load_model*/
 				/* 0 if svm_model is created by svm_train */
+	void* predict_kernel;
 };
 
 struct svm_model *svm_train(const struct svm_problem *prob, const struct svm_parameter *param);

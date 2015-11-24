@@ -8,9 +8,20 @@
 #include <limits.h>
 #include <locale.h>
 #include "svm.h"
+
+#include <mutex>
+#include "svm_o.h"
+
 int libsvm_version = LIBSVM_VERSION;
+
+#if 0
 typedef float Qfloat;
 typedef signed char schar;
+#else
+typedef double Qfloat;
+typedef double schar;
+#endif
+
 #ifndef min
 template <class T> static inline T min(T x,T y) { return (x<y)?x:y; }
 #endif
@@ -1260,6 +1271,63 @@ double Solver_NU::calculate_rho()
 	return (r1-r2)/2;
 }
 
+template<typename RETURN_TYPE>
+static RETURN_TYPE* kernel_factory(const svm_node*const* nodes, std::size_t size, const svm_parameter& param)
+{
+	switch(param.dot_type)
+	{
+	case DENSE:
+		switch(param.kernel_type)
+		{
+		case LINEAR:
+			return new svm_o::LinearKernel_<svm_o::DotDense>(svm_o::DotDense(nodes, size));
+			break;
+		case RBF:
+			return new svm_o::RbfKernel<svm_o::DotDense>(svm_o::DotDense(nodes, size), param.gamma);
+			break;
+		default:
+			throw(std::runtime_error("Unsupported DENSE kernel type"));
+			break;
+		}
+		break;
+	case SPARSE:
+		switch(param.kernel_type)
+		{
+		case LINEAR:
+			return new svm_o::LinearKernel_<svm_o::DotSparse>(svm_o::DotSparse(nodes, size));
+			break;
+		case RBF:
+			return new svm_o::RbfKernel<svm_o::DotSparse>(svm_o::DotSparse(nodes, size), param.gamma);
+			break;
+		default:
+			throw(std::runtime_error("Unsupported SPARSE kernel type"));
+			break;
+		}
+		break;
+	case SPARSE_BIN:
+		switch(param.kernel_type)
+		{
+		case LINEAR:
+			return new svm_o::LinearKernel_<svm_o::DotSparseBin>(svm_o::DotSparseBin(nodes, size));
+			break;
+		case RBF:
+			return new svm_o::RbfKernel<svm_o::DotSparseBin>(svm_o::DotSparseBin(nodes, size), param.gamma);
+			break;
+		case TANIMOTO:
+			return new svm_o::TanimotoKernel<svm_o::DotSparseBin>(svm_o::DotSparseBin(nodes, size));
+			break;
+		default:
+			throw(std::runtime_error("Unsupported SPARSE_BIN kernel type"));
+			break;
+		}
+		break;
+	default:
+		return nullptr;
+		break;
+	}
+	return nullptr;
+}
+
 //
 // Q matrices for various formulations
 //
@@ -1267,23 +1335,50 @@ class SVC_Q: public Kernel
 { 
 public:
 	SVC_Q(const svm_problem& prob, const svm_parameter& param, const schar *y_)
-	:Kernel(prob.l, prob.x, param)
+		:Kernel(prob.l, prob.x, param)
 	{
-		clone(y,y_,prob.l);
-		cache = new Cache(prob.l,(long int)(param.cache_size*(1<<20)));
+		clone(y, y_, prob.l);
+		cache = new Cache(prob.l, (long int)(param.cache_size*(1 << 20)));
+		kernel_ = std::unique_ptr<svm_o::ITrain>(kernel_factory<svm_o::ITrain>(prob.x, prob.l, param));
+
 		QD = new double[prob.l];
-		for(int i=0;i<prob.l;i++)
-			QD[i] = (this->*kernel_function)(i,i);
+		if(kernel_)
+		{
+			for(int i = 0;i < prob.l;i++)
+			{
+				kernel_->get_q(i, i, QD[i]);
+			}
+		}
+		else
+		{
+			for(int i = 0;i < prob.l;i++)
+			{
+				QD[i] = (this->*kernel_function)(i, i);
+			}
+		}
 	}
-	
+
 	Qfloat *get_Q(int i, int len) const
 	{
 		Qfloat *data;
 		int start, j;
 		if((start = cache->get_data(i,&data,len)) < len)
 		{
-			for(j=start;j<len;j++)
-				data[j] = (Qfloat)(y[i]*y[j]*(this->*kernel_function)(i,j));
+			if (kernel_)
+			{
+				kernel_->get_q(i, start, len, data);
+				for (size_t j = start; j<len; j++)
+				{
+					data[j] = (y[i] * y[j] * data[j]);
+				}
+			}
+			else
+			{
+				for(j = start;j < len;j++)
+				{
+					data[j] = (Qfloat)(y[i] * y[j] * (this->*kernel_function)(i, j));
+				}
+			}
 		}
 		return data;
 	}
@@ -1296,7 +1391,10 @@ public:
 	void swap_index(int i, int j) const
 	{
 		cache->swap_index(i,j);
-		Kernel::swap_index(i,j);
+		if(!kernel_)
+			Kernel::swap_index(i, j);
+		else
+			kernel_->swap_index(i, j);
 		swap(y[i],y[j]);
 		swap(QD[i],QD[j]);
 	}
@@ -1311,6 +1409,7 @@ private:
 	schar *y;
 	Cache *cache;
 	double *QD;
+	std::unique_ptr<svm_o::ITrain> kernel_;
 };
 
 class ONE_CLASS_Q: public Kernel
@@ -2094,6 +2193,7 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 	svm_model *model = Malloc(svm_model,1);
 	model->param = *param;
 	model->free_sv = 0;	// XXX
+	model->predict_kernel = nullptr;
 
 	if(param->svm_type == ONE_CLASS ||
 	   param->svm_type == EPSILON_SVR ||
@@ -2500,6 +2600,12 @@ double svm_get_svr_probability(const svm_model *model)
 
 double svm_predict_values(const svm_model *model, const svm_node *x, double* dec_values)
 {
+	//TODO: hack
+	{
+		static std::mutex mutex;
+		std::lock_guard<std::mutex> lock(mutex);
+		if(!model->predict_kernel) const_cast<svm_model*>(model)->predict_kernel = kernel_factory<svm_o::IPredict>(model->SV, model->l, model->param);
+	}
 	int i;
 	if(model->param.svm_type == ONE_CLASS ||
 	   model->param.svm_type == EPSILON_SVR ||
@@ -2523,8 +2629,16 @@ double svm_predict_values(const svm_model *model, const svm_node *x, double* dec
 		int l = model->l;
 		
 		double *kvalue = Malloc(double,l);
-		for(i=0;i<l;i++)
-			kvalue[i] = Kernel::k_function(x,model->SV[i],model->param);
+		if (!model->predict_kernel)
+		{
+			for (i = 0;i < l;i++)
+				kvalue[i] = Kernel::k_function(x, model->SV[i], model->param);
+		}
+		else
+		{
+			svm_o::IPredict* kernel = reinterpret_cast<svm_o::IPredict*>(model->predict_kernel);
+			kernel->get_q(x, kvalue);
+		}
 
 		int *start = Malloc(int,nr_class);
 		start[0] = 0;
@@ -2635,7 +2749,12 @@ static const char *svm_type_table[] =
 
 static const char *kernel_type_table[]=
 {
-	"linear","polynomial","rbf","sigmoid","precomputed",NULL
+	"linear", "polynomial", "rbf", "sigmoid", "precomputed", "tanimoto", NULL
+};
+
+static const char *dot_type_table[] =
+{
+	"default", "dense", "sparse", "sparse_bin", NULL
 };
 
 int svm_save_model(const char *model_file_name, const svm_model *model)
@@ -2650,6 +2769,7 @@ int svm_save_model(const char *model_file_name, const svm_model *model)
 
 	fprintf(fp,"svm_type %s\n", svm_type_table[param.svm_type]);
 	fprintf(fp,"kernel_type %s\n", kernel_type_table[param.kernel_type]);
+	fprintf(fp, "dot_type %s\n", dot_type_table[param.dot_type]);
 
 	if(param.kernel_type == POLY)
 		fprintf(fp,"degree %d\n", param.degree);
@@ -2802,6 +2922,24 @@ bool read_model_header(FILE *fp, svm_model* model)
 			if(kernel_type_table[i] == NULL)
 			{
 				fprintf(stderr,"unknown kernel function.\n");	
+				return false;
+			}
+		}
+		else if(strcmp(cmd, "dot_type") == 0)
+		{
+			FSCANF(fp, "%80s", cmd);
+			int i;
+			for(i = 0;dot_type_table[i];i++)
+			{
+				if(strcmp(dot_type_table[i], cmd) == 0)
+				{
+					param.dot_type = i;
+					break;
+				}
+			}
+			if(dot_type_table[i] == NULL)
+			{
+				fprintf(stderr, "unknown dot function.\n");
 				return false;
 			}
 		}
@@ -3008,6 +3146,9 @@ void svm_free_model_content(svm_model* model_ptr)
 
 	free(model_ptr->nSV);
 	model_ptr->nSV = NULL;
+
+	if(model_ptr->predict_kernel)
+		delete(reinterpret_cast<svm_o::IPredict*>(model_ptr->predict_kernel));
 }
 
 void svm_free_and_destroy_model(svm_model** model_ptr_ptr)
@@ -3031,15 +3172,16 @@ const char *svm_check_parameter(const svm_problem *prob, const svm_parameter *pa
 	// svm_type
 
 	int svm_type = param->svm_type;
+
 	if(svm_type != C_SVC &&
 	   svm_type != NU_SVC &&
 	   svm_type != ONE_CLASS &&
 	   svm_type != EPSILON_SVR &&
 	   svm_type != NU_SVR)
 		return "unknown svm type";
+
 	
 	// kernel_type, degree
-	
 	int kernel_type = param->kernel_type;
 	if(kernel_type != LINEAR &&
 	   kernel_type != POLY &&
@@ -3047,6 +3189,9 @@ const char *svm_check_parameter(const svm_problem *prob, const svm_parameter *pa
 	   kernel_type != SIGMOID &&
 	   kernel_type != PRECOMPUTED)
 		return "unknown kernel type";
+
+
+
 
 	if(param->gamma < 0)
 		return "gamma < 0";
