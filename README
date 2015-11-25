@@ -668,7 +668,7 @@ You may need to increase maximum Java heap size.
 Library usages are similar to the C version. These functions are available:
 
 public class svm {
-	public static final int LIBSVM_VERSION=320; 
+	public static final int LIBSVM_VERSION=321; 
 	public static svm_model svm_train(svm_problem prob, svm_parameter param);
 	public static void svm_cross_validation(svm_problem prob, svm_parameter param, int nr_fold, double[] target);
 	public static int svm_get_svm_type(svm_model model);
@@ -711,7 +711,7 @@ them via Visual C++, use the following steps:
 to libsvm directory. If environment variables of VC++ have not been
 set, type
 
-"C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\vcvars32.bat"
+""C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\amd64\vcvars64.bat""
 
 You may have to modify the above command according which version of
 VC++ or where it is installed.
@@ -724,9 +724,8 @@ nmake -f Makefile.win clean all
 
 nmake -f Makefile.win lib
 
-4. (optional) To build 64-bit windows binaries, you must
-	(1) Run vcvars64.bat instead of vcvars32.bat. Note that 
-	vcvars64.bat is located at "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\amd64\"
+4. (optional) To build 32-bit windows binaries, you must
+	(1) Setup "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\vcvars32.bat" instead of vcvars64.bat
 	(2) Change CFLAGS in Makefile.win: /D _WIN32 to /D _WIN64	
 	
 Another way is to build them from Visual C++ environment. See details
