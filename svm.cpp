@@ -10,6 +10,7 @@
 #include "svm.h"
 
 #include <mutex>
+#include <memory>
 #include "svm_o.h"
 
 int libsvm_version = LIBSVM_VERSION;
@@ -1280,7 +1281,7 @@ static RETURN_TYPE* kernel_factory(const svm_node*const* nodes, std::size_t size
 		switch(param.kernel_type)
 		{
 		case LINEAR:
-			return new svm_o::LinearKernel_<svm_o::DotDense>(svm_o::DotDense(nodes, size));
+			return new svm_o::LinearKernel<svm_o::DotDense>(svm_o::DotDense(nodes, size));
 			break;
 		case RBF:
 			return new svm_o::RbfKernel<svm_o::DotDense>(svm_o::DotDense(nodes, size), param.gamma);
@@ -1294,7 +1295,7 @@ static RETURN_TYPE* kernel_factory(const svm_node*const* nodes, std::size_t size
 		switch(param.kernel_type)
 		{
 		case LINEAR:
-			return new svm_o::LinearKernel_<svm_o::DotSparse>(svm_o::DotSparse(nodes, size));
+			return new svm_o::LinearKernel<svm_o::DotSparse>(svm_o::DotSparse(nodes, size));
 			break;
 		case RBF:
 			return new svm_o::RbfKernel<svm_o::DotSparse>(svm_o::DotSparse(nodes, size), param.gamma);
@@ -1308,7 +1309,7 @@ static RETURN_TYPE* kernel_factory(const svm_node*const* nodes, std::size_t size
 		switch(param.kernel_type)
 		{
 		case LINEAR:
-			return new svm_o::LinearKernel_<svm_o::DotSparseBin>(svm_o::DotSparseBin(nodes, size));
+			return new svm_o::LinearKernel<svm_o::DotSparseBin>(svm_o::DotSparseBin(nodes, size));
 			break;
 		case RBF:
 			return new svm_o::RbfKernel<svm_o::DotSparseBin>(svm_o::DotSparseBin(nodes, size), param.gamma);

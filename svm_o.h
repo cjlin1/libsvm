@@ -37,6 +37,7 @@
 #include <vector>
 #include <unordered_map>
 #include <iostream>
+#include <algorithm>
 
 #include "tbb/tick_count.h"
 #include "tbb/tbb.h"
@@ -370,24 +371,24 @@ namespace svm_o
 	};
 
 	template<typename DOT>
-	class LinearKernel_: public IPredict, public ITrain
+	class LinearKernel: public IPredict, public ITrain
 	{
 	public:
-		LinearKernel_(DOT&& dot): dot_(std::move(dot))
+		LinearKernel(DOT&& dot): dot_(std::move(dot))
 		{
 			std::clog << "LinearKernel" << std::endl;
 		}
 
-		virtual ~LinearKernel_()
+		virtual ~LinearKernel()
 		{
 			std::clog << "~LinearKernel" << std::endl;
 		}
 
-		LinearKernel_(const LinearKernel_&) = default;
-		LinearKernel_& operator=(const LinearKernel_&) = default;
+		LinearKernel(const LinearKernel&) = default;
+		LinearKernel& operator=(const LinearKernel&) = default;
 
-		LinearKernel_(LinearKernel_&&) = default;
-		LinearKernel_& operator=(LinearKernel_&&) = default;
+		LinearKernel(LinearKernel&&) = default;
+		LinearKernel& operator=(LinearKernel&&) = default;
 		
 		virtual void get_q(const std::size_t i, const std::size_t j, double& out) const
 		{

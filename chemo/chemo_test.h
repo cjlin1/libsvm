@@ -37,6 +37,8 @@
 #include <iostream>
 #include <fstream>
 #include <unordered_map>
+#include <stdexcept>
+#include <memory>
 
 #include "tbb/tick_count.h"
 #include "tbb/tbb.h"

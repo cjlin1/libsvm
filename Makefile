@@ -1,3 +1,6 @@
+#dependencies:
+#	Intel tbb library: https://www.threadingbuildingblocks.org
+
 #CXX ?= g++
 CXX = icpc
 
@@ -5,11 +8,11 @@ ifeq ($(CXX),icpc)
 	VECREPORT = -qopt-report5 -qopt-report-phase=vec -qopt-report-file=stdout
 	VECREPORT = 
 	CFLAGS = -Wall -Wconversion -O3 -std=c++11  -tbb -g $(VECREPORT) -xHost -debug inline-debug-info -I./
-	LDFLAGS = -ltbbmalloc_proxy -lm
+	LDFLAGS = -ltbbmalloc_proxy -lm -lrt
 else
 	#-fPIC
 	CFLAGS = -Wall -Wconversion -O3 -std=c++11  -g -march=native -I./
-	LDFLAGS = -ltbb -ltbbmalloc_proxy -lm
+	LDFLAGS = -ltbb -ltbbmalloc_proxy -lm -lrt
 endif 
 
 SHVER = 2
