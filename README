@@ -726,7 +726,7 @@ nmake -f Makefile.win lib
 
 4. (optional) To build 32-bit windows binaries, you must
 	(1) Setup "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\vcvars32.bat" instead of vcvars64.bat
-	(2) Change CFLAGS in Makefile.win: /D _WIN32 to /D _WIN64	
+	(2) Change CFLAGS in Makefile.win: /D _WIN64 to /D _WIN32
 	
 Another way is to build them from Visual C++ environment. See details
 in libsvm FAQ.
