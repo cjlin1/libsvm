@@ -5,6 +5,9 @@ from ctypes.util import find_library
 from os import path
 import sys
 
+if sys.version_info[0] >= 3:
+	xrange = range
+
 __all__ = ['libsvm', 'svm_problem', 'svm_parameter',
            'toPyModel', 'gen_svm_nodearray', 'print_null', 'svm_node', 'C_SVC',
            'EPSILON_SVR', 'LINEAR', 'NU_SVC', 'NU_SVR', 'ONE_CLASS',

@@ -1,11 +1,11 @@
 #You must ensure nmake.exe, cl.exe, link.exe are in system path.
-#VCVARS32.bat
+#VCVARS64.bat
 #Under dosbox prompt
 #nmake -f Makefile.win
 
 ##########################################
 CXX = cl.exe
-CFLAGS = /nologo /O2 /EHsc /I. /D _WIN32 /D _CRT_SECURE_NO_DEPRECATE
+CFLAGS = /nologo /O2 /EHsc /I. /D _WIN64 /D _CRT_SECURE_NO_DEPRECATE
 TARGET = windows
 
 all: $(TARGET)\svm-train.exe $(TARGET)\svm-predict.exe $(TARGET)\svm-scale.exe $(TARGET)\svm-toy.exe lib
