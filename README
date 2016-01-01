@@ -1,3 +1,13 @@
+Mavenized LIBSVM
+================
+
+Mavenized version of LIBSVM library originally converted by Christopher Berner and developed by Chih-Chung Chang and Chih-Jen Lin.
+
+http://www.csie.ntu.edu.tw/~cjlin/libsvm
+
+LIBSVM
+======
+
 Libsvm is a simple, easy-to-use, and efficient software for SVM
 classification and regression. It solves C-SVM classification, nu-SVM
 classification, one-class-SVM, epsilon-SVM regression, and nu-SVM
