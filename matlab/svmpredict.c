@@ -297,12 +297,12 @@ void mexFunction( int nlhs, mxArray *plhs[],
 		if(nrhs==4)
 		{
 			int i, argc = 1;
-			char cmd[CMD_LEN], *argv[CMD_LEN/2];
+			char cmd[CMD_LEN], *argv[CMD_LEN/2], *r = (char *)NULL;
 
 			// put options in argv[]
 			mxGetString(prhs[3], cmd,  mxGetN(prhs[3]) + 1);
-			if((argv[argc] = strtok(cmd, " ")) != NULL)
-				while((argv[++argc] = strtok(NULL, " ")) != NULL)
+			if((argv[argc] = strtok_r(cmd, " ", &r)) != NULL)
+				while((argv[++argc] = strtok_r(NULL, " ", &r)) != NULL)
 					;
 
 			for(i=1;i<argc;i++)

@@ -77,10 +77,10 @@ void predict(FILE *input, FILE *output)
 	{
 		int i = 0;
 		double target_label, predict_label;
-		char *idx, *val, *label, *endptr;
+		char *idx, *val, *label, *endptr, *r = (char *)NULL;
 		int inst_max_index = -1; // strtol gives 0 if wrong format, and precomputed kernel has <index> start from 0
 
-		label = strtok(line," \t\n");
+		label = strtok_r(line," \t\n",&r);
 		if(label == NULL) // empty line
 			exit_input_error(total+1);
 
@@ -96,8 +96,8 @@ void predict(FILE *input, FILE *output)
 				x = (struct svm_node *) realloc(x,max_nr_attr*sizeof(struct svm_node));
 			}
 
-			idx = strtok(NULL,":");
-			val = strtok(NULL," \t");
+			idx = strtok_r(NULL,":",&r);
+			val = strtok_r(NULL," \t",&r);
 
 			if(val == NULL)
 				break;
