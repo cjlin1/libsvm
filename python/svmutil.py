@@ -156,11 +156,13 @@ def svm_train(arg1, arg2=None, arg3=None):
 		libsvm.svm_cross_validation(prob, param, nr_fold, target)
 		ACC, MSE, SCC = evaluations(prob.y[:l], target[:l])
 		if param.svm_type in [EPSILON_SVR, NU_SVR]:
-			print("Cross Validation Mean squared error = %g" % MSE)
-			print("Cross Validation Squared correlation coefficient = %g" % SCC)
+			if not params.quiet:
+				print("Cross Validation Mean squared error = %g" % MSE)
+				print("Cross Validation Squared correlation coefficient = %g" % SCC)
 			return MSE
 		else:
-			print("Cross Validation Accuracy = %g%%" % ACC)
+			if not params.quiet:
+				print("Cross Validation Accuracy = %g%%" % ACC)
 			return ACC
 	else:
 		m = libsvm.svm_train(prob, param)

@@ -154,6 +154,7 @@ class svm_parameter(Structure):
 		self.cross_validation = False
 		self.nr_fold = 0
 		self.print_func = cast(None, PRINT_STRING_FUN)
+		self.quiet = True
 
 	def parse_options(self, options):
 		if isinstance(options, list):
