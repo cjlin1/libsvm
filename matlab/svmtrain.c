@@ -58,6 +58,7 @@ struct svm_problem prob;		// set by read_problem
 struct svm_model *model;
 struct svm_node *x_space;
 int cross_validation;
+int quiet;
 int nr_fold;
 
 
@@ -85,11 +86,13 @@ double do_cross_validation()
 			sumyy += y*y;
 			sumvy += v*y;
 		}
-		mexPrintf("Cross Validation Mean squared error = %g\n",total_error/prob.l);
-		mexPrintf("Cross Validation Squared correlation coefficient = %g\n",
-			((prob.l*sumvy-sumv*sumy)*(prob.l*sumvy-sumv*sumy))/
-			((prob.l*sumvv-sumv*sumv)*(prob.l*sumyy-sumy*sumy))
-			);
+		if (quiet == 0){
+			mexPrintf("Cross Validation Mean squared error = %g\n",total_error/prob.l);
+			mexPrintf("Cross Validation Squared correlation coefficient = %g\n",
+				((prob.l*sumvy-sumv*sumy)*(prob.l*sumvy-sumv*sumy))/
+				((prob.l*sumvv-sumv*sumv)*(prob.l*sumyy-sumy*sumy))
+				);
+		}
 		retval = total_error/prob.l;
 	}
 	else
@@ -97,7 +100,9 @@ double do_cross_validation()
 		for(i=0;i<prob.l;i++)
 			if(target[i] == prob.y[i])
 				++total_correct;
-		mexPrintf("Cross Validation Accuracy = %g%%\n",100.0*total_correct/prob.l);
+		if (quiet == 0){
+			mexPrintf("Cross Validation Accuracy = %g%%\n",100.0*total_correct/prob.l);
+		}
 		retval = 100.0*total_correct/prob.l;
 	}
 	free(target);
@@ -129,6 +134,7 @@ int parse_command_line(int nrhs, const mxArray *prhs[], char *model_file_name)
 	param.weight_label = NULL;
 	param.weight = NULL;
 	cross_validation = 0;
+	quiet = 0;
 
 	if(nrhs <= 1)
 		return 1;
@@ -188,6 +194,7 @@ int parse_command_line(int nrhs, const mxArray *prhs[], char *model_file_name)
 				param.probability = atoi(argv[i]);
 				break;
 			case 'q':
+				quiet = 1;
 				print_func = &print_null;
 				i--;
 				break;
