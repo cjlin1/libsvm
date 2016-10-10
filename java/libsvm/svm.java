@@ -2686,7 +2686,7 @@ public class svm {
 
 		if (read_model_header(fp, model) == false)
 		{
-			throw new IOException("ERROR: failed to read model\n");
+			throw new IOException("ERROR: failed to read model");
 		}
 
 		// read sv_coef and SV
@@ -2854,5 +2854,11 @@ public class svm {
 			svm_print_string = svm_print_stdout;
 		else 
 			svm_print_string = print_func;
+	}
+	
+	public static void svm_set_print_err_string_function(svm_print_interface print_func)
+	{
+		if (print_func != null)
+			svm_print_err_string = print_func;
 	}
 }
