@@ -37,6 +37,7 @@ static inline double powi(double base, int times)
 #define INF HUGE_VAL
 #define TAU 1e-12
 #define Malloc(type,n) (type *)malloc((n)*sizeof(type))
+#define Calloc(type,n) (type *)calloc(n,sizeof(type))
 
 static void print_string_stdout(const char *s)
 {
@@ -2886,14 +2887,8 @@ svm_model *svm_load_model(const char *model_file_name)
 
 	// read parameters
 
-	svm_model *model = Malloc(svm_model,1);
-	model->rho = NULL;
-	model->probA = NULL;
-	model->probB = NULL;
-	model->sv_indices = NULL;
-	model->label = NULL;
-	model->nSV = NULL;
-	
+	svm_model *model = Calloc(svm_model,1);
+
 	// read header
 	if (!read_model_header(fp, model))
 	{
