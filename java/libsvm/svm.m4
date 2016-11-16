@@ -2549,6 +2549,11 @@ public class svm {
 	{
 		svm_parameter param = new svm_parameter();
 		model.param = param;
+		// parameters for training only won't be assigned, but arrays are assigned as NULL for safety
+		param.nr_weight = 0;
+		param.weight_label = null;
+		param.weight = null;
+
 		try
 		{
 			while(true)

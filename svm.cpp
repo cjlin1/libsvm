@@ -2767,6 +2767,11 @@ static char* readline(FILE *input)
 bool read_model_header(FILE *fp, svm_model* model)
 {
 	svm_parameter& param = model->param;
+	// parameters for training only won't be assigned, but arrays are assigned as NULL for safety
+	param.nr_weight = 0;
+	param.weight_label = NULL;
+	param.weight = NULL;
+
 	char cmd[81];
 	while(1)
 	{
