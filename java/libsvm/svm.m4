@@ -1,4 +1,4 @@
-define(`swap',`do {$1 _=$2; $2=$3; $3=_;} while(false)')
+define(`swap',`do {$1 tmp=$2; $2=$3; $3=tmp;} while(false)')
 define(`Qfloat',`float')
 define(`SIZE_OF_QFLOAT',4)
 define(`TAU',1e-12)
