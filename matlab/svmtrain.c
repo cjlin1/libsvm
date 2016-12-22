@@ -47,7 +47,7 @@ void exit_with_help()
 	"-h shrinking : whether to use the shrinking heuristics, 0 or 1 (default 1)\n"
 	"-b probability_estimates : whether to train a SVC or SVR model for probability estimates, 0 or 1 (default 0)\n"
 	"-wi weight : set the parameter C of class i to weight*C, for C-SVC (default 1)\n"
-	"-v n : n-fold cross validation mode\n"
+	"-v n: n-fold cross validation mode\n"
 	"-q : quiet mode (no outputs)\n"
 	);
 }

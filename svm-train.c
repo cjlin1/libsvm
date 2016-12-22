@@ -65,7 +65,7 @@ static int max_line_len;
 static char* readline(FILE *input)
 {
 	int len;
-	
+
 	if(fgets(line,max_line_len,input) == NULL)
 		return NULL;
 
