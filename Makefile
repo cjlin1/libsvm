@@ -1,5 +1,5 @@
 CXX ?= g++
-CFLAGS = -Wall -Wconversion -O3 -fPIC
+CFLAGS = -Wall -Wconversion -O3 -fPIC -march=native
 SHVER = 2
 OS = $(shell uname)
 
