@@ -1,4 +1,4 @@
-LIBRARY libsvm
+LIBRARY svm
 EXPORTS
 	svm_train	@1
 	svm_cross_validation	@2
