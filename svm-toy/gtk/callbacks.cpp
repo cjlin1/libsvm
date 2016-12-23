@@ -13,7 +13,7 @@ using namespace std;
 #define XLEN 500
 #define YLEN 500
 
-GdkColor colors[] = 
+GdkColor colors[] =
 {
 	{0,0,0,0},
 	{0,0,120<<8,120<<8},
@@ -103,7 +103,7 @@ on_button_run_clicked                  (GtkButton       *button,
 	if(point_list.empty()) return;
 
 	svm_parameter param;
-	int i,j;	
+	int i,j;
 
 	// default values
 	param.svm_type = C_SVC;
@@ -180,7 +180,7 @@ on_button_run_clicked                  (GtkButton       *button,
 				break;
 		}
 	}
-	
+
 	// build problem
 	svm_problem prob;
 
@@ -213,8 +213,8 @@ on_button_run_clicked                  (GtkButton       *button,
 		x[0].index = 1;
 		x[1].index = -1;
 		int *j = new int[XLEN];
-	
-		for (i = 0; i < XLEN; i++) 
+
+		for (i = 0; i < XLEN; i++)
 		{
 			x[0].value = (double) i / XLEN;
 			j[i] = (int)(YLEN*svm_predict(model, x));
@@ -223,24 +223,24 @@ on_button_run_clicked                  (GtkButton       *button,
 		gdk_gc_set_foreground(gc,&colors[0]);
 		gdk_draw_line(pixmap,gc,0,0,0,YLEN-1);
 		gdk_draw_line(draw_main->window,gc,0,0,0,YLEN-1);
-		
+
 		int p = (int)(param.p * YLEN);
 		for(i = 1; i < XLEN; i++)
 		{
 			gdk_gc_set_foreground(gc,&colors[0]);
 			gdk_draw_line(pixmap,gc,i,0,i,YLEN-1);
 			gdk_draw_line(draw_main->window,gc,i,0,i,YLEN-1);
-			
+
 			gdk_gc_set_foreground(gc,&colors[5]);
 			gdk_draw_line(pixmap,gc,i-1,j[i-1],i,j[i]);
 			gdk_draw_line(draw_main->window,gc,i-1,j[i-1],i,j[i]);
-			
+
 			if(param.svm_type == EPSILON_SVR)
 			{
 				gdk_gc_set_foreground(gc,&colors[2]);
 				gdk_draw_line(pixmap,gc,i-1,j[i-1]+p,i,j[i]+p);
 				gdk_draw_line(draw_main->window,gc,i-1,j[i-1]+p,i,j[i]+p);
-			
+
 				gdk_gc_set_foreground(gc,&colors[2]);
 				gdk_draw_line(pixmap,gc,i-1,j[i-1]-p,i,j[i]-p);
 				gdk_draw_line(draw_main->window,gc,i-1,j[i-1]-p,i,j[i]-p);
@@ -277,8 +277,8 @@ on_button_run_clicked                  (GtkButton       *button,
 		x[0].index = 1;
 		x[1].index = 2;
 		x[2].index = -1;
-	
-		for (i = 0; i < XLEN; i++) 
+
+		for (i = 0; i < XLEN; i++)
 			for (j = 0; j < YLEN; j++) {
 				x[0].value = (double) i / XLEN;
 				x[1].value = (double) j / YLEN;
@@ -345,7 +345,7 @@ void show_fileselection()
 		GTK_OBJECT(GTK_FILE_SELECTION(fileselection)->ok_button),
 		"clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy),
 		(GtkObject *) fileselection);
-	
+
 	gtk_signal_connect_object (GTK_OBJECT
 		(GTK_FILE_SELECTION(fileselection)->cancel_button),
 		"clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy),
@@ -381,13 +381,13 @@ on_filesel_ok_clicked                  (GtkButton       *button,
 	if(fileselection_flag == SAVE)
 	{
 		FILE *fp = fopen(filename,"w");
-		
+
 		const char *p = gtk_entry_get_text(GTK_ENTRY(entry_option));
 		const char* svm_type_str = strstr(p, "-s ");
 		int svm_type = C_SVC;
 		if(svm_type_str != NULL)
 			sscanf(svm_type_str, "-s %d", &svm_type);
-		
+
 		if(fp)
 		{
 			if(svm_type == EPSILON_SVR || svm_type == NU_SVR)
@@ -430,7 +430,7 @@ on_filesel_ok_clicked                  (GtkButton       *button,
 			}
 			fclose(fp);
 			draw_all_points();
-		}				
+		}
 	}
 }
 

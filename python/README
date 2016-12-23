@@ -110,10 +110,10 @@ functions. The usage is similar to LIBSVM MATLAB interface.
 Data Structures
 ===============
 
-Four data structures derived from svm.h are svm_node, svm_problem, svm_parameter, 
-and svm_model. They all contain fields with the same names in svm.h. Access 
-these fields carefully because you directly use a C structure instead of a 
-Python object. For svm_model, accessing the field directly is not recommanded. 
+Four data structures derived from svm.h are svm_node, svm_problem, svm_parameter,
+and svm_model. They all contain fields with the same names in svm.h. Access
+these fields carefully because you directly use a C structure instead of a
+Python object. For svm_model, accessing the field directly is not recommanded.
 Programmers should use the interface functions or methods of svm_model class
 in Python to get the values. The following description introduces additional
 fields and methods.
@@ -135,7 +135,7 @@ LIBSVM shared library:
 
     Show the index and the value of a node.
 
-    >>> print(node) 
+    >>> print(node)
 
 - Function: gen_svm_nodearray(xi [,feature_max=None [,isKernel=False]])
 
@@ -149,9 +149,9 @@ LIBSVM shared library:
 
     feature_max: if feature_max is assigned, features with indices larger than
                  feature_max are removed.
-    
+
     isKernel: if isKernel == True, the list index starts from 0 for precomputed
-              kernel. Otherwise, the list index starts from 1. The default 
+              kernel. Otherwise, the list index starts from 1. The default
 	      value is False.
 
 - class svm_problem:
@@ -224,7 +224,7 @@ LIBSVM shared library:
     >>> nr_sv = model.get_nr_sv()
     >>> is_prob_model = model.is_probability_model()
     >>> support_vector_coefficients = model.get_sv_coef()
-    >>> support_vectors = model.get_SV() 
+    >>> support_vectors = model.get_SV()
 
 Utility Functions
 =================
@@ -308,9 +308,9 @@ The above command loads
            regression).
 
     p_vals: a list of decision values or probability estimates (if '-b 1'
-            is specified). If k is the number of classes in training data, 
-	    for decision values, each element includes results of predicting 
-	    k(k-1)/2 binary-class SVMs. For classification, k = 1 is a 
+            is specified). If k is the number of classes in training data,
+	    for decision values, each element includes results of predicting
+	    k(k-1)/2 binary-class SVMs. For classification, k = 1 is a
 	    special case. Decision value [+1] is returned for each testing
 	    instance, instead of an empty list.
 	    For probabilities, each element contains k values indicating

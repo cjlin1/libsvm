@@ -33,7 +33,7 @@ void libsvmwrite(const char *filename, const mxArray *label_vec, const mxArray *
 
 	if(fp ==NULL)
 	{
-		mexPrintf("can't open output file %s\n",filename);			
+		mexPrintf("can't open output file %s\n",filename);
 		return;
 	}
 
@@ -72,7 +72,7 @@ void libsvmwrite(const char *filename, const mxArray *label_vec, const mxArray *
 
 		low = jc[i], high = jc[i+1];
 		for(k=low;k<high;k++)
-			fprintf(fp," %lu:%g", (size_t)ir[k]+1, samples[k]);		
+			fprintf(fp," %lu:%g", (size_t)ir[k]+1, samples[k]);
 
 		fprintf(fp,"\n");
 	}
@@ -90,30 +90,30 @@ void mexFunction( int nlhs, mxArray *plhs[],
 		fake_answer(nlhs, plhs);
 		return;
 	}
-	
+
 	// Transform the input Matrix to libsvm format
 	if(nrhs == 3)
 	{
 		char filename[256];
 		if(!mxIsDouble(prhs[1]) || !mxIsDouble(prhs[2]))
 		{
-			mexPrintf("Error: label vector and instance matrix must be double\n");			
+			mexPrintf("Error: label vector and instance matrix must be double\n");
 			return;
 		}
-		
-		mxGetString(prhs[0], filename, mxGetN(prhs[0])+1);		
+
+		mxGetString(prhs[0], filename, mxGetN(prhs[0])+1);
 
 		if(mxIsSparse(prhs[2]))
 			libsvmwrite(filename, prhs[1], prhs[2]);
 		else
 		{
-			mexPrintf("Instance_matrix must be sparse\n");			
+			mexPrintf("Instance_matrix must be sparse\n");
 			return;
 		}
 	}
 	else
 	{
-		exit_with_help();		
+		exit_with_help();
 		return;
 	}
 }

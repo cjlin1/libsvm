@@ -51,7 +51,7 @@ void predict(int nlhs, mxArray *plhs[], const mxArray *prhs[], struct svm_model 
 	int label_vector_row_num, label_vector_col_num;
 	int feature_number, testing_instance_number;
 	int instance_index;
-	double *ptr_instance, *ptr_label, *ptr_predict_label; 
+	double *ptr_instance, *ptr_label, *ptr_predict_label;
 	double *ptr_prob_estimates, *ptr_dec_values, *ptr;
 	struct svm_node *x;
 	mxArray *pplhs[1]; // transposed instance sparse matrix
@@ -197,7 +197,7 @@ void predict(int nlhs, mxArray *plhs[], const mxArray *prhs[], struct svm_model 
 			{
 				double *dec_values = (double *) malloc(sizeof(double) * nr_class*(nr_class-1)/2);
 				predict_label = svm_predict_values(model, x, dec_values);
-				if(nr_class == 1) 
+				if(nr_class == 1)
 					ptr_dec_values[instance_index] = 1;
 				else
 					for(i=0;i<(nr_class*(nr_class-1))/2;i++)

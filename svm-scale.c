@@ -73,18 +73,18 @@ int main(int argc,char **argv)
 		fprintf(stderr,"inconsistent lower/upper specification\n");
 		exit(1);
 	}
-	
+
 	if(restore_filename && save_filename)
 	{
 		fprintf(stderr,"cannot use -r and -s simultaneously\n");
 		exit(1);
 	}
 
-	if(argc != i+1) 
+	if(argc != i+1)
 		exit_with_help();
 
 	fp=fopen(argv[i],"r");
-	
+
 	if(fp==NULL)
 	{
 		fprintf(stderr,"can't open file %s\n", argv[i]);
@@ -102,7 +102,7 @@ int main(int argc,char **argv)
 	++p;\
 	while(isspace(*p)) ++p;\
 	while(*p && !isspace(*p)) ++p;
-	
+
 	/* assumption: min index of attributes is 1 */
 	/* pass 1: find out max index of attributes */
 	max_index = 0;
@@ -182,7 +182,7 @@ int main(int argc,char **argv)
 			return clean_up(fp_restore, fp, "ERROR: failed to read labels\n");
 		y_max = max(y_max,target);
 		y_min = min(y_min,target);
-		
+
 		SKIP_TARGET
 
 		while(sscanf(p,"%d:%lf",&index,&value)==2)
@@ -192,32 +192,32 @@ int main(int argc,char **argv)
 				feature_max[i]=max(feature_max[i],0);
 				feature_min[i]=min(feature_min[i],0);
 			}
-			
+
 			feature_max[index]=max(feature_max[index],value);
 			feature_min[index]=min(feature_min[index],value);
 
 			SKIP_ELEMENT
 			next_index=index+1;
-		}		
+		}
 
 		for(i=next_index;i<=max_index;i++)
 		{
 			feature_max[i]=max(feature_max[i],0);
 			feature_min[i]=min(feature_min[i],0);
-		}	
+		}
 	}
 
 	rewind(fp);
 
 	/* pass 2.5: save/restore feature_min/feature_max */
-	
+
 	if(restore_filename)
 	{
 		/* fp_restore rewinded in finding max_index */
 		int idx, c;
 		double fmin, fmax;
 		int next_index = 1;
-		
+
 		if((c = fgetc(fp_restore)) == 'y')
 		{
 			if(fscanf(fp_restore, "%lf %lf\n", &y_lower, &y_upper) != 2 ||
@@ -228,7 +228,7 @@ int main(int argc,char **argv)
 		else
 			ungetc(c, fp_restore);
 
-		if (fgetc(fp_restore) == 'x') 
+		if (fgetc(fp_restore) == 'x')
 		{
 			if(fscanf(fp_restore, "%lf %lf\n", &lower, &upper) != 2)
 				return clean_up(fp_restore, fp, "ERROR: failed to read scaling parameters\n");
@@ -245,7 +245,7 @@ int main(int argc,char **argv)
 
 				next_index = idx + 1;
 			}
-			
+
 			for(i=next_index;i<=max_index;i++)
 				if(feature_min[i] != feature_max[i])
 					fprintf(stderr,
@@ -283,7 +283,7 @@ int main(int argc,char **argv)
 
 		fclose(fp_save);
 	}
-	
+
 	/* pass 3: scale */
 	while(readline(fp)!=NULL)
 	{
@@ -291,7 +291,7 @@ int main(int argc,char **argv)
 		int next_index=1;
 		double target;
 		double value;
-		
+
 		if (sscanf(p,"%lf",&target) != 1)
 			return clean_up(NULL, fp, "ERROR: failed to read labels\n");
 		output_target(target);
@@ -302,12 +302,12 @@ int main(int argc,char **argv)
 		{
 			for(i=next_index;i<index;i++)
 				output(i,0);
-			
+
 			output(index,value);
 
 			SKIP_ELEMENT
 			next_index=index+1;
-		}		
+		}
 
 		for(i=next_index;i<=max_index;i++)
 			output(i,0);
@@ -316,7 +316,7 @@ int main(int argc,char **argv)
 	}
 
 	if (new_num_nonzeros > num_nonzeros)
-		fprintf(stderr, 
+		fprintf(stderr,
 			"WARNING: original #nonzeros %ld\n"
 			"       > new      #nonzeros %ld\n"
 			"If feature values are non-negative and sparse, use -l 0 rather than the default -l -1\n",
@@ -332,7 +332,7 @@ int main(int argc,char **argv)
 char* readline(FILE *input)
 {
 	int len;
-	
+
 	if(fgets(line,max_line_len,input) == NULL)
 		return NULL;
 
@@ -372,7 +372,7 @@ void output(int index, double value)
 	else if(value == feature_max[index])
 		value = upper;
 	else
-		value = lower + (upper-lower) * 
+		value = lower + (upper-lower) *
 			(value-feature_min[index])/
 			(feature_max[index]-feature_min[index]);
 

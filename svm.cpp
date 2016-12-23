@@ -368,7 +368,7 @@ double Kernel::k_function(const svm_node *x, const svm_node *y,
 		case PRECOMPUTED:  //x: test (validation), y: SV
 			return x[(int)(y->value)].value;
 		default:
-			return 0;  // Unreachable 
+			return 0;  // Unreachable
 	}
 }
 
@@ -939,7 +939,7 @@ void Solver::do_shrinking()
 		}
 	}
 
-	if(unshrink == false && Gmax1 + Gmax2 <= eps*10) 
+	if(unshrink == false && Gmax1 + Gmax2 <= eps*10)
 	{
 		unshrink = true;
 		reconstruct_gradient();
@@ -1264,7 +1264,7 @@ double Solver_NU::calculate_rho()
 // Q matrices for various formulations
 //
 class SVC_Q: public Kernel
-{ 
+{
 public:
 	SVC_Q(const svm_problem& prob, const svm_parameter& param, const schar *y_)
 	:Kernel(prob.l, prob.x, param)
@@ -1360,7 +1360,7 @@ private:
 };
 
 class SVR_Q: public Kernel
-{ 
+{
 public:
 	SVR_Q(const svm_problem& prob, const svm_parameter& param)
 	:Kernel(prob.l, prob.x, param)
@@ -1703,7 +1703,7 @@ static decision_function svm_train_one(
 
 // Platt's binary SVM Probablistic Output: an improvement from Lin et al.
 static void sigmoid_train(
-	int l, const double *dec_values, const double *labels, 
+	int l, const double *dec_values, const double *labels,
 	double& A, double& B)
 {
 	double prior1=0, prior0 = 0;
@@ -1998,9 +1998,9 @@ static double svm_svr_probability(
 	int count=0;
 	mae=0;
 	for(i=0;i<prob->l;i++)
-		if (fabs(ymv[i]) > 5*std) 
+		if (fabs(ymv[i]) > 5*std)
 			count=count+1;
-		else 
+		else
 			mae+=fabs(ymv[i]);
 	mae /= (prob->l-count);
 	info("Prob. model for test data: target value = predicted value + z,\nz: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma= %g\n",mae);
@@ -2049,8 +2049,8 @@ static void svm_group_classes(const svm_problem *prob, int *nr_class_ret, int **
 	}
 
 	//
-	// Labels are ordered by their first occurrence in the training set. 
-	// However, for two-class sets with -1/+1 labels and -1 appears first, 
+	// Labels are ordered by their first occurrence in the training set.
+	// However, for two-class sets with -1/+1 labels and -1 appears first,
 	// we swap labels to ensure that internally the binary SVM has positive data corresponding to the +1 instances.
 	//
 	if (nr_class == 2 && label[0] == -1 && label[1] == 1)
@@ -2106,7 +2106,7 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 		model->probA = NULL; model->probB = NULL;
 		model->sv_coef = Malloc(double *,1);
 
-		if(param->probability && 
+		if(param->probability &&
 		   (param->svm_type == EPSILON_SVR ||
 		    param->svm_type == NU_SVR))
 		{
@@ -2150,7 +2150,7 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 
 		// group training data of the same class
 		svm_group_classes(prob,&nr_class,&label,&start,&count,perm);
-		if(nr_class == 1) 
+		if(nr_class == 1)
 			info("WARNING: training data in only one class. See README for details.\n");
 
 		svm_node **x = Malloc(svm_node *,l);
@@ -2365,7 +2365,7 @@ void svm_cross_validation(const svm_problem *prob, const svm_parameter *param, i
 		int *index = Malloc(int,l);
 		for(i=0;i<l;i++)
 			index[i]=perm[i];
-		for (c=0; c<nr_class; c++) 
+		for (c=0; c<nr_class; c++)
 			for(i=0;i<count[c];i++)
 			{
 				int j = i+rand()%(count[c]-i);
@@ -2437,7 +2437,7 @@ void svm_cross_validation(const svm_problem *prob, const svm_parameter *param, i
 			++k;
 		}
 		struct svm_model *submodel = svm_train(&subprob,param);
-		if(param->probability && 
+		if(param->probability &&
 		   (param->svm_type == C_SVC || param->svm_type == NU_SVC))
 		{
 			double *prob_estimates=Malloc(double,svm_get_nr_class(submodel));
@@ -2582,7 +2582,7 @@ double svm_predict(const svm_model *model, const svm_node *x)
 	   model->param.svm_type == EPSILON_SVR ||
 	   model->param.svm_type == NU_SVR)
 		dec_values = Malloc(double, 1);
-	else 
+	else
 		dec_values = Malloc(double, nr_class*(nr_class-1)/2);
 	double pred_result = svm_predict_values(model, x, dec_values);
 	free(dec_values);
@@ -2630,7 +2630,7 @@ double svm_predict_probability(
 		free(pairwise_prob);
 		return model->label[prob_max_idx];
 	}
-	else 
+	else
 		return svm_predict(model, x);
 }
 

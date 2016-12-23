@@ -47,7 +47,7 @@ if len(sys.argv) > 2:
 
 cmd = '{0} -s "{1}" "{2}" > "{3}"'.format(svmscale_exe, range_file, train_pathname, scaled_file)
 print('Scaling training data...')
-Popen(cmd, shell = True, stdout = PIPE).communicate()	
+Popen(cmd, shell = True, stdout = PIPE).communicate()
 
 cmd = '{0} -svmtrain "{1}" -gnuplot "{2}" "{3}"'.format(grid_py, svmtrain_exe, gnuplot_exe, scaled_file)
 print('Cross validation...')
@@ -70,10 +70,10 @@ print('Output model: {0}'.format(model_file))
 if len(sys.argv) > 2:
 	cmd = '{0} -r "{1}" "{2}" > "{3}"'.format(svmscale_exe, range_file, test_pathname, scaled_test_file)
 	print('Scaling testing data...')
-	Popen(cmd, shell = True, stdout = PIPE).communicate()	
+	Popen(cmd, shell = True, stdout = PIPE).communicate()
 
 	cmd = '{0} "{1}" "{2}" "{3}"'.format(svmpredict_exe, scaled_test_file, model_file, predict_test_file)
 	print('Testing...')
-	Popen(cmd, shell = True).communicate()	
+	Popen(cmd, shell = True).communicate()
 
 	print('Output prediction: {0}'.format(predict_test_file))

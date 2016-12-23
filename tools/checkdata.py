@@ -10,7 +10,7 @@
 # All rights reserved.
 #
 # This program is distributed under the same license of the LIBSVM package.
-# 
+#
 
 from sys import argv, exit
 import os.path
@@ -51,7 +51,7 @@ def main():
 		# check label
 		try:
 			label = nodes.pop(0)
-			
+
 			if label.find(',') != -1:
 				# multi-label format
 				try:
@@ -96,7 +96,7 @@ def main():
 
 		if line_error:
 			error_line_count += 1
-	
+
 	if error_line_count > 0:
 		print("Found {0} lines with error.".format(error_line_count))
 		return 1
