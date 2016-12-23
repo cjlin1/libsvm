@@ -1,0 +1,38 @@
+#                                               -*- cmake -*-
+#
+#  LibSVMConfig.cmake(.in)
+#
+#  Find LibSVM includes and libraries
+#
+
+# Use the following variables to compile and link against LibSVM:
+#  LIBSVM_FOUND          True if LibSVM was found on your system
+#  LIBSVM_USE_FILE       The file making LibSVM usable
+#  LIBSVM_DEFINITIONS    Definitions needed to build with LibSVM
+#  LIBSVM_INCLUDE_DIRS   List of directories where LibSVM' header file are
+#  LIBSVM_LIBRARIES      List of libraries to link against
+#  LIBSVM_LIBRARY_DIRS   List of directories containing LibSVM' libraries
+#  LIBSVM_ROOT_DIR       The base directory of LibSVM
+#  LIBSVM_VERSION_STRING A human-readable string containing the version
+#  LIBSVM_VERSION_MAJOR  The major version of LibSVM
+#  LIBSVM_VERSION_MINOR  The minor version of LibSVM
+#  LIBSVM_VERSION_PATCH  The patch version of LibSVM
+
+set ( LIBSVM_FOUND 1 )
+
+set ( LIBSVM_DEFINITIONS  "@LIBSVM_DEFINITIONS@" )
+set ( LIBSVM_INCLUDE_DIR  "@LIBSVM_INCLUDE_DIR@" )
+set ( LIBSVM_INCLUDE_DIRS "@LIBSVM_INCLUDE_DIRS@" )
+set ( LIBSVM_LIBRARY      "@LIBSVM_LIBRARY@" )
+set ( LIBSVM_LIBRARIES    "@LIBSVM_LIBRARIES@" )
+set ( LIBSVM_LIBRARY_DIRS "@LIBSVM_LIBRARY_DIRS@" )
+set ( LIBSVM_ROOT_DIR     "@LIBSVM_ROOT_DIR@" )
+
+set ( LIBSVM_VERSION_STRING "@LIBSVM_VERSION_STRING@" )
+set ( LIBSVM_VERSION_MAJOR  "@LIBSVM_VERSION_MAJOR@" )
+set ( LIBSVM_VERSION_MINOR  "@LIBSVM_VERSION_MINOR@" )
+set ( LIBSVM_VERSION_PATCH  "@LIBSVM_VERSION_PATCH@" )
+
+set ( LIBSVM_PYTHON_MODULE_PATH "@LIBSVM_PYTHON_MODULE_PATH@" )
+set ( LIBSVM_JAVA_PATH "@LIBSVM_JAVA_PATH@" )
+set ( LIBSVM_OCTAVE_PKG_DIR "@LIBSVM_OCTAVE_PKG_DIR@" )
