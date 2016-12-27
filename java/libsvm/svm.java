@@ -1304,8 +1304,18 @@ public class svm {
 			System.out.flush();
 		}
 	};
+	
+	private static svm_print_interface svm_print_stderr = new svm_print_interface() {
+		
+		public void print(String s)
+		{
+			System.err.print(s);
+			System.err.flush();
+		}
+	};
 
 	private static svm_print_interface svm_print_string = svm_print_stdout;
+	private static svm_print_interface svm_print_err_string = svm_print_stderr;
 
 	static void info(String s) 
 	{
@@ -2015,7 +2025,7 @@ public class svm {
 					if(param.weight_label[i] == label[j])
 						break;
 				if(j == nr_class)
-					System.err.print("WARNING: class label "+param.weight_label[i]+" specified in weight is not found\n");
+					svm_print_err_string.print("WARNING: class label "+param.weight_label[i]+" specified in weight is not found\n");
 				else
 					weighted_C[j] *= param.weight[i];
 			}
@@ -2315,7 +2325,7 @@ public class svm {
 		return model.probA[0];
 		else
 		{
-			System.err.print("Model doesn't contain information for SVR probability inference\n");
+			svm_print_err_string.print("Model doesn't contain information for SVR probability inference\n");
 			return 0;
 		}
 	}
@@ -2580,7 +2590,7 @@ public class svm {
 					}
 					if(i == svm_type_table.length)
 					{
-						System.err.print("unknown svm type.\n");
+						svm_print_err_string.print("unknown svm type.\n");
 						return false;
 					}
 				}
@@ -2597,7 +2607,7 @@ public class svm {
 					}
 					if(i == kernel_type_table.length)
 					{
-						System.err.print("unknown kernel function.\n");
+						svm_print_err_string.print("unknown kernel function.\n");
 						return false;
 					}
 				}
@@ -2657,7 +2667,7 @@ public class svm {
 				}
 				else
 				{
-					System.err.print("unknown text in model file: ["+cmd+"]\n");
+					svm_print_err_string.print("unknown text in model file: ["+cmd+"]\n");
 					return false;
 				}
 			}
@@ -2687,8 +2697,7 @@ public class svm {
 
 		if (read_model_header(fp, model) == false)
 		{
-			System.err.print("ERROR: failed to read model\n");
-			return null;
+			throw new IOException("ERROR: failed to read model");
 		}
 
 		// read sv_coef and SV
@@ -2856,5 +2865,11 @@ public class svm {
 			svm_print_string = svm_print_stdout;
 		else 
 			svm_print_string = print_func;
+	}
+	
+	public static void svm_set_print_err_string_function(svm_print_interface print_func)
+	{
+		if (print_func != null)
+			svm_print_err_string = print_func;
 	}
 }
