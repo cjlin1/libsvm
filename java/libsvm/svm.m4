@@ -1,4 +1,4 @@
-define(`swap',`do {$1 _=$2; $2=$3; $3=_;} while(false)')
+define(`swap',`do {$1 tmp=$2; $2=$3; $3=tmp;} while(false)')
 define(`Qfloat',`float')
 define(`SIZE_OF_QFLOAT',4)
 define(`TAU',1e-12)
@@ -1293,7 +1293,7 @@ public class svm {
 	//
 	// construct and solve various formulations
 	//
-	public static final int LIBSVM_VERSION=321; 
+	public static final int LIBSVM_VERSION=322; 
 	public static final Random rand = new Random();
 
 	private static svm_print_interface svm_print_stdout = new svm_print_interface()
@@ -2428,7 +2428,13 @@ public class svm {
 					pairwise_prob[j][i]=1-pairwise_prob[i][j];
 					k++;
 				}
-			multiclass_probability(nr_class,pairwise_prob,prob_estimates);
+			if (nr_class == 2)
+			{
+				prob_estimates[0] = pairwise_prob[0][1];
+				prob_estimates[1] = pairwise_prob[1][0];
+			}
+			else
+				multiclass_probability(nr_class,pairwise_prob,prob_estimates);
 
 			int prob_max_idx = 0;
 			for(i=1;i<nr_class;i++)
@@ -2549,6 +2555,11 @@ public class svm {
 	{
 		svm_parameter param = new svm_parameter();
 		model.param = param;
+		// parameters for training only won't be assigned, but arrays are assigned as NULL for safety
+		param.nr_weight = 0;
+		param.weight_label = null;
+		param.weight = null;
+
 		try
 		{
 			while(true)

@@ -129,8 +129,7 @@ svm-toy:
 	(available from http://www.gtk.org)
 	
 	The pre-built Windows binaries are in the `windows'
-	directory. We use Visual C++ on a 32-bit machine, so the
-	maximal cache size is 2GB.
+	directory. We use Visual C++ on a 64-bit machine.
 
 `svm-train' Usage
 =================
@@ -678,7 +677,7 @@ You may need to increase maximum Java heap size.
 Library usages are similar to the C version. These functions are available:
 
 public class svm {
-	public static final int LIBSVM_VERSION=321; 
+	public static final int LIBSVM_VERSION=322; 
 	public static svm_model svm_train(svm_problem prob, svm_parameter param);
 	public static void svm_cross_validation(svm_problem prob, svm_parameter param, int nr_fold, double[] target);
 	public static int svm_get_svm_type(svm_model model);

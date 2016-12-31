@@ -2612,7 +2612,13 @@ double svm_predict_probability(
 				pairwise_prob[j][i]=1-pairwise_prob[i][j];
 				k++;
 			}
-		multiclass_probability(nr_class,pairwise_prob,prob_estimates);
+		if (nr_class == 2)
+		{
+			prob_estimates[0] = pairwise_prob[0][1];
+			prob_estimates[1] = pairwise_prob[1][0];
+		}
+		else
+			multiclass_probability(nr_class,pairwise_prob,prob_estimates);
 
 		int prob_max_idx = 0;
 		for(i=1;i<nr_class;i++)
@@ -2767,6 +2773,11 @@ static char* readline(FILE *input)
 bool read_model_header(FILE *fp, svm_model* model)
 {
 	svm_parameter& param = model->param;
+	// parameters for training only won't be assigned, but arrays are assigned as NULL for safety
+	param.nr_weight = 0;
+	param.weight_label = NULL;
+	param.weight = NULL;
+
 	char cmd[81];
 	while(1)
 	{
