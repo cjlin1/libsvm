@@ -10,7 +10,7 @@
 
     <groupId>com.datumbox</groupId>
     <artifactId>libsvm</artifactId>
-    <version>3.21</version>
+    <version>3.22</version>
 
     <name>libsvm</name>
     <description>LIBSVM - A Library for Support Vector Machines</description>
