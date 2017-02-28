@@ -874,6 +874,11 @@ int Solver::select_working_set(int &out_i, int &out_j)
 		}
 	}
 
+	if (Gmax_idx < 0 || Gmin_idx < 0)
+	{
+		fprintf(stderr,"\nWARNING: Numerical instability.\n");
+		return 1;
+	}
 	if(Gmax+Gmax2 < eps || Gmin_idx == -1)
 		return 1;
 
