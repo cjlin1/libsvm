@@ -49,24 +49,34 @@ On other systems, consult `Makefile' to build them (e.g., see
 'Building Windows binaries' in this file) or use the pre-built
 binaries (Windows binaries are in the directory `windows').
 
-The format of training and testing data file is:
+The format of training and testing data files is:
 
 <label> <index1>:<value1> <index2>:<value2> ...
 .
 .
 .
 
-Each line contains an instance and is ended by a '\n' character.  For
-classification, <label> is an integer indicating the class label
-(multi-class is supported). For regression, <label> is the target
-value which can be any real number. For one-class SVM, it's not used
-so can be any number.  The pair <index>:<value> gives a feature
-(attribute) value: <index> is an integer starting from 1 and <value>
-is a real number. The only exception is the precomputed kernel, where
-<index> starts from 0; see the section of precomputed kernels. Indices
-must be in ASCENDING order. Labels in the testing file are only used
-to calculate accuracy or errors. If they are unknown, just fill the
-first column with any numbers.
+Each line contains an instance and is ended by a '\n' character. For
+<labal> in the training set, we have the following cases.
+
+* classification: <label> is an integer indicating the class label
+  (multi-class is supported).
+
+* For regression, <label> is the target value which can be any real
+  number.
+
+* For one-class SVM, <label> is not used and can be any number.
+
+In the test set, <label> is used only to calculate accuracy or
+errors. If it's unknown, any number is fine. For one-class SVM, if
+non-outliers/outliers are known, their labels in the test file must be
++1/-1 for evaluation.
+
+The pair <index>:<value> gives a feature (attribute) value: <index> is
+an integer starting from 1 and <value> is a real number. The only
+exception is the precomputed kernel, where <index> starts from 0; see
+the section of precomputed kernels. Indices must be in ASCENDING
+order.
 
 A sample classification data included in this package is
 `heart_scale'. To check if your data is in a correct form, use
@@ -301,7 +311,7 @@ These functions and structures are declared in the header file
 `svm.h'.  You need to #include "svm.h" in your C/C++ source files and
 link your program with `svm.cpp'. You can see `svm-train.c' and
 `svm-predict.c' for examples showing how to use them. We define
-LIBSVM_VERSION and declare `extern int libsvm_version; ' in svm.h, so
+LIBSVM_VERSION and declare `extern int libsvm_version;' in svm.h, so
 you can check the version number.
 
 Before you classify test data, you need to construct an SVM model
