@@ -3043,6 +3043,16 @@ void svm_destroy_param(svm_parameter* param)
 	free(param->weight);
 }
 
+void svm_destroy_problem(svm_problem *problem)
+{
+    delete [] problem->y;
+    problem->y = NULL;
+    for(int i=0;i<problem->l;i++)
+        delete [] problem->x[i];
+    delete [] problem->x;
+    problem->x = NULL;
+}
+
 const char *svm_check_parameter(const svm_problem *prob, const svm_parameter *param)
 {
 	// svm_type
