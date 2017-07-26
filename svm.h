@@ -91,6 +91,7 @@ double svm_predict_probability(const struct svm_model *model, const struct svm_n
 void svm_free_model_content(struct svm_model *model_ptr);
 void svm_free_and_destroy_model(struct svm_model **model_ptr_ptr);
 void svm_destroy_param(struct svm_parameter *param);
+void svm_destroy_problem(svm_problem *problem);
 
 const char *svm_check_parameter(const struct svm_problem *prob, const struct svm_parameter *param);
 int svm_check_probability_model(const struct svm_model *model);
