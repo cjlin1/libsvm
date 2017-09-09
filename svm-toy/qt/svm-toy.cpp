@@ -1,4 +1,4 @@
-#include <QtGui>
+#include <QtWidgets>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -108,7 +108,7 @@ private slots:
 		param.weight = NULL;
 
 		// parse options
-		const char *p = input_line.text().toAscii().constData();
+		const char *p = input_line.text().toLatin1().constData();
 
 		while (1) {
 			while (*p && *p != '-')
@@ -286,9 +286,9 @@ private slots:
 		QString filename = QFileDialog::getSaveFileName();
 		if(!filename.isNull())
 		{
-			FILE *fp = fopen(filename.toAscii().constData(),"w");
+			FILE *fp = fopen(filename.toLatin1().constData(),"w");
 
-			const char *p = input_line.text().toAscii().constData();
+			const char *p = input_line.text().toLatin1().constData();
 			const char* svm_type_str = strstr(p, "-s ");
 			int svm_type = C_SVC;
 			if(svm_type_str != NULL)
@@ -315,7 +315,7 @@ private slots:
 		QString filename = QFileDialog::getOpenFileName();
 		if(!filename.isNull())
 		{
-			FILE *fp = fopen(filename.toAscii().constData(),"r");
+			FILE *fp = fopen(filename.toLatin1().constData(),"r");
 			if(fp)
 			{
 				clear_all();
