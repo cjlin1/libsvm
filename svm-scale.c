@@ -266,15 +266,15 @@ int main(int argc,char **argv)
 		if(y_scaling)
 		{
 			fprintf(fp_save, "y\n");
-			fprintf(fp_save, "%.16g %.16g\n", y_lower, y_upper);
-			fprintf(fp_save, "%.16g %.16g\n", y_min, y_max);
+			fprintf(fp_save, "%.17g %.17g\n", y_lower, y_upper);
+			fprintf(fp_save, "%.17g %.17g\n", y_min, y_max);
 		}
 		fprintf(fp_save, "x\n");
-		fprintf(fp_save, "%.16g %.16g\n", lower, upper);
+		fprintf(fp_save, "%.17g %.17g\n", lower, upper);
 		for(i=1;i<=max_index;i++)
 		{
 			if(feature_min[i]!=feature_max[i])
-				fprintf(fp_save,"%d %.16g %.16g\n",i,feature_min[i],feature_max[i]);
+				fprintf(fp_save,"%d %.17g %.17g\n",i,feature_min[i],feature_max[i]);
 		}
 
 		if(min_index < 1)
@@ -358,7 +358,7 @@ void output_target(double value)
 		else value = y_lower + (y_upper-y_lower) *
 			     (value - y_min)/(y_max-y_min);
 	}
-	printf("%g ",value);
+	printf("%.17g ",value);
 }
 
 void output(int index, double value)

@@ -68,7 +68,7 @@ void libsvmwrite(const char *filename, const mxArray *label_vec, const mxArray *
 
 	for(i=0;i<l;i++)
 	{
-		fprintf(fp,"%g", labels[i]);
+		fprintf(fp,"%.17g", labels[i]);
 
 		low = jc[i], high = jc[i+1];
 		for(k=low;k<high;k++)

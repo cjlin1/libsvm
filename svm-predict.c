@@ -128,7 +128,7 @@ void predict(FILE *input, FILE *output)
 		else
 		{
 			predict_label = svm_predict(model,x);
-			fprintf(output,"%g\n",predict_label);
+			fprintf(output,"%.17g\n",predict_label);
 		}
 
 		if(predict_label == target_label)

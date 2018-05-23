@@ -2664,10 +2664,10 @@ int svm_save_model(const char *model_file_name, const svm_model *model)
 		fprintf(fp,"degree %d\n", param.degree);
 
 	if(param.kernel_type == POLY || param.kernel_type == RBF || param.kernel_type == SIGMOID)
-		fprintf(fp,"gamma %g\n", param.gamma);
+		fprintf(fp,"gamma %.17g\n", param.gamma);
 
 	if(param.kernel_type == POLY || param.kernel_type == SIGMOID)
-		fprintf(fp,"coef0 %g\n", param.coef0);
+		fprintf(fp,"coef0 %.17g\n", param.coef0);
 
 	int nr_class = model->nr_class;
 	int l = model->l;
@@ -2677,7 +2677,7 @@ int svm_save_model(const char *model_file_name, const svm_model *model)
 	{
 		fprintf(fp, "rho");
 		for(int i=0;i<nr_class*(nr_class-1)/2;i++)
-			fprintf(fp," %g",model->rho[i]);
+			fprintf(fp," %.17g",model->rho[i]);
 		fprintf(fp, "\n");
 	}
 
@@ -2693,14 +2693,14 @@ int svm_save_model(const char *model_file_name, const svm_model *model)
 	{
 		fprintf(fp, "probA");
 		for(int i=0;i<nr_class*(nr_class-1)/2;i++)
-			fprintf(fp," %g",model->probA[i]);
+			fprintf(fp," %.17g",model->probA[i]);
 		fprintf(fp, "\n");
 	}
 	if(model->probB)
 	{
 		fprintf(fp, "probB");
 		for(int i=0;i<nr_class*(nr_class-1)/2;i++)
-			fprintf(fp," %g",model->probB[i]);
+			fprintf(fp," %.17g",model->probB[i]);
 		fprintf(fp, "\n");
 	}
 
@@ -2719,7 +2719,7 @@ int svm_save_model(const char *model_file_name, const svm_model *model)
 	for(int i=0;i<l;i++)
 	{
 		for(int j=0;j<nr_class-1;j++)
-			fprintf(fp, "%.16g ",sv_coef[j][i]);
+			fprintf(fp, "%.17g ",sv_coef[j][i]);
 
 		const svm_node *p = SV[i];
 
