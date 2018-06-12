@@ -31,6 +31,7 @@ def svm_read_problem(data_file_name, return_scipy=False):
 		# In case an instance with all zero features
 		if len(line) == 1: line += ['']
 		label, features = line
+		prob_y += [float(label)]
 		if scipy != None and return_scipy:
 			nz = 0
 			for e in features.split():
@@ -45,18 +46,16 @@ def svm_read_problem(data_file_name, return_scipy=False):
 			xi = {}
 			for e in features.split():
 				ind, val = e.split(":")
-				xi[int(ind)] = float(val)
+				if float(val) != 0:
+					xi[int(ind)] = float(val)
 			prob_x += [xi]
-		prob_y += [float(label)]
 	if scipy != None and return_scipy:
 		prob_y = scipy.array(prob_y)
 		prob_x = scipy.array(prob_x)
 		col_idx = scipy.array(col_idx)
 		row_ptr = scipy.array(row_ptr)
 		prob_x = sparse.csr_matrix((prob_x, col_idx, row_ptr))
-		return (prob_y, prob_x)
-	else:
-		return (prob_y, prob_x)
+	return (prob_y, prob_x)
 
 def svm_load_model(model_file_name):
 	"""
