@@ -5,56 +5,15 @@ sys.path = [os.path.dirname(os.path.abspath(__file__))] + sys.path
 from svm import *
 from svm import __all__ as svm_all
 from svm import scipy, sparse
+from commonutil import *
+from commonutil import __all__ as common_all
 
 if sys.version_info[0] < 3:
 	range = xrange
 	from itertools import izip as zip
 
-__all__ = ['evaluations', 'svm_load_model', 'svm_predict', 'svm_read_problem',
-           'svm_save_model', 'svm_train'] + svm_all
+__all__ = ['svm_load_model', 'svm_predict', 'svm_save_model', 'svm_train'] + svm_all + common_all
 
-
-def svm_read_problem(data_file_name, return_scipy=False):
-	"""
-	svm_read_problem(data_file_name, return_scipy=False) -> [y, x], y: list, x: list of dictionary
-	svm_read_problem(data_file_name, return_scipy=True)  -> [y, x], y: ndarray, x: csr_matrix
-
-	Read LIBSVM-format data from data_file_name and return labels y
-	and data instances x.
-	"""
-	prob_y = []
-	prob_x = []
-	row_ptr = [0]
-	col_idx = []
-	for i, line in enumerate(open(data_file_name)):
-		line = line.split(None, 1)
-		# In case an instance with all zero features
-		if len(line) == 1: line += ['']
-		label, features = line
-		prob_y += [float(label)]
-		if scipy != None and return_scipy:
-			nz = 0
-			for e in features.split():
-				ind, val = e.split(":")
-				val = float(val)
-				if val != 0:
-					col_idx += [int(ind)-1]
-					prob_x += [val]
-					nz += 1
-			row_ptr += [row_ptr[-1]+nz]
-		else:
-			xi = {}
-			for e in features.split():
-				ind, val = e.split(":")
-				xi[int(ind)] = float(val)
-			prob_x += [xi]
-	if scipy != None and return_scipy:
-		prob_y = scipy.array(prob_y)
-		prob_x = scipy.array(prob_x)
-		col_idx = scipy.array(col_idx)
-		row_ptr = scipy.array(row_ptr)
-		prob_x = sparse.csr_matrix((prob_x, col_idx, row_ptr))
-	return (prob_y, prob_x)
 
 def svm_load_model(model_file_name):
 	"""
@@ -76,66 +35,6 @@ def svm_save_model(model_file_name, model):
 	Save a LIBSVM model to the file model_file_name.
 	"""
 	libsvm.svm_save_model(model_file_name.encode(), model)
-
-def evaluations_scipy(ty, pv):
-	"""
-	evaluations_scipy(ty, pv) -> (ACC, MSE, SCC)
-	ty, pv: ndarray
-
-	Calculate accuracy, mean squared error and squared correlation coefficient
-	using the true values (ty) and predicted values (pv).
-	"""
-	if not (scipy != None and isinstance(ty, scipy.ndarray) and isinstance(pv, scipy.ndarray)):
-		raise TypeError("type of ty and pv must be ndarray")
-	if len(ty) != len(pv):
-		raise ValueError("len(ty) must be equal to len(pv)")
-	ACC = 100.0*(ty == pv).mean()
-	MSE = ((ty - pv)**2).mean()
-	l = len(ty)
-	sumv = pv.sum()
-	sumy = ty.sum()
-	sumvy = (pv*ty).sum()
-	sumvv = (pv*pv).sum()
-	sumyy = (ty*ty).sum()
-	with scipy.errstate(all = 'raise'):
-		try:
-			SCC = ((l*sumvy-sumv*sumy)*(l*sumvy-sumv*sumy))/((l*sumvv-sumv*sumv)*(l*sumyy-sumy*sumy))
-		except:
-			SCC = float('nan')
-	return (float(ACC), float(MSE), float(SCC))
-
-def evaluations(ty, pv, useScipy = True):
-	"""
-	evaluations(ty, pv, useScipy) -> (ACC, MSE, SCC)
-	ty, pv: list, tuple or ndarray
-	useScipy: convert ty, pv to ndarray, and use scipy functions for the evaluation
-
-	Calculate accuracy, mean squared error and squared correlation coefficient
-	using the true values (ty) and predicted values (pv).
-	"""
-	if scipy != None and useScipy:
-		return evaluations_scipy(scipy.asarray(ty), scipy.asarray(pv))
-	if len(ty) != len(pv):
-		raise ValueError("len(ty) must be equal to len(pv)")
-	total_correct = total_error = 0
-	sumv = sumy = sumvv = sumyy = sumvy = 0
-	for v, y in zip(pv, ty):
-		if y == v:
-			total_correct += 1
-		total_error += (v-y)*(v-y)
-		sumv += v
-		sumy += y
-		sumvv += v*v
-		sumyy += y*y
-		sumvy += v*y
-	l = len(ty)
-	ACC = 100.0*total_correct/l
-	MSE = total_error/l
-	try:
-		SCC = ((l*sumvy-sumv*sumy)*(l*sumvy-sumv*sumy))/((l*sumvv-sumv*sumv)*(l*sumyy-sumy*sumy))
-	except:
-		SCC = float('nan')
-	return (float(ACC), float(MSE), float(SCC))
 
 def svm_train(arg1, arg2=None, arg3=None):
 	"""

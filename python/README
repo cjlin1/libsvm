@@ -131,6 +131,10 @@ in svmutil.py and the usage is the same as the LIBSVM MATLAB interface.
 >>> m = svm_train(prob, param)
 # For the format of precomputed kernel, please read LIBSVM README.
 
+# Apply data scaling in Scipy format
+>>> y, x = svm_read_problem('../heart_scale', return_scipy=True)
+>>> scale_param = csr_find_scale_param(x, lower=0)
+>>> scaled_x = csr_scale(x, scale_param)
 
 # Other utility functions
 >>> svm_save_model('heart_scale.model', m)
@@ -297,12 +301,14 @@ To use utility functions, type
     >>> from svmutil import *
 
 The above command loads
-    svm_train()        : train an SVM model
-    svm_predict()      : predict testing data
-    svm_read_problem() : read the data from a LIBSVM-format file.
-    svm_load_model()   : load a LIBSVM model.
-    svm_save_model()   : save model to a file.
-    evaluations()      : evaluate prediction results.
+    svm_train()            : train an SVM model
+    svm_predict()          : predict testing data
+    svm_read_problem()     : read the data from a LIBSVM-format file.
+    svm_load_model()       : load a LIBSVM model.
+    svm_save_model()       : save model to a file.
+    evaluations()          : evaluate prediction results.
+    csr_find_scale_param() : find scaling parameter for data in csr format.
+    csr_scale()            : apply data scaling to data in csr format.
 
 - Function: svm_train
 
@@ -390,7 +396,7 @@ The above command loads
     >>> m = svm_train(y, x, '-c 5')
     >>> p_labels, p_acc, p_vals = svm_predict(y, x, m)
 
-- Functions:  svm_read_problem/svm_load_model/svm_save_model
+- Functions: svm_read_problem/svm_load_model/svm_save_model
 
     See the usage by examples:
 
@@ -400,7 +406,7 @@ The above command loads
 
 - Function: evaluations
 
-    Calculate some evaluations using the true values (ty) and predicted
+    Calculate some evaluations using the true values (ty) and the predicted
     values (pv):
 
     >>> (ACC, MSE, SCC) = evaluations(ty, pv, useScipy)
@@ -417,6 +423,26 @@ The above command loads
 
     SCC: squared correlation coefficient.
 
+- Function: csr_find_scale_parameter/csr_scale
+
+    Scale data in csr format.
+
+    >>> param = csr_find_scale_param(x [, lower=l, upper=u])
+    >>> x = csr_scale(x, param)
+
+    x: a csr_matrix of data.
+
+    l: x scaling lower limit; default -1.
+
+    u: x scaling upper limit; default 1.
+
+	The scaling process is: x * diag(coef) + ones(l, 1) * offset'
+
+    param: a dictionary of scaling parameters, where param['coef'] = coef and param['offset'] = offset.
+
+    coef: a scipy array of scaling coefficients.
+
+    offset: a scipy array of scaling offsets.
 
 Additional Information
 ======================

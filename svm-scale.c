@@ -236,9 +236,13 @@ int main(int argc,char **argv)
 			{
 				for(i = next_index;i<idx;i++)
 					if(feature_min[i] != feature_max[i])
+					{
 						fprintf(stderr,
-							"WARNING: feature index %d appeared in file %s was not seen in the scaling factor file %s.\n",
+							"WARNING: feature index %d appeared in file %s was not seen in the scaling factor file %s. The feature is scaled to 0.\n",
 							i, argv[argc-1], restore_filename);
+						feature_min[i] = 0;
+						feature_max[i] = 0;
+					}
 
 				feature_min[idx] = fmin;
 				feature_max[idx] = fmax;
@@ -248,9 +252,13 @@ int main(int argc,char **argv)
 
 			for(i=next_index;i<=max_index;i++)
 				if(feature_min[i] != feature_max[i])
+				{
 					fprintf(stderr,
-						"WARNING: feature index %d appeared in file %s was not seen in the scaling factor file %s.\n",
+						"WARNING: feature index %d appeared in file %s was not seen in the scaling factor file %s. The feature is scaled to 0.\n",
 						i, argv[argc-1], restore_filename);
+					feature_min[i] = 0;
+					feature_max[i] = 0;
+				}
 		}
 		fclose(fp_restore);
 	}

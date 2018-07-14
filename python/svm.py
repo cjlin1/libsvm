@@ -152,6 +152,9 @@ def csr_to_problem_nojit(l, x_val, x_ind, x_rowptr, prob_val, prob_ind, prob_row
 		prob_val[prob_slice] = x_val[x_slice]
 
 def csr_to_problem(x, prob, isKernel):
+	if not x.has_sorted_indices:
+		x.sort_indices()
+
 	# Extra space for termination node and (possibly) bias term
 	x_space = prob.x_space = scipy.empty((x.nnz+x.shape[0]), dtype=svm_node)
 	prob.rowptr = x.indptr.copy()
