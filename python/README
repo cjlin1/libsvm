@@ -227,10 +227,10 @@ LIBSVM shared library:
 
     y: a Python list/tuple/ndarray of l labels (type must be int/double).
 
-	x: 1. a list/tuple of l training instances. Feature vector of
-	      each training instance is a list/tuple or dictionary.
+    x: 1. a list/tuple of l training instances. Feature vector of
+          each training instance is a list/tuple or dictionary.
 
-	   2. an l * n numpy ndarray or scipy spmatrix (n: number of features).
+       2. an l * n numpy ndarray or scipy spmatrix (n: number of features).
 
     Note that if your x contains sparse data (i.e., dictionary), the internal
     ctypes data format is still sparse.
@@ -320,10 +320,10 @@ The above command loads
 
     y: a list/tuple/ndarray of l training labels (type must be int/double).
 
-	x: 1. a list/tuple of l training instances. Feature vector of
-	      each training instance is a list/tuple or dictionary.
+    x: 1. a list/tuple of l training instances. Feature vector of
+          each training instance is a list/tuple or dictionary.
 
-	   2. an l * n numpy ndarray or scipy spmatrix (n: number of features).
+       2. an l * n numpy ndarray or scipy spmatrix (n: number of features).
 
     training_options: a string in the same form as that for LIBSVM command
                       mode.
@@ -361,13 +361,13 @@ The above command loads
     >>> p_labs, p_acc, p_vals = svm_predict(y, x, model [,'predicting_options'])
 
     y: a list/tuple/ndarray of l true labels (type must be int/double).
-	   It is used for calculating the accuracy. Use [] if true labels are
+       It is used for calculating the accuracy. Use [] if true labels are
        unavailable.
 
-	x: 1. a list/tuple of l training instances. Feature vector of
-	      each training instance is a list/tuple or dictionary.
+    x: 1. a list/tuple of l training instances. Feature vector of
+          each training instance is a list/tuple or dictionary.
 
-	   2. an l * n numpy ndarray or scipy spmatrix (n: number of features).
+       2. an l * n numpy ndarray or scipy spmatrix (n: number of features).
 
     predicting_options: a string of predicting options in the same format as
                         that of LIBSVM.
@@ -436,7 +436,7 @@ The above command loads
 
     u: x scaling upper limit; default 1.
 
-	The scaling process is: x * diag(coef) + ones(l, 1) * offset'
+    The scaling process is: x * diag(coef) + ones(l, 1) * offset'
 
     param: a dictionary of scaling parameters, where param['coef'] = coef and param['offset'] = offset.
 
