@@ -42,8 +42,9 @@ More information about parameter selection can be found in
 Installation and Data Format
 ============================
 
-On Unix systems, type `make' to build the `svm-train' and `svm-predict'
-programs. Run them without arguments to show the usages of them.
+On Unix systems, type `make' to build the `svm-train', `svm-predict',
+and `svm-scale' programs. Run them without arguments to show the
+usages of them.
 
 On other systems, consult `Makefile' to build them (e.g., see
 'Building Windows binaries' in this file) or use the pre-built
