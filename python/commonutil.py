@@ -164,3 +164,5 @@ def csr_scale(x, scale_param):
 			"       > new      #nonzeros %d\n" % scaled_x.getnnz() +
 			"If feature values are non-negative and sparse, get scale_param by setting lower=0 rather than the default lower=-1.",
 			file=sys.stderr)
+
+	return scaled_x
