@@ -25,6 +25,7 @@ def svm_read_problem(data_file_name, return_scipy=False):
 	prob_x = []
 	row_ptr = [0]
 	col_idx = []
+	indx_start = 1
 	for i, line in enumerate(open(data_file_name)):
 		line = line.split(None, 1)
 		# In case an instance with all zero features
@@ -35,9 +36,11 @@ def svm_read_problem(data_file_name, return_scipy=False):
 			nz = 0
 			for e in features.split():
 				ind, val = e.split(":")
+				if ind == '0':
+					indx_start = 0
 				val = float(val)
 				if val != 0:
-					col_idx += [int(ind)-1]
+					col_idx += [int(ind)-indx_start]
 					prob_x += [val]
 					nz += 1
 			row_ptr += [row_ptr[-1]+nz]
