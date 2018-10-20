@@ -461,7 +461,7 @@ class Solver {
 		int counter = Math.min(l,1000)+1;
 		int[] working_set = new int[2];
 
-		while(iter < max_iter)
+		while(iter < max_iter && !Thread.currentThread().isInterrupted())
 		{
 			// show progress and do shrinking
 
