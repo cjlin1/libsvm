@@ -9,7 +9,7 @@
 <a name="_TOP"><b><h1><a
 href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a>  FAQ </h1></b></a>
 <b>last modified : </b>
-Tue, 20 Oct 2015 13:43:40 GMT
+Sun,  7 Jan 2018 11:54:08 GMT
 <class="categories">
 <li><a
 href="#_TOP">All Questions</a>(84)</li>
@@ -1795,6 +1795,10 @@ of [0,1]:
 <pre>
 (data - repmat(min(data,[],1),size(data,1),1))*spdiags(1./(max(data,[],1)-min(data,[],1))',0,size(data,2),size(data,2))
 </pre>
+This setting is capable to handle large-scale sparse sets (with non-negative
+feature values) because repmat() won't generate a large dense matrix.
+
+
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>

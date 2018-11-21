@@ -5,8 +5,16 @@ from ctypes.util import find_library
 from os import path
 import sys
 
-if sys.version_info[0] >= 3:
-	xrange = range
+try:
+	import scipy
+	from scipy import sparse
+except:
+	scipy = None
+	sparse = None
+
+if sys.version_info[0] < 3:
+	range = xrange
+	from itertools import izip as zip
 
 __all__ = ['libsvm', 'svm_problem', 'svm_parameter',
            'toPyModel', 'gen_svm_nodearray', 'print_null', 'svm_node', 'C_SVC',
@@ -57,59 +65,162 @@ class svm_node(Structure):
 	_types = [c_int, c_double]
 	_fields_ = genFields(_names, _types)
 
+	def __init__(self, index=-1, value=0):
+		self.index, self.value = index, value
+
 	def __str__(self):
 		return '%d:%g' % (self.index, self.value)
 
-def gen_svm_nodearray(xi, feature_max=None, isKernel=None):
-	if isinstance(xi, dict):
-		index_range = xi.keys()
-	elif isinstance(xi, (list, tuple)):
-		if not isKernel:
-			xi = [0] + xi  # idx should start from 1
-		index_range = range(len(xi))
-	else:
-		raise TypeError('xi should be a dictionary, list or tuple')
-
+def gen_svm_nodearray(xi, feature_max=None, isKernel=False):
 	if feature_max:
 		assert(isinstance(feature_max, int))
-		index_range = filter(lambda j: j <= feature_max, index_range)
-	if not isKernel:
-		index_range = filter(lambda j:xi[j] != 0, index_range)
 
-	index_range = sorted(index_range)
-	ret = (svm_node * (len(index_range)+1))()
+	xi_shift = 0 # ensure correct indices of xi
+	if scipy and isinstance(xi, tuple) and len(xi) == 2\
+			and isinstance(xi[0], scipy.ndarray) and isinstance(xi[1], scipy.ndarray): # for a sparse vector
+		if not isKernel:
+			index_range = xi[0] + 1 # index starts from 1
+		else:
+			index_range = xi[0] # index starts from 0 for precomputed kernel
+		if feature_max:
+			index_range = index_range[scipy.where(index_range <= feature_max)]
+	elif scipy and isinstance(xi, scipy.ndarray):
+		if not isKernel:
+			xi_shift = 1
+			index_range = xi.nonzero()[0] + 1 # index starts from 1
+		else:
+			index_range = scipy.arange(0, len(xi)) # index starts from 0 for precomputed kernel
+		if feature_max:
+			index_range = index_range[scipy.where(index_range <= feature_max)]
+	elif isinstance(xi, (dict, list, tuple)):
+		if isinstance(xi, dict):
+			index_range = xi.keys()
+		elif isinstance(xi, (list, tuple)):
+			if not isKernel:
+				xi_shift = 1
+				index_range = range(1, len(xi) + 1) # index starts from 1
+			else:
+				index_range = range(0, len(xi)) # index starts from 0 for precomputed kernel
+
+		if feature_max:
+			index_range = filter(lambda j: j <= feature_max, index_range)
+		if not isKernel:
+			index_range = filter(lambda j:xi[j-xi_shift] != 0, index_range)
+
+		index_range = sorted(index_range)
+	else:
+		raise TypeError('xi should be a dictionary, list, tuple, 1-d numpy array, or tuple of (index, data)')
+
+	ret = (svm_node*(len(index_range)+1))()
 	ret[-1].index = -1
-	for idx, j in enumerate(index_range):
-		ret[idx].index = j
-		ret[idx].value = xi[j]
+
+	if scipy and isinstance(xi, tuple) and len(xi) == 2\
+			and isinstance(xi[0], scipy.ndarray) and isinstance(xi[1], scipy.ndarray): # for a sparse vector
+		for idx, j in enumerate(index_range):
+			ret[idx].index = j
+			ret[idx].value = (xi[1])[idx]
+	else:
+		for idx, j in enumerate(index_range):
+			ret[idx].index = j
+			ret[idx].value = xi[j - xi_shift]
+
 	max_idx = 0
-	if index_range:
+	if len(index_range) > 0:
 		max_idx = index_range[-1]
 	return ret, max_idx
+
+try:
+	from numba import jit
+	jit_enabled = True
+except:
+	jit = lambda x: x
+	jit_enabled = False
+
+@jit
+def csr_to_problem_jit(l, x_val, x_ind, x_rowptr, prob_val, prob_ind, prob_rowptr, indx_start):
+	for i in range(l):
+		b1,e1 = x_rowptr[i], x_rowptr[i+1]
+		b2,e2 = prob_rowptr[i], prob_rowptr[i+1]-1
+		for j in range(b1,e1):
+			prob_ind[j-b1+b2] = x_ind[j]+indx_start
+			prob_val[j-b1+b2] = x_val[j]
+def csr_to_problem_nojit(l, x_val, x_ind, x_rowptr, prob_val, prob_ind, prob_rowptr, indx_start):
+	for i in range(l):
+		x_slice = slice(x_rowptr[i], x_rowptr[i+1])
+		prob_slice = slice(prob_rowptr[i], prob_rowptr[i+1]-1)
+		prob_ind[prob_slice] = x_ind[x_slice]+indx_start
+		prob_val[prob_slice] = x_val[x_slice]
+
+def csr_to_problem(x, prob, isKernel):
+	if not x.has_sorted_indices:
+		x.sort_indices()
+
+	# Extra space for termination node and (possibly) bias term
+	x_space = prob.x_space = scipy.empty((x.nnz+x.shape[0]), dtype=svm_node)
+	prob.rowptr = x.indptr.copy()
+	prob.rowptr[1:] += scipy.arange(1,x.shape[0]+1)
+	prob_ind = x_space["index"]
+	prob_val = x_space["value"]
+	prob_ind[:] = -1
+	if not isKernel:
+		indx_start = 1 # index starts from 1
+	else:
+		indx_start = 0 # index starts from 0 for precomputed kernel
+	if jit_enabled:
+		csr_to_problem_jit(x.shape[0], x.data, x.indices, x.indptr, prob_val, prob_ind, prob.rowptr, indx_start)
+	else:
+		csr_to_problem_nojit(x.shape[0], x.data, x.indices, x.indptr, prob_val, prob_ind, prob.rowptr, indx_start)
 
 class svm_problem(Structure):
 	_names = ["l", "y", "x"]
 	_types = [c_int, POINTER(c_double), POINTER(POINTER(svm_node))]
 	_fields_ = genFields(_names, _types)
 
-	def __init__(self, y, x, isKernel=None):
-		if len(y) != len(x):
-			raise ValueError("len(y) != len(x)")
+	def __init__(self, y, x, isKernel=False):
+		if (not isinstance(y, (list, tuple))) and (not (scipy and isinstance(y, scipy.ndarray))):
+			raise TypeError("type of y: {0} is not supported!".format(type(y)))
+
+		if isinstance(x, (list, tuple)):
+			if len(y) != len(x):
+				raise ValueError("len(y) != len(x)")
+		elif scipy != None and isinstance(x, (scipy.ndarray, sparse.spmatrix)):
+			if len(y) != x.shape[0]:
+				raise ValueError("len(y) != len(x)")
+			if isinstance(x, scipy.ndarray):
+				x = scipy.ascontiguousarray(x) # enforce row-major
+			if isinstance(x, sparse.spmatrix):
+				x = x.tocsr()
+				pass
+		else:
+			raise TypeError("type of x: {0} is not supported!".format(type(x)))
 		self.l = l = len(y)
 
 		max_idx = 0
 		x_space = self.x_space = []
-		for i, xi in enumerate(x):
-			tmp_xi, tmp_idx = gen_svm_nodearray(xi,isKernel=isKernel)
-			x_space += [tmp_xi]
-			max_idx = max(max_idx, tmp_idx)
+		if scipy != None and isinstance(x, sparse.csr_matrix):
+			csr_to_problem(x, self, isKernel)
+			max_idx = x.shape[1]
+		else:
+			for i, xi in enumerate(x):
+				tmp_xi, tmp_idx = gen_svm_nodearray(xi,isKernel=isKernel)
+				x_space += [tmp_xi]
+				max_idx = max(max_idx, tmp_idx)
 		self.n = max_idx
 
 		self.y = (c_double * l)()
-		for i, yi in enumerate(y): self.y[i] = yi
+		if scipy != None and isinstance(y, scipy.ndarray):
+			scipy.ctypeslib.as_array(self.y, (self.l,))[:] = y
+		else:
+			for i, yi in enumerate(y): self.y[i] = yi
 
 		self.x = (POINTER(svm_node) * l)()
-		for i, xi in enumerate(self.x_space): self.x[i] = xi
+		if scipy != None and isinstance(x, sparse.csr_matrix):
+			base = addressof(self.x_space.ctypes.data_as(POINTER(svm_node))[0])
+			x_ptr = cast(self.x, POINTER(c_uint64))
+			x_ptr = scipy.ctypeslib.as_array(x_ptr,(self.l,))
+			x_ptr[:] = self.rowptr[:-1]*sizeof(svm_node)+base
+		else:
+			for i, xi in enumerate(self.x_space): self.x[i] = xi
 
 class svm_parameter(Structure):
 	_names = ["svm_type", "kernel_type", "degree", "gamma", "coef0",
@@ -244,7 +355,7 @@ class svm_model(Structure):
 	def __del__(self):
 		# free memory created by C to avoid memory leak
 		if hasattr(self, '__createfrom__') and self.__createfrom__ == 'C':
-			libsvm.svm_free_and_destroy_model(pointer(self))
+			libsvm.svm_free_and_destroy_model(pointer(pointer(self)))
 
 	def get_svm_type(self):
 		return libsvm.svm_get_svm_type(self)
@@ -274,8 +385,8 @@ class svm_model(Structure):
 		return (libsvm.svm_check_probability_model(self) == 1)
 
 	def get_sv_coef(self):
-		return [tuple(self.sv_coef[j][i] for j in xrange(self.nr_class - 1))
-				for i in xrange(self.l)]
+		return [tuple(self.sv_coef[j][i] for j in range(self.nr_class - 1))
+				for i in range(self.l)]
 
 	def get_SV(self):
 		result = []

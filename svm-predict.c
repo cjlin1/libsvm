@@ -63,7 +63,7 @@ void predict(FILE *input, FILE *output)
 			int *labels=(int *) malloc(nr_class*sizeof(int));
 			svm_get_labels(model,labels);
 			prob_estimates = (double *) malloc(nr_class*sizeof(double));
-			fprintf(output,"labels");		
+			fprintf(output,"labels");
 			for(j=0;j<nr_class;j++)
 				fprintf(output," %d",labels[j]);
 			fprintf(output,"\n");
@@ -128,7 +128,7 @@ void predict(FILE *input, FILE *output)
 		else
 		{
 			predict_label = svm_predict(model,x);
-			fprintf(output,"%g\n",predict_label);
+			fprintf(output,"%.17g\n",predict_label);
 		}
 
 		if(predict_label == target_label)

@@ -125,19 +125,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	return msg.wParam;
 }
 
-int getfilename( HWND hWnd , char *filename, int len, int save) 
-{ 	
-	OPENFILENAME OpenFileName; 	
+int getfilename( HWND hWnd , char *filename, int len, int save)
+{
+	OPENFILENAME OpenFileName;
 	memset(&OpenFileName,0,sizeof(OpenFileName));
 	filename[0]='\0';
- 	
-	OpenFileName.lStructSize       = sizeof(OPENFILENAME); 
-	OpenFileName.hwndOwner         = hWnd; 	
-	OpenFileName.lpstrFile         = filename; 
-	OpenFileName.nMaxFile          = len; 
+
+	OpenFileName.lStructSize       = sizeof(OPENFILENAME);
+	OpenFileName.hwndOwner         = hWnd;
+	OpenFileName.lpstrFile         = filename;
+	OpenFileName.nMaxFile          = len;
 	OpenFileName.Flags             = 0;
- 
-	return save?GetSaveFileName(&OpenFileName):GetOpenFileName(&OpenFileName);		
+
+	return save?GetSaveFileName(&OpenFileName):GetOpenFileName(&OpenFileName);
 }
 
 void clear_all()
@@ -178,7 +178,7 @@ void button_run_clicked()
 
 	svm_parameter param;
 	int i,j;
-	
+
 	// default values
 	param.svm_type = C_SVC;
 	param.kernel_type = RBF;
@@ -256,7 +256,7 @@ void button_run_clicked()
 				break;
 		}
 	}
-	
+
 	// build problem
 	svm_problem prob;
 
@@ -295,21 +295,21 @@ void button_run_clicked()
 			x[0].value = (double) i / XLEN;
 			j[i] = (int)(YLEN*svm_predict(model, x));
 		}
-		
+
 		DrawLine(buffer_dc,0,0,0,YLEN,colors[0]);
 		DrawLine(window_dc,0,0,0,YLEN,colors[0]);
-		
+
 		int p = (int)(param.p * YLEN);
 		for(int i=1; i < XLEN; i++)
 		{
 			DrawLine(buffer_dc,i,0,i,YLEN,colors[0]);
 			DrawLine(window_dc,i,0,i,YLEN,colors[0]);
-			
+
 			DrawLine(buffer_dc,i-1,j[i-1],i,j[i],colors[5]);
 			DrawLine(window_dc,i-1,j[i-1],i,j[i],colors[5]);
 
 			if(param.svm_type == EPSILON_SVR)
-			{			
+			{
 				DrawLine(buffer_dc,i-1,j[i-1]+p,i,j[i]+p,colors[2]);
 				DrawLine(window_dc,i-1,j[i-1]+p,i,j[i]+p,colors[2]);
 
@@ -317,7 +317,7 @@ void button_run_clicked()
 				DrawLine(window_dc,i-1,j[i-1]-p,i,j[i]-p,colors[2]);
 			}
 		}
-		
+
 		svm_free_and_destroy_model(&model);
 		delete[] j;
 		delete[] x_space;
@@ -403,7 +403,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 				button_run_clicked();
 				break;
 			case ID_BUTTON_CLEAR:
-				clear_all();				
+				clear_all();
 				break;
 			case ID_BUTTON_SAVE:
 				{
@@ -434,13 +434,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 							}
 							fclose(fp);
 						}
-					}					
+					}
 				}
 				break;
 			case ID_BUTTON_LOAD:
 				{
 					char filename[1024];
-					if(getfilename(hwnd,filename,1024,0))					
+					if(getfilename(hwnd,filename,1024,0))
 					{
 						FILE *fp = fopen(filename,"r");
 						if(fp)

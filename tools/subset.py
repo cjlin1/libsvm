@@ -28,7 +28,7 @@ def process_options(argv):
 		exit_with_help(argv)
 
 	# default method is stratified selection
-	method = 0  
+	method = 0
 	subset_file = sys.stdout
 	rest_file = None
 
@@ -71,7 +71,7 @@ def stratified_selection(dataset, subset_size):
 	# some rare classes may not be selected
 	for label in sorted(label_linenums, key=lambda x: len(label_linenums[x])):
 		linenums = label_linenums[label]
-		label_size = len(linenums) 
+		label_size = len(linenums)
 		# at least one instance per class
 		s = int(min(remaining, max(1, math.ceil(label_size*(float(subset_size)/l)))))
 		if s == 0:
@@ -88,7 +88,7 @@ Please use -s 1.
 
 def main(argv=sys.argv):
 	dataset, subset_size, method, subset_file, rest_file = process_options(argv)
-	#uncomment the following line to fix the random seed 
+	#uncomment the following line to fix the random seed
 	#random.seed(0)
 	selected_lines = []
 
@@ -103,14 +103,14 @@ def main(argv=sys.argv):
 	for i in xrange(len(selected_lines)):
 		for cnt in xrange(selected_lines[i]-prev_selected_linenum-1):
 			line = dataset.readline()
-			if rest_file: 
+			if rest_file:
 				rest_file.write(line)
 		subset_file.write(dataset.readline())
 		prev_selected_linenum = selected_lines[i]
 	subset_file.close()
 
 	if rest_file:
-		for line in dataset: 
+		for line in dataset:
 			rest_file.write(line)
 		rest_file.close()
 	dataset.close()

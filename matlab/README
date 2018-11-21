@@ -24,9 +24,9 @@ the usage and the way of specifying parameters are the same as that of LIBSVM.
 Installation
 ============
 
-On Windows systems, pre-built binary files are already in the 
-directory '..\windows', so no need to conduct installation. Now we 
-provide binary files only for 64bit MATLAB on Windows. If you would 
+On Windows systems, pre-built binary files are already in the
+directory '..\windows', so no need to conduct installation. Now we
+provide binary files only for 64bit MATLAB on Windows. If you would
 like to re-build the package, please rely on the following steps.
 
 We recommend using make.m on both MATLAB and OCTAVE. Just type 'make'
@@ -60,8 +60,8 @@ Example:
 	matlab>> make
 
 On Unix systems, if neither make.m nor 'mex -setup' works, please use
-Makefile and type 'make' in a command window. Note that we assume 
-your MATLAB is installed in '/usr/local/matlab'. If not, please change 
+Makefile and type 'make' in a command window. Note that we assume
+your MATLAB is installed in '/usr/local/matlab'. If not, please change
 MATLABDIR in Makefile.
 
 Example:
@@ -142,7 +142,7 @@ accuracy, is a vector including accuracy (for classification), mean
 squared error, and squared correlation coefficient (for regression).
 The third is a matrix containing decision values or probability
 estimates (if '-b 1' is specified). If k is the number of classes
-in training data, for decision values, each row includes results of 
+in training data, for decision values, each row includes results of
 predicting k(k-1)/2 binary-class SVMs. For classification, k = 1 is a
 special case. Decision value +1 is returned for each testing instance,
 instead of an empty vector. For probabilities, each row contains k values
@@ -153,20 +153,20 @@ in the model structure.
 Other Utilities
 ===============
 
-A matlab function libsvmread reads files in LIBSVM format: 
+A matlab function libsvmread reads files in LIBSVM format:
 
-[label_vector, instance_matrix] = libsvmread('data.txt'); 
+[label_vector, instance_matrix] = libsvmread('data.txt');
 
 Two outputs are labels and instances, which can then be used as inputs
-of svmtrain or svmpredict. 
+of svmtrain or svmpredict.
 
 A matlab function libsvmwrite writes Matlab matrix to a file in LIBSVM format:
 
 libsvmwrite('data.txt', label_vector, instance_matrix)
 
 The instance_matrix must be a sparse matrix. (type must be double)
-For 32bit and 64bit MATLAB on Windows, pre-built binary files are ready 
-in the directory `..\windows', but in future releases, we will only 
+For 32bit and 64bit MATLAB on Windows, pre-built binary files are ready
+in the directory `..\windows', but in future releases, we will only
 include 64bit MATLAB binary files.
 
 These codes are prepared by Rong-En Fan and Kai-Wei Chang from National

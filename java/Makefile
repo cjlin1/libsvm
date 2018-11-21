@@ -5,9 +5,10 @@ FILES = libsvm/svm.class libsvm/svm_model.class libsvm/svm_node.class \
 		svm_train.class svm_predict.class svm_toy.class svm_scale.class
 
 #JAVAC = jikes
-JAVAC_FLAGS = -target 1.5 -source 1.5
+JAVAC_FLAGS = -target 1.7 -source 1.7
 JAVAC = javac
 # JAVAC_FLAGS =
+export CLASSPATH := .:$(CLASSPATH)
 
 all: $(FILES)
 	jar cvf libsvm.jar *.class libsvm/*.class

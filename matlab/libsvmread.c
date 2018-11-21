@@ -9,8 +9,8 @@
 #ifdef MX_API_VER
 #if MX_API_VER < 0x07030000
 typedef int mwIndex;
-#endif 
-#endif 
+#endif
+#endif
 #ifndef max
 #define max(x,y) (((x)>(y))?(x):(y))
 #endif
@@ -38,7 +38,7 @@ static int max_line_len;
 static char* readline(FILE *input)
 {
 	int len;
-	
+
 	if(fgets(line,max_line_len,input) == NULL)
 		return NULL;
 

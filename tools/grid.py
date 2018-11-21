@@ -42,7 +42,7 @@ class GridOption:
 			options = options.split()
 		i = 0
 		pass_through_options = []
-		
+
 		while i < len(options):
 			if options[i] == '-log2c':
 				i = i + 1
@@ -68,7 +68,7 @@ class GridOption:
 				i = i + 1
 				if options[i] == 'null':
 					self.gnuplot_pathname = None
-				else:	
+				else:
 					self.gnuplot_pathname = options[i]
 			elif options[i] == '-out':
 				i = i + 1
@@ -142,7 +142,7 @@ def redraw(db,best_param,gnuplot,options,tofile=False):
 				  " at screen 0.5,0.8 center\n".format(2**best_log2c, 2**best_log2g).encode())
 	gnuplot.write(b"set key at screen 0.9,0.9\n")
 	gnuplot.write(b"splot \"-\" with lines\n")
-	
+
 	db.sort(key = lambda x:(x[0], -x[1]))
 
 	prevc = db[0][0]
@@ -157,7 +157,7 @@ def redraw(db,best_param,gnuplot,options,tofile=False):
 
 
 def calculate_jobs(options):
-	
+
 	def range_f(begin,end,step):
 		# like range, but works on non-integer too
 		seq = []
@@ -167,31 +167,31 @@ def calculate_jobs(options):
 			seq.append(begin)
 			begin = begin + step
 		return seq
-	
+
 	def permute_sequence(seq):
 		n = len(seq)
 		if n <= 1: return seq
-	
+
 		mid = int(n/2)
 		left = permute_sequence(seq[:mid])
 		right = permute_sequence(seq[mid+1:])
-	
+
 		ret = [seq[mid]]
 		while left or right:
 			if left: ret.append(left.pop(0))
 			if right: ret.append(right.pop(0))
-			
-		return ret	
 
-	
+		return ret
+
+
 	c_seq = permute_sequence(range_f(options.c_begin,options.c_end,options.c_step))
 	g_seq = permute_sequence(range_f(options.g_begin,options.g_end,options.g_step))
 
 	if not options.grid_with_c:
 		c_seq = [None]
 	if not options.grid_with_g:
-		g_seq = [None] 
-	
+		g_seq = [None]
+
 	nr_c = float(len(c_seq))
 	nr_g = float(len(g_seq))
 	i, j = 0, 0
@@ -214,30 +214,30 @@ def calculate_jobs(options):
 			jobs.append(line)
 
 	resumed_jobs = {}
-	
+
 	if options.resume_pathname is None:
 		return jobs, resumed_jobs
 
 	for line in open(options.resume_pathname, 'r'):
 		line = line.strip()
 		rst = re.findall(r'rate=([0-9.]+)',line)
-		if not rst: 
+		if not rst:
 			continue
 		rate = float(rst[0])
 
-		c, g = None, None 
+		c, g = None, None
 		rst = re.findall(r'log2c=([0-9.-]+)',line)
-		if rst: 
+		if rst:
 			c = float(rst[0])
 		rst = re.findall(r'log2g=([0-9.-]+)',line)
-		if rst: 
+		if rst:
 			g = float(rst[0])
 
 		resumed_jobs[(c,g)] = rate
 
 	return jobs, resumed_jobs
 
-	
+
 class WorkerStopToken:  # used to notify the worker to stop or if a worker is dead
 	pass
 
@@ -248,7 +248,7 @@ class Worker(Thread):
 		self.job_queue = job_queue
 		self.result_queue = result_queue
 		self.options = options
-		
+
 	def run(self):
 		while True:
 			(cexp,gexp) = self.job_queue.get()
@@ -266,9 +266,9 @@ class Worker(Thread):
 				if rate is None: raise RuntimeError('get no rate')
 			except:
 				# we failed, let others do that and we just quit
-			
+
 				traceback.print_exception(sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
-				
+
 				self.job_queue.put((cexp,gexp))
 				sys.stderr.write('worker {0} quit.\n'.format(self.name))
 				break
@@ -278,14 +278,14 @@ class Worker(Thread):
 	def get_cmd(self,c,g):
 		options=self.options
 		cmdline = '"' + options.svmtrain_pathname + '"'
-		if options.grid_with_c: 
+		if options.grid_with_c:
 			cmdline += ' -c {0} '.format(c)
-		if options.grid_with_g: 
+		if options.grid_with_g:
 			cmdline += ' -g {0} '.format(g)
 		cmdline += ' -v {0} {1} {2} '.format\
 			(options.fold,options.pass_through_string,options.dataset_pathname)
 		return cmdline
-		
+
 class LocalWorker(Worker):
 	def run_one(self,c,g):
 		cmdline = self.get_cmd(c,g)
@@ -312,7 +312,7 @@ class TelnetWorker(Worker):
 		Worker.__init__(self,name,job_queue,result_queue,options)
 		self.host = host
 		self.username = username
-		self.password = password		
+		self.password = password
 	def run(self):
 		import telnetlib
 		self.tn = tn = telnetlib.Telnet(self.host)
@@ -323,11 +323,11 @@ class TelnetWorker(Worker):
 
 		# XXX: how to know whether login is successful?
 		tn.read_until(self.username)
-		# 
+		#
 		print('login ok', self.host)
 		tn.write('cd '+os.getcwd()+'\n')
 		Worker.run(self)
-		tn.write('exit\n')			   
+		tn.write('exit\n')
 	def run_one(self,c,g):
 		cmdline = self.get_cmd(c,g)
 		result = self.tn.write(cmdline+'\n')
@@ -335,9 +335,9 @@ class TelnetWorker(Worker):
 		for line in output.split('\n'):
 			if str(line).find('Cross') != -1:
 				return float(line.split()[-1][0:-1])
-			
+
 def find_parameters(dataset_pathname, options=''):
-	
+
 	def update_param(c,g,rate,best_c,best_g,best_rate,worker,resumed):
 		if (rate > best_rate) or (rate==best_rate and g==best_g and c<best_c):
 			best_rate,best_c,best_g = rate,c,g
@@ -356,16 +356,16 @@ def find_parameters(dataset_pathname, options=''):
 			output_str += 'rate={0}\n'.format(rate)
 			result_file.write(output_str)
 			result_file.flush()
-		
+
 		return best_c,best_g,best_rate
-		
+
 	options = GridOption(dataset_pathname, options);
 
 	if options.gnuplot_pathname:
 		gnuplot = Popen(options.gnuplot_pathname,stdin = PIPE,stdout=PIPE,stderr=PIPE).stdin
 	else:
 		gnuplot = None
-		
+
 	# put jobs in queue
 
 	jobs,resumed_jobs = calculate_jobs(options)
@@ -386,7 +386,7 @@ def find_parameters(dataset_pathname, options=''):
 	# use FIFO, the job will be put
 	# into the end of the queue, and the graph
 	# will only be updated in the end
- 
+
 	job_queue._put = job_queue.queue.appendleft
 
 	# fire telnet workers
@@ -426,7 +426,7 @@ def find_parameters(dataset_pathname, options=''):
 
 	db = []
 	best_rate = -1
-	best_c,best_g = None,None  
+	best_c,best_g = None,None
 
 	for (c,g) in resumed_jobs:
 		rate = resumed_jobs[(c,g)]
@@ -477,7 +477,7 @@ grid_options :
 -svmtrain pathname : set svm executable path and name
 -gnuplot {pathname | "null"} :
     pathname -- set gnuplot executable path and name
-    "null"   -- do not plot 
+    "null"   -- do not plot
 -out {pathname | "null"} : (default dataset.out)
     pathname -- set output file path and name
     "null"   -- do not output file
@@ -487,7 +487,7 @@ grid_options :
 
 svm_options : additional options for svm-train""")
 		sys.exit(1)
-	
+
 	if len(sys.argv) < 2:
 		exit_with_help()
 	dataset_pathname = sys.argv[-1]

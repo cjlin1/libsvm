@@ -289,12 +289,12 @@ public class svm_toy extends Applet {
 				x[0].value = (double) i / XLEN;
 				j[i] = (int)(YLEN*svm.svm_predict(model, x));
 			}
-			
+
 			buffer_gc.setColor(colors[0]);
 			buffer_gc.drawLine(0,0,0,YLEN-1);
 			window_gc.setColor(colors[0]);
 			window_gc.drawLine(0,0,0,YLEN-1);
-			
+
 			int p = (int)(param.p * YLEN);
 			for(int i=1;i<XLEN;i++)
 			{
@@ -441,7 +441,7 @@ public class svm_toy extends Applet {
 		} catch (IOException e) { System.err.print(e); }
 		draw_all_points();
 	}
-	
+
 	protected void processMouseEvent(MouseEvent e)
 	{
 		if(e.getID() == MouseEvent.MOUSE_PRESSED)

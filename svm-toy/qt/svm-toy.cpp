@@ -1,4 +1,4 @@
-#include <QtGui>
+#include <QtWidgets>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -73,9 +73,9 @@ private:
 	void draw_all_points()
 	{
 		for(list<point>::iterator p = point_list.begin(); p != point_list.end();p++)
-			draw_point(*p);	
+			draw_point(*p);
 	}
-private slots: 
+private slots:
 	void button_change_icon_clicked()
 	{
 		++current_value;
@@ -88,7 +88,7 @@ private slots:
 		if(point_list.empty()) return;
 
 		svm_parameter param;
-		int i,j;	
+		int i,j;
 
 		// default values
 		param.svm_type = C_SVC;
@@ -108,7 +108,7 @@ private slots:
 		param.weight = NULL;
 
 		// parse options
-		const char *p = input_line.text().toAscii().constData();
+		const char *p = input_line.text().toLatin1().constData();
 
 		while (1) {
 			while (*p && *p != '-')
@@ -165,7 +165,7 @@ private slots:
 					break;
 			}
 		}
-	
+
 		// build problem
 		svm_problem prob;
 
@@ -204,7 +204,7 @@ private slots:
 				x[0].value = (double) i / XLEN;
 				j[i] = (int)(YLEN*svm_predict(model, x));
 			}
-			
+
 			buffer_painter.setPen(colors[0]);
 			buffer_painter.drawLine(0,0,0,YLEN-1);
 
@@ -213,10 +213,10 @@ private slots:
 			{
 				buffer_painter.setPen(colors[0]);
 				buffer_painter.drawLine(i,0,i,YLEN-1);
-			
+
 				buffer_painter.setPen(colors[5]);
 				buffer_painter.drawLine(i-1,j[i-1],i,j[i]);
-				
+
 				if(param.svm_type == EPSILON_SVR)
 				{
 					buffer_painter.setPen(colors[2]);
@@ -286,14 +286,14 @@ private slots:
 		QString filename = QFileDialog::getSaveFileName();
 		if(!filename.isNull())
 		{
-			FILE *fp = fopen(filename.toAscii().constData(),"w");
-			
-			const char *p = input_line.text().toAscii().constData();
+			FILE *fp = fopen(filename.toLatin1().constData(),"w");
+
+			const char *p = input_line.text().toLatin1().constData();
 			const char* svm_type_str = strstr(p, "-s ");
 			int svm_type = C_SVC;
 			if(svm_type_str != NULL)
 				sscanf(svm_type_str, "-s %d", &svm_type);
-		
+
 			if(fp)
 			{
 				if(svm_type == EPSILON_SVR || svm_type == NU_SVR)
@@ -315,7 +315,7 @@ private slots:
 		QString filename = QFileDialog::getOpenFileName();
 		if(!filename.isNull())
 		{
-			FILE *fp = fopen(filename.toAscii().constData(),"r");
+			FILE *fp = fopen(filename.toLatin1().constData(),"r");
 			if(fp)
 			{
 				clear_all();
@@ -339,9 +339,9 @@ private slots:
 				}
 				fclose(fp);
 				draw_all_points();
-			}				
+			}
 		}
-		
+
 	}
 };
 
@@ -376,12 +376,12 @@ SvmToyWindow::SvmToyWindow()
 
   	// don't blank the window before repainting
 	setAttribute(Qt::WA_NoBackground);
-  
+
 	icon1 = QPixmap(4,4);
 	icon2 = QPixmap(4,4);
 	icon3 = QPixmap(4,4);
-	
-	
+
+
 	QPainter painter;
 	painter.begin(&icon1);
 	painter.fillRect(0,0,4,4,QBrush(colors[4]));
@@ -401,7 +401,7 @@ SvmToyWindow::SvmToyWindow()
 	button_save.setGeometry( 150, YLEN, 50, 25);
 	button_load.setGeometry( 200, YLEN, 50, 25);
 	input_line.setGeometry( 250, YLEN, 250, 25);
-	
+
 	input_line.setText(DEFAULT_PARAM);
 	button_change_icon.setIcon(icon1);
 }
