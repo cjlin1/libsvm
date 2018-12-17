@@ -11,7 +11,10 @@ from commonutil import __all__ as common_all
 if sys.version_info[0] < 3:
 	range = xrange
 	from itertools import izip as zip
-
+	_cstr = lambda s: s.encode("utf-8") if isinstance(s,unicode) else str(s)
+else:
+	_cstr = lambda s: bytes(s, "utf-8")        
+        
 __all__ = ['svm_load_model', 'svm_predict', 'svm_save_model', 'svm_train'] + svm_all + common_all
 
 
@@ -21,7 +24,7 @@ def svm_load_model(model_file_name):
 
 	Load a LIBSVM model from model_file_name and return.
 	"""
-	model = libsvm.svm_load_model(model_file_name.encode())
+	model = libsvm.svm_load_model(_cstr(model_file_name))
 	if not model:
 		print("can't open model file %s" % model_file_name)
 		return None
@@ -34,7 +37,7 @@ def svm_save_model(model_file_name, model):
 
 	Save a LIBSVM model to the file model_file_name.
 	"""
-	libsvm.svm_save_model(model_file_name.encode(), model)
+	libsvm.svm_save_model(_cstr(model_file_name), model)
 
 def svm_train(arg1, arg2=None, arg3=None):
 	"""
