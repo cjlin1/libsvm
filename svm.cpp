@@ -3065,10 +3065,11 @@ const char *svm_check_parameter(const svm_problem *prob, const svm_parameter *pa
 	   kernel_type != PRECOMPUTED)
 		return "unknown kernel type";
 
-	if(param->gamma < 0)
+	if((kernel_type == POLY || kernel_type == RBF || kernel_type == SIGMOID) &&
+	   param->gamma < 0)
 		return "gamma < 0";
 
-	if(param->degree < 0)
+	if(kernel_type == POLY && param->degree < 0)
 		return "degree of polynomial kernel < 0";
 
 	// cache_size,eps,C,nu,p,shrinking

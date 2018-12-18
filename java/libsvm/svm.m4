@@ -2741,10 +2741,13 @@ public class svm {
 		   kernel_type != svm_parameter.PRECOMPUTED)
 			return "unknown kernel type";
 
-		if(param.gamma < 0)
+		if((kernel_type == svm_parameter.POLY ||
+		   kernel_type == svm_parameter.RBF ||
+		   kernel_type == svm_parameter.SIGMOID) &&
+		   param.gamma < 0)
 			return "gamma < 0";
 
-		if(param.degree < 0)
+		if(kernel_type == svm_parameter.POLY && param.degree < 0)
 			return "degree of polynomial kernel < 0";
 
 		// cache_size,eps,C,nu,p,shrinking
