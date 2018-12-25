@@ -23,11 +23,11 @@ octave:
 
 binary: svmpredict.$(MEX_EXT) svmtrain.$(MEX_EXT) libsvmread.$(MEX_EXT) libsvmwrite.$(MEX_EXT)
 
-svmpredict.$(MEX_EXT):     svmpredict.c ../svm.h ../svm.o svm_model_matlab.o
-	$(MEX) $(MEX_OPTION) svmpredict.c ../svm.o svm_model_matlab.o
+svmpredict.$(MEX_EXT):     svmpredict.c ../svm.h ../svm.cpp svm_model_matlab.c
+	$(MEX) $(MEX_OPTION) svmpredict.c ../svm.cpp svm_model_matlab.c
 
-svmtrain.$(MEX_EXT):       svmtrain.c ../svm.h ../svm.o svm_model_matlab.o
-	$(MEX) $(MEX_OPTION) svmtrain.c ../svm.o svm_model_matlab.o
+svmtrain.$(MEX_EXT):       svmtrain.c ../svm.h ../svm.cpp svm_model_matlab.c
+	$(MEX) $(MEX_OPTION) svmtrain.c ../svm.cpp svm_model_matlab.c
 
 libsvmread.$(MEX_EXT):	libsvmread.c
 	$(MEX) $(MEX_OPTION) libsvmread.c
@@ -35,11 +35,5 @@ libsvmread.$(MEX_EXT):	libsvmread.c
 libsvmwrite.$(MEX_EXT):	libsvmwrite.c
 	$(MEX) $(MEX_OPTION) libsvmwrite.c
 
-svm_model_matlab.o:     svm_model_matlab.c ../svm.h
-	$(CXX) $(CFLAGS) -c svm_model_matlab.c
-
-../svm.o: ../svm.cpp ../svm.h
-	make -C .. svm.o
-
 clean:
-	rm -f *~ *.o *.mex* *.obj ../svm.o
+	rm -f *~ *.o *.mex* *.obj
