@@ -44,8 +44,10 @@ Quick Start
 
 "Quick Start with Scipy" is in the next section.
 
-There are two levels of usage. The high-level one uses utility functions
-in svmutil.py and the usage is the same as the LIBSVM MATLAB interface.
+There are two levels of usage. The high-level one uses utility
+functions in svmutil.py and commonutil.py (shared with LIBLINEAR and
+imported by svmutil.py). The usage is the same as the LIBSVM MATLAB
+interface.
 
 >>> from svmutil import *
 # Read data in LIBSVM format
