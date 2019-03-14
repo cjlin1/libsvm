@@ -58,7 +58,7 @@ The format of training and testing data files is:
 .
 
 Each line contains an instance and is ended by a '\n' character. For
-<labal> in the training set, we have the following cases.
+<label> in the training set, we have the following cases.
 
 * classification: <label> is an integer indicating the class label
   (multi-class is supported).
