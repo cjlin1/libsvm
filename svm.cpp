@@ -7,6 +7,9 @@
 #include <stdarg.h>
 #include <limits.h>
 #include <locale.h>
+#ifdef _WIN32
+#include <limits>
+#endif
 #include "svm.h"
 int libsvm_version = LIBSVM_VERSION;
 typedef float Qfloat;
@@ -37,6 +40,32 @@ static inline double powi(double base, int times)
 #define INF HUGE_VAL
 #define TAU 1e-12
 #define Malloc(type,n) (type *)malloc((n)*sizeof(type))
+
+// New function to ensure the same behaviour for random number generation on windows and linux
+int myrand() {
+#ifdef _WIN32
+	// In MS Visual Studio (2012) RAND_MAX = 0x7FFF (15bit) = 32767
+	// In Linux GCC (4.6) 32bits RAND_MAX = 0x7FFFFFFF (31bit) = 2147483647
+	// In Linux GCC (4.6) 64bits RAND_MAX = 0x7FFFFFFFFFFFFFFF (63 bits) = 9223372036854775807
+	// so in MS Visual Studio we need to call rand() several times to always ensure the same random number range than in Linux GCC
+	if (std::numeric_limits<int>::max() == 0x7FFFFFFF) {
+		// make a 31bit random number by using several 15bit rand()
+		return ((rand() << 16) + (rand() << 1) + (rand() >> 14));
+	}
+	else if (std::numeric_limits<int>::max() == 0x7FFFFFFFFFFFFFFF) {
+		// make a 63bit random number by using several 15bit rand()
+		return ((rand() << 48) + (rand() << 33) + (rand() << 18) + (rand() << 3) + (rand() >> 12));
+	}
+	else {
+		//fallback - should never happen on 32 or 64 bits systems
+		return rand();
+	}
+#else
+	// In Linux GCC (4.6) 32bits RAND_MAX = 0x7FFFFFFF (31bit) or 64bits RAND_MAX = 0x7FFFFFFFFFFFFFFF (63 bits)
+	// nothing special to do
+	return rand();
+#endif
+}
 
 static void print_string_stdout(const char *s)
 {
@@ -1903,7 +1932,7 @@ static void svm_binary_svc_probability(
 	for(i=0;i<prob->l;i++) perm[i]=i;
 	for(i=0;i<prob->l;i++)
 	{
-		int j = i+rand()%(prob->l-i);
+		int j = i+myrand()%(prob->l-i);
 		swap(perm[i],perm[j]);
 	}
 	for(i=0;i<nr_fold;i++)
@@ -2368,7 +2397,7 @@ void svm_cross_validation(const svm_problem *prob, const svm_parameter *param, i
 		for (c=0; c<nr_class; c++)
 			for(i=0;i<count[c];i++)
 			{
-				int j = i+rand()%(count[c]-i);
+				int j = i+myrand()%(count[c]-i);
 				swap(index[start[c]+j],index[start[c]+i]);
 			}
 		for(i=0;i<nr_fold;i++)
@@ -2405,7 +2434,7 @@ void svm_cross_validation(const svm_problem *prob, const svm_parameter *param, i
 		for(i=0;i<l;i++) perm[i]=i;
 		for(i=0;i<l;i++)
 		{
-			int j = i+rand()%(l-i);
+			int j = i+myrand()%(l-i);
 			swap(perm[i],perm[j]);
 		}
 		for(i=0;i<=nr_fold;i++)
