@@ -163,8 +163,6 @@ options:
 -q : quiet mode (no outputs)
 
 
-The k in the -g option means the number of attributes in the input data.
-
 option -v randomly splits the data into n parts and calculates cross
 validation accuracy/mean squared error on them.
 
