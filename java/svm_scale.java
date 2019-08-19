@@ -1,6 +1,7 @@
 import libsvm.*;
 import java.io.*;
 import java.util.*;
+import static java.lang.Math.*;
 import java.text.DecimalFormat;
 
 class svm_scale
@@ -165,7 +166,7 @@ class svm_scale
 			{
 				StringTokenizer st2 = new StringTokenizer(restore_line);
 				idx = Integer.parseInt(st2.nextToken());
-				max_index = Math.max(max_index, idx);
+				max_index = max(max_index, idx);
 			}
 			fp_restore = rewind(fp_restore, restore_filename);
 		}
@@ -177,7 +178,7 @@ class svm_scale
 			while(st.hasMoreTokens())
 			{
 				index = Integer.parseInt(st.nextToken());
-				max_index = Math.max(max_index, index);
+				max_index = max(max_index, index);
 				st.nextToken();
 				num_nonzeros++;
 			}
@@ -208,8 +209,8 @@ class svm_scale
 
 			StringTokenizer st = new StringTokenizer(line," \t\n\r\f:");
 			target = Double.parseDouble(st.nextToken());
-			y_max = Math.max(y_max, target);
-			y_min = Math.min(y_min, target);
+			y_max = max(y_max, target);
+			y_min = min(y_min, target);
 
 			while (st.hasMoreTokens())
 			{
@@ -218,19 +219,19 @@ class svm_scale
 
 				for (i = next_index; i<index; i++)
 				{
-					feature_max[i] = Math.max(feature_max[i], 0);
-					feature_min[i] = Math.min(feature_min[i], 0);
+					feature_max[i] = max(feature_max[i], 0);
+					feature_min[i] = min(feature_min[i], 0);
 				}
 
-				feature_max[index] = Math.max(feature_max[index], value);
-				feature_min[index] = Math.min(feature_min[index], value);
+				feature_max[index] = max(feature_max[index], value);
+				feature_min[index] = min(feature_min[index], value);
 				next_index = index + 1;
 			}
 
 			for(i=next_index;i<=max_index;i++)
 			{
-				feature_max[i] = Math.max(feature_max[i], 0);
-				feature_min[i] = Math.min(feature_min[i], 0);
+				feature_max[i] = max(feature_max[i], 0);
+				feature_min[i] = min(feature_min[i], 0);
 			}
 		}
 
