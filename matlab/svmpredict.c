@@ -14,7 +14,7 @@ typedef int mwIndex;
 
 #define CMD_LEN 2048
 
-int print_null(const char *s,...) {}
+int print_null(const char *s,...) {return 0;}
 int (*info)(const char *fmt,...) = &mexPrintf;
 
 void read_sparse_instance(const mxArray *prhs, int index, struct svm_node *x)
