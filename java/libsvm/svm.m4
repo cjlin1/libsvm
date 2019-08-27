@@ -2,6 +2,8 @@ define(`swap',`do {$1 tmp=$2; $2=$3; $3=tmp;} while(false)')
 define(`Qfloat',`float')
 define(`SIZE_OF_QFLOAT',4)
 define(`TAU',1e-12)
+define(`NULL',null)
+define(`bool',boolean)
 changecom(`//',`')
 package libsvm;
 import java.io.*;
@@ -320,7 +322,7 @@ class Solver {
 	int[] active_set;
 	double[] G_bar;		// gradient, if we treat free variables as 0
 	int l;
-	boolean unshrink;	// XXX
+	bool unshrink;	// XXX
 
 	static final double INF = java.lang.Double.POSITIVE_INFINITY;
 
@@ -336,9 +338,9 @@ class Solver {
 			alpha_status[i] = LOWER_BOUND;
 		else alpha_status[i] = FREE;
 	}
-	boolean is_upper_bound(int i) { return alpha_status[i] == UPPER_BOUND; }
-	boolean is_lower_bound(int i) { return alpha_status[i] == LOWER_BOUND; }
-	boolean is_free(int i) { return alpha_status[i] == FREE; }
+	bool is_upper_bound(int i) { return alpha_status[i] == UPPER_BOUND; }
+	bool is_lower_bound(int i) { return alpha_status[i] == LOWER_BOUND; }
+	bool is_free(int i) { return alpha_status[i] == FREE; }
 
 	// java: information about solution except alpha,
 	// because we cannot return multiple values otherwise...
@@ -604,8 +606,8 @@ class Solver {
 			// update alpha_status and G_bar
 
 			{
-				boolean ui = is_upper_bound(i);
-				boolean uj = is_upper_bound(j);
+				bool ui = is_upper_bound(i);
+				bool uj = is_upper_bound(j);
 				update_alpha_status(i);
 				update_alpha_status(j);
 				int k;
@@ -708,7 +710,7 @@ class Solver {
 			}
 
 		int i = Gmax_idx;
-		Qfloat[] Q_i = null;
+		Qfloat[] Q_i = NULL;
 		if(i != -1) // NULL Q_i not accessed: Gmax=-INF if i=-1
 			Q_i = Q.get_Q(i,active_size);
 
@@ -772,7 +774,7 @@ class Solver {
 		return 0;
 	}
 
-	private boolean be_shrunk(int i, double Gmax1, double Gmax2)
+	private bool be_shrunk(int i, double Gmax1, double Gmax2)
 	{
 		if(is_upper_bound(i))
 		{
@@ -952,8 +954,8 @@ final class Solver_NU extends Solver
 
 		int ip = Gmaxp_idx;
 		int in = Gmaxn_idx;
-		Qfloat[] Q_ip = null;
-		Qfloat[] Q_in = null;
+		Qfloat[] Q_ip = NULL;
+		Qfloat[] Q_in = NULL;
 		if(ip != -1) // NULL Q_ip not accessed: Gmaxp=-INF if ip=-1
 			Q_ip = Q.get_Q(ip,active_size);
 		if(in != -1)
@@ -1023,7 +1025,7 @@ final class Solver_NU extends Solver
 		return 0;
 	}
 
-	private boolean be_shrunk(int i, double Gmax1, double Gmax2, double Gmax3, double Gmax4)
+	private bool be_shrunk(int i, double Gmax1, double Gmax2, double Gmax3, double Gmax4)
 	{
 		if(is_upper_bound(i))
 		{
@@ -1948,9 +1950,9 @@ public class svm {
 		{
 			// regression or one-class-svm
 			model.nr_class = 2;
-			model.label = null;
-			model.nSV = null;
-			model.probA = null; model.probB = null;
+			model.label = NULL;
+			model.nSV = NULL;
+			model.probA = NULL; model.probB = NULL;
 			model.sv_coef = new double[1][];
 
 			if(param.probability == 1 &&
@@ -2027,12 +2029,12 @@ public class svm {
 
 			// train k*(k-1)/2 models
 
-			boolean[] nonzero = new boolean[l];
+			bool[] nonzero = new bool[l];
 			for(i=0;i<l;i++)
 				nonzero[i] = false;
 			decision_function[] f = new decision_function[nr_class*(nr_class-1)/2];
 
-			double[] probA=null,probB=null;
+			double[] probA=null,probB=NULL;
 			if (param.probability == 1)
 			{
 				probA=new double[nr_class*(nr_class-1)/2];
@@ -2103,8 +2105,8 @@ public class svm {
 			}
 			else
 			{
-				model.probA=null;
-				model.probB=null;
+				model.probA=NULL;
+				model.probB=NULL;
 			}
 
 			int total_sv = 0;
@@ -2296,14 +2298,14 @@ public class svm {
 
 	public static void svm_get_labels(svm_model model, int[] label)
 	{
-		if (model.label != null)
+		if (model.label != NULL)
 			for(int i=0;i<model.nr_class;i++)
 				label[i] = model.label[i];
 	}
 
 	public static void svm_get_sv_indices(svm_model model, int[] indices)
 	{
-		if (model.sv_indices != null)
+		if (model.sv_indices != NULL)
 			for(int i=0;i<model.l;i++)
 				indices[i] = model.sv_indices[i];
 	}
@@ -2316,7 +2318,7 @@ public class svm {
 	public static double svm_get_svr_probability(svm_model model)
 	{
 		if ((model.param.svm_type == EPSILON_SVR || model.param.svm_type == NU_SVR) &&
-		    model.probA!=null)
+		    model.probA!=NULL)
 		return model.probA[0];
 		else
 		{
@@ -2415,7 +2417,7 @@ public class svm {
 	public static double svm_predict_probability(svm_model model, svm_node[] x, double[] prob_estimates)
 	{
 		if ((model.param.svm_type == C_SVC || model.param.svm_type == NU_SVC) &&
-		    model.probA!=null && model.probB!=null)
+		    model.probA!=NULL && model.probB!=NULL)
 		{
 			int i;
 			int nr_class = model.nr_class;
@@ -2556,14 +2558,14 @@ public class svm {
 		return Integer.parseInt(s);
 	}
 
-	private static boolean read_model_header(BufferedReader fp, svm_model model)
+	private static bool read_model_header(BufferedReader fp, svm_model model)
 	{
 		svm_parameter param = new svm_parameter();
 		model.param = param;
 		// parameters for training only won't be assigned, but arrays are assigned as NULL for safety
 		param.nr_weight = 0;
-		param.weight_label = null;
-		param.weight = null;
+		param.weight_label = NULL;
+		param.weight = NULL;
 
 		try
 		{
@@ -2684,17 +2686,17 @@ public class svm {
 		// read parameters
 
 		svm_model model = new svm_model();
-		model.rho = null;
-		model.probA = null;
-		model.probB = null;
-		model.label = null;
-		model.nSV = null;
+		model.rho = NULL;
+		model.probA = NULL;
+		model.probB = NULL;
+		model.label = NULL;
+		model.nSV = NULL;
 
 		// read header
 		if (!read_model_header(fp, model))
 		{
 			System.err.print("ERROR: failed to read model\n");
-			return null;
+			return NULL;
 		}
 
 		// read sv_coef and SV
@@ -2842,15 +2844,15 @@ public class svm {
 			}
 		}
 
-		return null;
+		return NULL;
 	}
 
 	public static int svm_check_probability_model(svm_model model)
 	{
 		if (((model.param.svm_type == C_SVC || model.param.svm_type == NU_SVC) &&
-		model.probA!=null && model.probB!=null) ||
+		model.probA!=NULL && model.probB!=NULL) ||
 		((model.param.svm_type == EPSILON_SVR || model.param.svm_type == NU_SVR) &&
-		 model.probA!=null))
+		 model.probA!=NULL))
 			return 1;
 		else
 			return 0;
@@ -2858,7 +2860,7 @@ public class svm {
 
 	public static void svm_set_print_string_function(svm_print_interface print_func)
 	{
-		if (print_func == null)
+		if (print_func == NULL)
 			svm_print_string = svm_print_stdout;
 		else
 			svm_print_string = print_func;
