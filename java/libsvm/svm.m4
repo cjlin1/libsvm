@@ -179,7 +179,7 @@ abstract class Kernel extends QMatrix {
 			case svm_parameter.PRECOMPUTED:
 				return x[i][(int)(x[j][0].value)].value;
 			default:
-				return 0;	// java
+				return 0;	// Unreachable
 		}
 	}
 
@@ -274,10 +274,10 @@ abstract class Kernel extends QMatrix {
 			}
 			case svm_parameter.SIGMOID:
 				return Math.tanh(param.gamma*dot(x,y)+param.coef0);
-			case svm_parameter.PRECOMPUTED:
+			case svm_parameter.PRECOMPUTED:  //x: test (validation), y: SV
 				return	x[(int)(y[0].value)].value;
 			default:
-				return 0;	// java
+				return 0;	// Unreachable
 		}
 	}
 }
@@ -674,7 +674,7 @@ class Solver {
 	{
 		// return i,j such that
 		// i: maximizes -y_i * grad(f)_i, i in I_up(\alpha)
-		// j: mimimizes the decrease of obj value
+		// j: minimizes the decrease of obj value
 		//    (if quadratic coefficeint <= 0, replace it with tau)
 		//    -y_j*grad(f)_j < -y_i*grad(f)_i, j in I_low(\alpha)
 
@@ -831,6 +831,7 @@ class Solver {
 			unshrink = true;
 			reconstruct_gradient();
 			active_size = l;
+			svm.info("*");
 		}
 
 		for(i=0;i<active_size;i++)
@@ -858,16 +859,16 @@ class Solver {
 		{
 			double yG = y[i]*G[i];
 
-			if(is_lower_bound(i))
+			if(is_upper_bound(i))
 			{
-				if(y[i] > 0)
+				if(y[i] < 0)
 					ub = Math.min(ub,yG);
 				else
 					lb = Math.max(lb,yG);
 			}
-			else if(is_upper_bound(i))
+			else if(is_lower_bound(i))
 			{
-				if(y[i] < 0)
+				if(y[i] > 0)
 					ub = Math.min(ub,yG);
 				else
 					lb = Math.max(lb,yG);
@@ -1102,10 +1103,10 @@ final class Solver_NU extends Solver
 		{
 			if(y[i]==+1)
 			{
-				if(is_lower_bound(i))
-					ub1 = Math.min(ub1,G[i]);
-				else if(is_upper_bound(i))
+				if(is_upper_bound(i))
 					lb1 = Math.max(lb1,G[i]);
+				else if(is_lower_bound(i))
+					ub1 = Math.min(ub1,G[i]);
 				else
 				{
 					++nr_free1;
@@ -1114,10 +1115,10 @@ final class Solver_NU extends Solver
 			}
 			else
 			{
-				if(is_lower_bound(i))
-					ub2 = Math.min(ub2,G[i]);
-				else if(is_upper_bound(i))
+				if(is_upper_bound(i))
 					lb2 = Math.max(lb2,G[i]);
+				else if(is_lower_bound(i))
+					ub2 = Math.min(ub2,G[i]);
 				else
 				{
 					++nr_free2;
@@ -1293,7 +1294,7 @@ public class svm {
 	//
 	// construct and solve various formulations
 	//
-	public static final int LIBSVM_VERSION=323;
+	public static final int LIBSVM_VERSION=324;
 	public static final Random rand = new Random();
 
 	private static svm_print_interface svm_print_stdout = new svm_print_interface()
@@ -1672,6 +1673,7 @@ public class svm {
 	private static double sigmoid_predict(double decision_value, double A, double B)
 	{
 		double fApB = decision_value*A+B;
+	// 1-p used later; avoid catastrophic cancellation
 		if (fApB >= 0)
 			return Math.exp(-fApB)/(1.0+Math.exp(-fApB));
 		else
@@ -2102,7 +2104,7 @@ public class svm {
 				model.probB=null;
 			}
 
-			int nnz = 0;
+			int total_sv = 0;
 			int[] nz_count = new int[nr_class];
 			model.nSV = new int[nr_class];
 			for(i=0;i<nr_class;i++)
@@ -2112,17 +2114,17 @@ public class svm {
 					if(nonzero[start[i]+j])
 					{
 						++nSV;
-						++nnz;
+						++total_sv;
 					}
 				model.nSV[i] = nSV;
 				nz_count[i] = nSV;
 			}
 
-			svm.info("Total nSV = "+nnz+"\n");
+			svm.info("Total nSV = "+total_sv+"\n");
 
-			model.l = nnz;
-			model.SV = new svm_node[nnz][];
-			model.sv_indices = new int[nnz];
+			model.l = total_sv;
+			model.SV = new svm_node[total_sv][];
+			model.sv_indices = new int[total_sv];
 			p = 0;
 			for(i=0;i<l;i++)
 				if(nonzero[i])
@@ -2138,7 +2140,7 @@ public class svm {
 
 			model.sv_coef = new double[nr_class-1][];
 			for(i=0;i<nr_class-1;i++)
-				model.sv_coef[i] = new double[nnz];
+				model.sv_coef[i] = new double[total_sv];
 
 			p = 0;
 			for(i=0;i<nr_class;i++)
@@ -2685,7 +2687,8 @@ public class svm {
 		model.label = null;
 		model.nSV = null;
 
-		if (read_model_header(fp, model) == false)
+		// read header
+		if (!read_model_header(fp, model))
 		{
 			System.err.print("ERROR: failed to read model\n");
 			return null;
