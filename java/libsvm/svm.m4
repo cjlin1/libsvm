@@ -198,7 +198,8 @@ abstract class Kernel extends QMatrix {
 			for(int i=0;i<l;i++)
 				x_square[i] = dot(x[i],x[i]);
 		}
-		else x_square = null;
+		else
+			x_square = null;
 	}
 
 	static double dot(svm_node[] x, svm_node[] y)
@@ -335,7 +336,7 @@ class Solver {
 	}
 	boolean is_upper_bound(int i) { return alpha_status[i] == UPPER_BOUND; }
 	boolean is_lower_bound(int i) { return alpha_status[i] == LOWER_BOUND; }
-	boolean is_free(int i) {  return alpha_status[i] == FREE; }
+	boolean is_free(int i) { return alpha_status[i] == FREE; }
 
 	// java: information about solution except alpha,
 	// because we cannot return multiple values otherwise...
@@ -2557,7 +2558,7 @@ public class svm {
 	{
 		svm_parameter param = new svm_parameter();
 		model.param = param;
-		// parameters for training only won't be assigned, but arrays are assigned as NULL for safety
+		// parameters for training only won't be assigned, but arrays are assigned as null for safety
 		param.nr_weight = 0;
 		param.weight_label = null;
 		param.weight = null;
