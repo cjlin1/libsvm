@@ -39,25 +39,19 @@ On MATLAB or Octave:
 
 If make.m does not work on MATLAB (especially for Windows), try 'mex
 -setup' to choose a suitable compiler for mex. Make sure your compiler
-is accessible and workable. Then type 'make' to start the
-installation.
+is accessible and workable. Then type 'make' to do the installation.
 
 Example:
 
 	matlab>> mex -setup
-	(ps: MATLAB will show the following messages to setup default compiler.)
-	Please choose your compiler for building external interface (MEX) files:
-	Would you like mex to locate installed compilers [y]/n? y
-	Select a compiler:
-	[1] Microsoft Visual C/C++ version 7.1 in C:\Program Files\Microsoft Visual Studio
-	[0] None
-	Compiler: 1
-	Please verify your choices:
-	Compiler: Microsoft Visual C/C++ 7.1
-	Location: C:\Program Files\Microsoft Visual Studio
-	Are these correct?([y]/n): y
 
-	matlab>> make
+MATLAB will choose the default compiler. If you have multiple compliers,
+a list is given and you can choose one from the list. For more details,
+please check the following page:
+
+https://www.mathworks.com/help/matlab/matlab_external/choose-c-or-c-compilers.html
+
+On Windows, make.m has been tested via using Visual C++.
 
 On Unix systems, if neither make.m nor 'mex -setup' works, please use
 Makefile and type 'make' in a command window. Note that we assume
