@@ -9,7 +9,7 @@
 <a name="_TOP"><b><h1><a
 href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a>  FAQ </h1></b></a>
 <b>last modified : </b>
-Sun,  7 Jan 2018 11:54:08 GMT
+Wed, 20 Feb 2019 17:53:09 GMT
 <class="categories">
 <li><a
 href="#_TOP">All Questions</a>(84)</li>
@@ -1109,7 +1109,7 @@ simply because its training time is shorter.
 <p>
 It is extremely easy. Taking c-svc for example, to solve
 <p>
-min_w w^Tw/2 + C \sum max(0, 1- (y_i w^Tx_i+b))^2,
+min_{w,b} w^Tw/2 + C \sum max(0, 1- (y_i w^Tx_i+b))^2,
 <p>
 only two 
 places of svm.cpp have to be changed. 
