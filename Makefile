@@ -1,4 +1,5 @@
 CXX ?= g++
+AR ?= ar
 CFLAGS = -Wall -Wconversion -O3 -fPIC
 SHVER = 2
 OS = $(shell uname)
@@ -12,6 +13,14 @@ lib: svm.o
 		SHARED_LIB_FLAG="-shared -Wl,-soname,libsvm.so.$(SHVER)"; \
 	fi; \
 	$(CXX) $${SHARED_LIB_FLAG} svm.o -o libsvm.so.$(SHVER)
+	
+static-lib: svm.o
+	if [ "$(OS)" = "Darwin" ]; then \
+        	STATIC_LIB_FLAG="-cr"; \
+	else \
+		STATIC_LIB_FLAG="-crf"; \
+	fi; \
+	$(AR) $${STATIC_LIB_FLAG} libsvm.a svm.o
 
 svm-predict: svm-predict.c svm.o
 	$(CXX) $(CFLAGS) svm-predict.c svm.o -o svm-predict -lm
@@ -22,4 +31,4 @@ svm-scale: svm-scale.c
 svm.o: svm.cpp svm.h
 	$(CXX) $(CFLAGS) -c svm.cpp
 clean:
-	rm -f *~ svm.o svm-train svm-predict svm-scale libsvm.so.$(SHVER)
+	rm -f *~ svm.o svm-train svm-predict svm-scale libsvm.a libsvm.so.$(SHVER)
