@@ -1,0 +1,8 @@
+matlab/libsvmread.mex*
+matlab/libsvmwrite.mex*
+matlab/svmpredict.mex*
+matlab/svmtrain.mex*
+svm-predict
+svm-scale
+svm-train
+svm.o
