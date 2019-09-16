@@ -1,16 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/* 
- * File:   serialization.hpp
- * Author: arash
- *
- * Created on September 13, 2019, 6:34 p.m.
- */
-
 #ifndef LIBSVM_BOOST_SERIALIZATION_HPP
 #define LIBSVM_BOOST_SERIALIZATION_HPP
 
