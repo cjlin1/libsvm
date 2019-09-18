@@ -11,12 +11,12 @@ namespace boost {
 namespace serialization {
 namespace detail{
     template<typename T>
-    T* Malloc(size_t n){
+    T* SVMMalloc(size_t n){
         return (T*)malloc((n)*sizeof(T));
     }
     
     template<typename T>
-    std::vector<T> save_1d_array(const T* array_1d, size_t n){
+    std::vector<T> svm_save_1d_array(const T* array_1d, size_t n){
         std::vector<T> vec_1d(n);
         for(size_t i=0;i<n;i++){
             vec_1d[i] = array_1d[i];
@@ -26,19 +26,19 @@ namespace detail{
     }
 
     template<typename T>
-    void load_1d_array(const std::vector<T> &vec_1d, T* &array_1d){
-        array_1d = Malloc<T>(vec_1d.size());
+    void svm_load_1d_array(const std::vector<T> &vec_1d, T* &array_1d){
+        array_1d = SVMMalloc<T>(vec_1d.size());
         for(size_t i=0;i<vec_1d.size();i++){
             array_1d[i] = vec_1d[i];
         }
     }
 
     template<typename T>
-    void load_2d_array(const std::vector<std::vector<T> > &vec_2d, T** &array_2d){
-        array_2d = detail::Malloc<T*>(vec_2d.size());
+    void svm_load_2d_array(const std::vector<std::vector<T> > &vec_2d, T** &array_2d){
+        array_2d = detail::SVMMalloc<T*>(vec_2d.size());
 
         for(size_t i=0;i<vec_2d.size();++i){
-            load_1d_array(vec_2d[i], array_2d[i]);
+            svm_load_1d_array(vec_2d[i], array_2d[i]);
         }
     }
 }//namespace detail
@@ -106,7 +106,7 @@ void save(Archive & ar, const svm_model &m, const unsigned int version){
     //rho
     {
         int n = m.nr_class * (m.nr_class-1)/2;
-        auto vec_rho = detail::save_1d_array(m.rho, n);
+        auto vec_rho = detail::svm_save_1d_array(m.rho, n);
         ar & BOOST_SERIALIZATION_NVP(vec_rho);
     }
     
@@ -115,7 +115,7 @@ void save(Archive & ar, const svm_model &m, const unsigned int version){
         std::vector<double> vec_probA;
         if(m.probA) // regression has probA only
         {
-            vec_probA = detail::save_1d_array(m.probA, m.nr_class*(m.nr_class-1)/2);
+            vec_probA = detail::svm_save_1d_array(m.probA, m.nr_class*(m.nr_class-1)/2);
         }
         ar & BOOST_SERIALIZATION_NVP(vec_probA);
     }
@@ -125,7 +125,7 @@ void save(Archive & ar, const svm_model &m, const unsigned int version){
         std::vector<double> vec_probB;
         if(m.probB)
         {
-            vec_probB = detail::save_1d_array(m.probB, m.nr_class*(m.nr_class-1)/2);
+            vec_probB = detail::svm_save_1d_array(m.probB, m.nr_class*(m.nr_class-1)/2);
         }
         ar & BOOST_SERIALIZATION_NVP(vec_probB);
     }
@@ -135,7 +135,7 @@ void save(Archive & ar, const svm_model &m, const unsigned int version){
         std::vector<int> vec_label;
         if(m.label)
         {
-            vec_label = detail::save_1d_array(m.label, m.nr_class);
+            vec_label = detail::svm_save_1d_array(m.label, m.nr_class);
         }
         ar & BOOST_SERIALIZATION_NVP(vec_label);
     }
@@ -145,7 +145,7 @@ void save(Archive & ar, const svm_model &m, const unsigned int version){
         std::vector<int> vec_nSV;
         if(m.nSV)
         {
-            vec_nSV = detail::save_1d_array(m.nSV, m.nr_class);
+            vec_nSV = detail::svm_save_1d_array(m.nSV, m.nr_class);
         }
         ar & BOOST_SERIALIZATION_NVP(vec_nSV);
     }
@@ -168,21 +168,21 @@ void load(Archive & ar, svm_model &m, const unsigned int version){
     {
         std::vector<std::vector<svm_node> > vec_SV;
         ar & BOOST_SERIALIZATION_NVP(vec_SV);
-        detail::load_2d_array(vec_SV, m.SV);
+        detail::svm_load_2d_array(vec_SV, m.SV);
     }
       
     //sv_coef
     {
         std::vector<std::vector<double> > vec_sv_coef;
         ar & BOOST_SERIALIZATION_NVP(vec_sv_coef);
-        detail::load_2d_array(vec_sv_coef, m.sv_coef);
+        detail::svm_load_2d_array(vec_sv_coef, m.sv_coef);
     }
     
     //rho
     {
         std::vector<double> vec_rho;
         ar & BOOST_SERIALIZATION_NVP(vec_rho);
-        detail::load_1d_array(vec_rho, m.rho);    
+        detail::svm_load_1d_array(vec_rho, m.rho);    
     }
     
     //probA
@@ -190,7 +190,7 @@ void load(Archive & ar, svm_model &m, const unsigned int version){
         std::vector<double> vec_probA;
         ar & BOOST_SERIALIZATION_NVP(vec_probA);
         if(!vec_probA.empty()){
-            detail::load_1d_array(vec_probA, m.probA);
+            detail::svm_load_1d_array(vec_probA, m.probA);
         }
     }
     
@@ -199,7 +199,7 @@ void load(Archive & ar, svm_model &m, const unsigned int version){
         std::vector<double> vec_probB;
         ar & BOOST_SERIALIZATION_NVP(vec_probB);
         if(!vec_probB.empty()){
-            detail::load_1d_array(vec_probB, m.probB);
+            detail::svm_load_1d_array(vec_probB, m.probB);
         }
     }
     
@@ -208,7 +208,7 @@ void load(Archive & ar, svm_model &m, const unsigned int version){
         std::vector<int> vec_label;
         ar & BOOST_SERIALIZATION_NVP(vec_label);
         if(!vec_label.empty()){
-            detail::load_1d_array(vec_label, m.label);
+            detail::svm_load_1d_array(vec_label, m.label);
         }
     }
     
@@ -217,7 +217,7 @@ void load(Archive & ar, svm_model &m, const unsigned int version){
         std::vector<int> vec_nSV;
         ar & BOOST_SERIALIZATION_NVP(vec_nSV);
         if(!vec_nSV.empty()){
-            detail::load_1d_array(vec_nSV, m.nSV);
+            detail::svm_load_1d_array(vec_nSV, m.nSV);
         }
     }
 
