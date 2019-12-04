@@ -26,6 +26,7 @@ class GridOption:
 			# svmtrain_pathname = r'c:\Program Files\libsvm\windows\svm-train.exe'
 			self.gnuplot_pathname = r'c:\tmp\gnuplot\binary\pgnuplot.exe'
 		self.fold = 5
+		self.kernel = 2
 		self.c_begin, self.c_end, self.c_step = -5,  15,  2
 		self.g_begin, self.g_end, self.g_step =  3, -15, -2
 		self.grid_with_c, self.grid_with_g = True, True
@@ -79,6 +80,9 @@ class GridOption:
 			elif options[i] == '-png':
 				i = i + 1
 				self.png_pathname = options[i]
+			elif options[i] == '-t':
+				i = i + 1
+				self.kernel = options[i]
 			elif options[i] == '-resume':
 				if i == (len(options)-1) or options[i+1].startswith('-'):
 					self.resume_pathname = self.dataset_title + '.out'
@@ -282,8 +286,9 @@ class Worker(Thread):
 			cmdline += ' -c {0} '.format(c)
 		if options.grid_with_g:
 			cmdline += ' -g {0} '.format(g)
-		cmdline += ' -v {0} {1} {2} '.format\
-			(options.fold,options.pass_through_string,options.dataset_pathname)
+		cmdline += '-t {3} -v {0} {1} {2} '.format\
+			(options.fold,options.pass_through_string,options.dataset_pathname, options.kernel)
+
 		return cmdline
 
 class LocalWorker(Worker):
@@ -468,22 +473,23 @@ Usage: grid.py [grid_options] [svm_options] dataset
 
 grid_options :
 -log2c {begin,end,step | "null"} : set the range of c (default -5,15,2)
-    begin,end,step -- c_range = 2^{begin,...,begin+k*step,...,end}
-    "null"         -- do not grid with c
+	begin,end,step -- c_range = 2^{begin,...,begin+k*step,...,end}
+	"null"		 -- do not grid with c
 -log2g {begin,end,step | "null"} : set the range of g (default 3,-15,-2)
-    begin,end,step -- g_range = 2^{begin,...,begin+k*step,...,end}
-    "null"         -- do not grid with g
+	begin,end,step -- g_range = 2^{begin,...,begin+k*step,...,end}
+	"null"		 -- do not grid with g
+-t n : kernel applied (default 2)
 -v n : n-fold cross validation (default 5)
 -svmtrain pathname : set svm executable path and name
 -gnuplot {pathname | "null"} :
-    pathname -- set gnuplot executable path and name
-    "null"   -- do not plot
+	pathname -- set gnuplot executable path and name
+	"null"   -- do not plot
 -out {pathname | "null"} : (default dataset.out)
-    pathname -- set output file path and name
-    "null"   -- do not output file
+	pathname -- set output file path and name
+	"null"   -- do not output file
 -png pathname : set graphic output file path and name (default dataset.png)
 -resume [pathname] : resume the grid task using an existing output file (default pathname is dataset.out)
-    This is experimental. Try this option only if some parameters have been checked for the SAME data.
+	This is experimental. Try this option only if some parameters have been checked for the SAME data.
 
 svm_options : additional options for svm-train""")
 		sys.exit(1)
