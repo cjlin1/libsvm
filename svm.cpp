@@ -9,6 +9,7 @@
 #include <locale.h>
 #include "svm.h"
 #ifdef SVM_CUDA
+#include <iostream>
 #include <assert.h>
 #include <vector>
 #include <cuda_runtime.h>
@@ -212,6 +213,7 @@ public:
 	KernelBase(int l, svm_node * const * x, const svm_parameter& param);
 	virtual ~KernelBase();
 
+	static void batch_k_function(const svm_node *x, const svm_model* model, double* out);
 	static double k_function(const svm_node *x, const svm_node *y,
 				 const svm_parameter& param);
 	virtual Qfloat *get_Q(int column, int len) const = 0;
@@ -327,6 +329,14 @@ double KernelBase::dot(const svm_node *px, const svm_node *py)
 	return sum;
 }
 
+void KernelBase::batch_k_function(const svm_node *x, const svm_model* model, double* out) {
+	svm_node **SV = model->SV;
+	const svm_parameter& param = model->param; 
+	for(int i=0; i<model->l; i++ ) {
+		out[i] = k_function(x,SV[i],param);
+	}
+}
+
 double KernelBase::k_function(const svm_node *x, const svm_node *y,
 			  const svm_parameter& param)
 {
@@ -374,7 +384,6 @@ double KernelBase::k_function(const svm_node *x, const svm_node *y,
 				sum += y->value * y->value;
 				++y;
 			}
-
 			return exp(-param.gamma*sum);
 		}
 		case SIGMOID:
@@ -387,34 +396,39 @@ double KernelBase::k_function(const svm_node *x, const svm_node *y,
 }
 
 #ifdef SVM_CUDA
+#define CUDA_CHECK(error) { \
+	if (error!=cudaSuccess){ \
+		std::cerr<<"CUDA ERROR "<< cudaGetErrorName(error) << " in file "  << __FILE__ << " line " <<__LINE__<< std::endl; \
+		exit(0); \
+	}  \
+}
+
 class CudaKernel : public KernelBase {
 public:
 	CudaKernel(int l, svm_node * const * x, const svm_parameter& param);
 	virtual ~CudaKernel();
 	virtual void done_shrinking() const;
+	static void batch_k_function(const svm_node *x, const svm_model* model, double* out);
 protected:
 	virtual void batch_kernel_function(int i, Qfloat *Q, int start, int end) const;
 private:
-	void libsvm2csr(int l) const;  //convert svm_node** x -> csr format
+	void x2csrMatrix(int sizeX) const;  //convert svm_node** x -> csr format matrix
 private:
-	cublasHandle_t m_cublas;
 	cusparseHandle_t m_cusparse;
 	cusparseMatDescr_t m_descr;
-	int m_max_index;
-	std::vector<int> m_csrRowPtr;
-	int* d_csrColIdx;
-	double* d_csrVal;
+	int m_max_index;		// max column of x matrix
+	std::vector<int> m_csrRowPtr;	// csr row ptr of x matrix
+	int* d_csrColIdx;		// csr col index of x matrix
+	double* d_csrVal;		// csr val vector of x matrix
 	double* d_vectorX;
-	int m_l;
-	int m_nnz;
+	int m_sizeX;		// size of x
+	int m_nnz;		// number of non-zero value of x matrix 
 };
 
 CudaKernel::CudaKernel(int l, svm_node * const * x, const svm_parameter& param) : KernelBase(l, x, param), 
-	m_cublas(NULL), m_cusparse(NULL), m_descr(NULL), m_max_index(0), m_csrRowPtr(l+1),
-	d_csrColIdx(NULL), d_csrVal(NULL), d_vectorX(NULL), m_l(l), m_nnz(0) {
-	// Init cublas & cusparse handlers
-	cublasStatus_t cublasResult = cublasCreate(&m_cublas);
-	assert(CUBLAS_STATUS_SUCCESS == cublasResult);
+	m_cusparse(NULL), m_descr(NULL), m_max_index(0), m_csrRowPtr(l+1),
+	d_csrColIdx(NULL), d_csrVal(NULL), d_vectorX(NULL), m_sizeX(l), m_nnz(0) {
+	// Init handlers
 	cusparseStatus_t cusparseResult = cusparseCreate(&m_cusparse);
 	assert(CUSPARSE_STATUS_SUCCESS == cusparseResult);
 	cusparseResult = cusparseCreateMatDescr(&m_descr);
@@ -434,18 +448,19 @@ CudaKernel::CudaKernel(int l, svm_node * const * x, const svm_parameter& param) 
 			node++;
 		}
 	}
+	m_max_index++;
 
-	libsvm2csr(l);
+	x2csrMatrix(l);
 }
 
-void CudaKernel::libsvm2csr(int l) const {
+void CudaKernel::x2csrMatrix(int sizeX) const {
 	// alloc host memory and fill up
 	std::vector<double> csrVal(m_nnz);
 	std::vector<int> csrColIdx(m_nnz);
 	int curPos = 0;
 	const svm_node *node;
 	int* csrRowPtr = (int*)m_csrRowPtr.data();
-	for( int i=0; i<l; i++ ) {
+	for( int i=0; i<sizeX; i++ ) {
 		csrRowPtr[i] = curPos;
 		node = x[i];
 		while(node->index != -1) {
@@ -455,44 +470,36 @@ void CudaKernel::libsvm2csr(int l) const {
 			node++;
 		}
 	}
-	csrRowPtr[l] = curPos;
+	csrRowPtr[sizeX] = curPos;
 
 	// copy csrVal, csrColIdx to device
-	cudaError_t cudaResult;
 	if( !d_vectorX ) {
-		cudaResult = cudaMalloc((void**)&d_vectorX, sizeof(double)*m_max_index);
-		assert(cudaSuccess == cudaResult);
+		CUDA_CHECK(cudaMalloc((void**)&d_vectorX, sizeof(double)*m_max_index));
 	}
 	if( !d_csrColIdx ) {
-	        cudaResult = cudaMalloc((void**)&d_csrColIdx, sizeof(int)*m_nnz);
-		assert(cudaSuccess == cudaResult);
+	        CUDA_CHECK(cudaMalloc((void**)&d_csrColIdx, sizeof(int)*m_nnz));
 	}
 	if( !d_csrVal ) {
-		cudaResult = cudaMalloc((void**)&d_csrVal, sizeof(double)*m_nnz);
-		assert(cudaSuccess == cudaResult);
+		CUDA_CHECK(cudaMalloc((void**)&d_csrVal, sizeof(double)*m_nnz));
 	}
-	cudaResult = cudaMemcpy(d_csrColIdx, csrColIdx.data(), sizeof(int)*m_nnz, cudaMemcpyHostToDevice);
-	assert(cudaSuccess == cudaResult);
-	cudaResult = cudaMemcpy(d_csrVal, csrVal.data(), sizeof(double)*m_nnz, cudaMemcpyHostToDevice);
-	assert(cudaSuccess == cudaResult);
+	CUDA_CHECK(cudaMemcpy(d_csrColIdx, csrColIdx.data(), sizeof(int)*m_nnz, cudaMemcpyHostToDevice));
+	CUDA_CHECK(cudaMemcpy(d_csrVal, csrVal.data(), sizeof(double)*m_nnz, cudaMemcpyHostToDevice));
 }
 
 CudaKernel::~CudaKernel() {
 	if(d_csrColIdx) cudaFree(d_csrColIdx);
 	if(d_csrVal) cudaFree(d_csrVal);
 	if(d_vectorX) cudaFree(d_vectorX);
-	if(m_cublas) cublasDestroy(m_cublas);
 	if(m_cusparse) cusparseDestroy(m_cusparse);
 	if(m_descr) cusparseDestroyMatDescr(m_descr);
 }
 
 void CudaKernel::done_shrinking() const {
 	KernelBase::done_shrinking();
-	libsvm2csr(m_l);
+	x2csrMatrix(m_sizeX);
 }
 
 void CudaKernel::batch_kernel_function(int i, Qfloat *Q, int start, int end) const {
-	cudaError_t cudaResult;
 	int len = end-start;
 
 	// get csrValA, csrColIndA, nnz ready for cusparseCsrmvEx
@@ -506,10 +513,8 @@ void CudaKernel::batch_kernel_function(int i, Qfloat *Q, int start, int end) con
 		csrRow[idx] = m_csrRowPtr[idx+start] - m_csrRowPtr[start];
 	}
 	int* csrRowPtrA = NULL;
-	cudaResult = cudaMalloc((void**)&csrRowPtrA, sizeof(int)*(len+1));
-	assert(cudaSuccess == cudaResult);
-	cudaResult = cudaMemcpy(csrRowPtrA, csrRow.data(), sizeof(int)*(len+1), cudaMemcpyHostToDevice);
-	assert(cudaSuccess == cudaResult);
+	CUDA_CHECK(cudaMalloc((void**)&csrRowPtrA, sizeof(int)*(len+1)));
+	CUDA_CHECK(cudaMemcpy(csrRowPtrA, csrRow.data(), sizeof(int)*(len+1), cudaMemcpyHostToDevice));
 
 	// get vector x ready for cusparseCsrmvEx
 	std::vector<double> vectorX(m_max_index, 0.0);
@@ -518,21 +523,16 @@ void CudaKernel::batch_kernel_function(int i, Qfloat *Q, int start, int end) con
 		vectorX[node->index] = node->value;
 		node++;	
 	}
-	cudaResult = cudaMemcpy(d_vectorX, vectorX.data(), sizeof(double)*m_max_index, cudaMemcpyHostToDevice);
-	assert(cudaSuccess == cudaResult);
+	CUDA_CHECK(cudaMemcpy(d_vectorX, vectorX.data(), sizeof(double)*m_max_index, cudaMemcpyHostToDevice));
 
 	// get vector y ready for cusparseCsrmvEx
-	std::vector<double> vectorY(len, 0.0);
 	double* d_vectorY = NULL;
-	cudaResult = cudaMalloc((void**)&d_vectorY, sizeof(double)*len);
-	assert(cudaSuccess == cudaResult);
-	cudaResult = cudaMemcpy(d_vectorY, vectorY.data(), sizeof(double)*len, cudaMemcpyHostToDevice);
-	assert(cudaSuccess == cudaResult);
+	CUDA_CHECK(cudaMalloc((void**)&d_vectorY, sizeof(double)*len));
 
 	// get temp buffer size and get it ready
 	size_t buffer_size = 0;
-	double h_one = 1.0;
-	double h_zero = 0.0;
+	static double h_one = 1.0;
+	static double h_zero = 0.0;
 	cusparseStatus_t cusparseResult = cusparseCsrmvEx_bufferSize(m_cusparse,
 		CUSPARSE_ALG0,
 		CUSPARSE_OPERATION_NON_TRANSPOSE,
@@ -551,8 +551,7 @@ void CudaKernel::batch_kernel_function(int i, Qfloat *Q, int start, int end) con
 		&buffer_size);
 	assert(CUSPARSE_STATUS_SUCCESS == cusparseResult);
 	void* buffer = NULL;
-	cudaResult = cudaMalloc ((void**)&buffer, buffer_size);
-	assert(cudaSuccess == cudaResult);
+	CUDA_CHECK(cudaMalloc ((void**)&buffer, buffer_size));
 
 	// call cusparseCsrmvEx
 	cusparseResult = cusparseCsrmvEx(m_cusparse,
@@ -574,8 +573,8 @@ void CudaKernel::batch_kernel_function(int i, Qfloat *Q, int start, int end) con
 	assert(CUSPARSE_STATUS_SUCCESS == cusparseResult);
 
 	// copy d_vectorY back to host
-	cudaResult = cudaMemcpy(vectorY.data(), d_vectorY, sizeof(double)*len, cudaMemcpyDeviceToHost);
-	assert(cudaSuccess == cudaResult);
+	std::vector<double> vectorY(len);
+	CUDA_CHECK(cudaMemcpy(vectorY.data(), d_vectorY, sizeof(double)*len, cudaMemcpyDeviceToHost));
 	for( int idx=0; idx<len; idx++ ) {
 		switch(kernel_type)
 		{
@@ -592,7 +591,7 @@ void CudaKernel::batch_kernel_function(int i, Qfloat *Q, int start, int end) con
 				Q[start+idx] = (Qfloat)(tanh(gamma*vectorY[idx]+coef0));
 				break;
 			default:
-				printf("unsupport kernel type");
+				printf("unsupport kernel type\n");
 				exit(0);
 		}
 	}
@@ -601,15 +600,320 @@ void CudaKernel::batch_kernel_function(int i, Qfloat *Q, int start, int end) con
 	cudaFree(d_vectorY);
 	cudaFree(buffer);
 
-	// debug, compare with base class
+	// debug, compare with base class result from cpu
 	/*std::vector<Qfloat> Qbase(start+len, 0.0);
         KernelBase::batch_kernel_function(i, Qbase.data(), start, end);
 	for( int idx=0; idx<len; idx++ ) {
-		if( fabs(Q[start+idx]-Qbase[start+idx])>0.0001 ) {
-			printf("%f <-> %f(%d, %d)\n", Q[idx], Qbase[idx], i, start+idx);
+		if( fabs(Q[start+idx]-Qbase[start+idx])>0.01 ) {
+			printf("%f <-> %f(%d, %d)\n", Q[start+idx], Qbase[start+idx], i, start+idx);
 		}
 	}*/
 }
+
+void svm_model::cuda_init() {
+	nMaxIdxSV = 0;
+	nnzSV = 0;
+	const svm_node *node;
+	for( int i=0; i<l; i++ ) {
+		node = SV[i];
+		while(node->index != -1) {
+			if( node->index > nMaxIdxSV )
+				nMaxIdxSV = node->index;
+			nnzSV++;
+			node++;
+		}
+	}
+
+	// get csrVal csrColIdx ready
+	std::vector<int> csrRowPtr(l+1);
+	std::vector<double> csrVal(nnzSV);
+	std::vector<int> csrColIdx(nnzSV);
+	int curPos = 0;
+	for( int i=0; i<l; i++ ) {
+		csrRowPtr[i] = curPos;
+		node = SV[i];
+		while(node->index != -1) {
+			csrVal[curPos] = node->value;
+			csrColIdx[curPos] = node->index;
+			curPos++;
+			node++;
+		}
+	}
+	csrRowPtr[l] = curPos;
+
+	// copy csrVal, csrColIdx to device
+	csrColIdxSV = NULL;
+	csrValSV = NULL;
+	csrRowPtrSV = NULL;
+	CUDA_CHECK(cudaMalloc((void**)&csrRowPtrSV, sizeof(int)*(l+1)));
+        CUDA_CHECK(cudaMalloc((void**)&csrColIdxSV, sizeof(int)*nnzSV));
+        CUDA_CHECK(cudaMalloc((void**)&csrValSV, sizeof(double)*nnzSV));
+	CUDA_CHECK(cudaMemcpy(csrRowPtrSV, csrRowPtr.data(), sizeof(int)*(l+1), cudaMemcpyHostToDevice));
+        CUDA_CHECK(cudaMemcpy(csrColIdxSV, csrColIdx.data(), sizeof(int)*nnzSV, cudaMemcpyHostToDevice));
+        CUDA_CHECK(cudaMemcpy(csrValSV, csrVal.data(), sizeof(double)*nnzSV, cudaMemcpyHostToDevice));
+}
+
+void svm_model::cuda_free() {
+	CUDA_CHECK(cudaFree(csrRowPtrSV));
+	CUDA_CHECK(cudaFree(csrColIdxSV));
+	CUDA_CHECK(cudaFree(csrValSV));
+}
+
+void CudaKernel::batch_k_function(const svm_node *x, const svm_model* model, double* out) {
+	const svm_parameter& param = model->param;
+	static const double one = 1.0;
+	static const double NegOne = -1.0;
+	static const double zero = 0.0;	
+	cublasHandle_t cublas = NULL;
+	cusparseHandle_t cusparse = NULL;
+	cusparseMatDescr_t descrSV = NULL;
+	cusparseMatDescr_t descrX = NULL;
+	cusparseMatDescr_t descrC = NULL;
+	cudaStream_t stream = NULL;
+	CUDA_CHECK(cudaStreamCreateWithFlags(&stream, cudaStreamNonBlocking));
+	cublasStatus_t cublasResult = cublasCreate(&cublas);
+	assert(CUBLAS_STATUS_SUCCESS == cublasResult);
+	cusparseStatus_t cusparseResult = cusparseCreate(&cusparse);
+	assert(CUSPARSE_STATUS_SUCCESS == cusparseResult);
+	cusparseResult = cusparseCreateMatDescr(&descrSV);
+	assert(CUSPARSE_STATUS_SUCCESS == cusparseResult);
+	cusparseSetMatIndexBase(descrSV,CUSPARSE_INDEX_BASE_ZERO);
+	cusparseSetMatType(descrSV, CUSPARSE_MATRIX_TYPE_GENERAL);
+        cusparseResult = cusparseCreateMatDescr(&descrX);
+        assert(CUSPARSE_STATUS_SUCCESS == cusparseResult);
+        cusparseSetMatIndexBase(descrX,CUSPARSE_INDEX_BASE_ZERO);
+        cusparseSetMatType(descrX, CUSPARSE_MATRIX_TYPE_GENERAL);
+        cusparseResult = cusparseCreateMatDescr(&descrC);
+	assert(CUSPARSE_STATUS_SUCCESS == cusparseResult);
+	cusparseSetMatIndexBase(descrC,CUSPARSE_INDEX_BASE_ZERO);
+	cusparseSetMatType(descrC, CUSPARSE_MATRIX_TYPE_GENERAL);
+	cusparseSetPointerMode(cusparse, CUSPARSE_POINTER_MODE_HOST);
+	cusparseSetStream(cusparse, stream);
+	cublasSetStream(cublas, stream);
+
+	// get max_index
+	int max_index = model->nMaxIdxSV;
+	const svm_node *node;
+	node = x;
+	int x_nnz = 0;
+	while(node->index != -1) {
+		if( node->index > max_index )
+			max_index = node->index;
+		x_nnz++;
+		node++;
+	}
+	max_index++;
+
+	// create a sparse matrix X = model->l * [x]
+	std::vector<int> csrRowPtr(model->l+1);
+	std::vector<double> csrVal(model->l*x_nnz);
+	std::vector<int> csrColIdx(model->l*x_nnz);
+	int curPos = 0;
+	for( int i=0; i<model->l; i++ ) {
+		csrRowPtr[i] = curPos;
+		node = x;
+		while(node->index != -1) {
+			csrVal[curPos] = node->value;
+			csrColIdx[curPos] = node->index;
+			curPos++;
+			node++;
+		}
+	}
+	csrRowPtr[model->l] = curPos;	
+	int* csrColIdxX = NULL;
+	double* csrValX = NULL;
+	int* csrRowPtrX = NULL;
+	CUDA_CHECK(cudaMalloc((void**)&csrRowPtrX, sizeof(int)*(model->l+1)));
+	CUDA_CHECK(cudaMalloc((void**)&csrColIdxX, sizeof(int)*model->l*x_nnz));
+	CUDA_CHECK(cudaMalloc((void**)&csrValX, sizeof(double)*model->l*x_nnz));
+	CUDA_CHECK(cudaMemcpyAsync(csrRowPtrX, csrRowPtr.data(), sizeof(int)*(model->l+1), cudaMemcpyHostToDevice, stream));
+	CUDA_CHECK(cudaMemcpyAsync(csrColIdxX, csrColIdx.data(), sizeof(int)*model->l*x_nnz, cudaMemcpyHostToDevice, stream));
+	CUDA_CHECK(cudaMemcpyAsync(csrValX, csrVal.data(), sizeof(double)*model->l*x_nnz, cudaMemcpyHostToDevice, stream));
+
+	int nnzC;
+	size_t buffer_size;
+	char* buffer = NULL; 
+	double* csrValC = NULL;
+	double* temp_csrValC = NULL;
+	int* csrRowPtrC = NULL;
+	int* csrColIdxC = NULL;
+	double* all_one = NULL;
+	double* d_out = NULL;
+	double* d_vectorX = NULL, *d_vectorY = NULL;
+	std::vector<double> h_all_one, vectorX;
+	switch(param.kernel_type)
+	{
+		case LINEAR:
+		case POLY:
+		case SIGMOID:
+			// get dense vector x ready
+			vectorX.resize(max_index, 0.0);
+			CUDA_CHECK(cudaMalloc((void**)&d_vectorX, sizeof(double)*max_index));
+			node = x;
+			while(node->index != -1) {
+				vectorX[node->index] = node->value;
+				node++;
+			}
+			CUDA_CHECK(cudaMemcpyAsync(d_vectorX, vectorX.data(), sizeof(double)*max_index, cudaMemcpyHostToDevice, stream));
+
+			// get dense vector y ready
+			CUDA_CHECK(cudaMalloc((void**)&d_vectorY, sizeof(double)*model->l));
+
+			// get buffer size
+			cusparseResult = cusparseCsrmvEx_bufferSize(cusparse,
+					CUSPARSE_ALG0,
+					CUSPARSE_OPERATION_NON_TRANSPOSE,
+					model->l, max_index,
+					model->nnzSV, &one, CUDA_R_64F,
+					descrSV, 
+					model->csrValSV, CUDA_R_64F,
+					model->csrRowPtrSV, model->csrColIdxSV,
+					d_vectorX, CUDA_R_64F,
+					&zero, CUDA_R_64F,
+					d_vectorY, CUDA_R_64F,
+					CUDA_R_64F, &buffer_size);
+			assert(CUSPARSE_STATUS_SUCCESS == cusparseResult);
+			CUDA_CHECK(cudaMalloc ((void**)&buffer, buffer_size));
+	
+			// y = dot(SV, x)
+			cusparseResult = cusparseCsrmvEx(cusparse,
+					CUSPARSE_ALG0,
+					CUSPARSE_OPERATION_NON_TRANSPOSE,
+					model->l, max_index,
+					model->nnzSV,
+					&one, CUDA_R_64F,
+					descrSV,
+					model->csrValSV, CUDA_R_64F,
+					model->csrRowPtrSV, model->csrColIdxSV,
+					d_vectorX, CUDA_R_64F,
+					&zero, CUDA_R_64F,
+					d_vectorY, CUDA_R_64F,
+					CUDA_R_64F, buffer);
+			assert(CUSPARSE_STATUS_SUCCESS == cusparseResult);
+
+			// copy vectorY back to host
+			CUDA_CHECK(cudaMemcpyAsync(out, d_vectorY, sizeof(double)*model->l, cudaMemcpyDeviceToHost, stream));
+			CUDA_CHECK(cudaStreamSynchronize(stream));
+
+			// update out base on kernel_type
+			if( param.kernel_type==POLY ) {
+				for( int i=0; i<model->l; i++ )
+					out[i] = powi(param.gamma*out[i]+param.coef0,param.degree);
+			} else if( param.kernel_type==SIGMOID ) {
+				for( int i=0; i<model->l; i++ ) 
+					out[i] = tanh(param.gamma*out[i]+param.coef0);
+			}
+			break;
+		case RBF:
+			// create a sparse matrix C = X-SV
+			CUDA_CHECK(cudaMalloc((void**)&csrRowPtrC, sizeof(int)*(model->l+1)));
+			cusparseResult = cusparseXcsrgeamNnz(cusparse, model->l, max_index,
+					descrX, model->l*x_nnz, csrRowPtrX, csrColIdxX,
+					descrSV, model->nnzSV, model->csrRowPtrSV, model->csrColIdxSV,
+					descrC, csrRowPtrC, &nnzC);
+			assert(CUSPARSE_STATUS_SUCCESS == cusparseResult);
+			CUDA_CHECK(cudaMalloc((void**)&csrColIdxC, sizeof(int)*nnzC));
+			CUDA_CHECK(cudaMalloc((void**)&csrValC, sizeof(double)*nnzC));
+			CUDA_CHECK(cudaMalloc((void**)&temp_csrValC, sizeof(double)*nnzC));
+
+			cusparseResult = cusparseDcsrgeam(cusparse, model->l, max_index,
+					&one,
+					descrX, model->l*x_nnz,
+					csrValX, csrRowPtrX, csrColIdxX,
+					&NegOne,
+					descrSV, model->nnzSV,
+					model->csrValSV, model->csrRowPtrSV, model->csrColIdxSV,
+					descrC,
+					csrValC, csrRowPtrC, csrColIdxC);
+			assert(CUSPARSE_STATUS_SUCCESS == cusparseResult);
+				
+			// do C = C^2
+			// equal to vector csrValC = csrValC^2
+			CUDA_CHECK(cudaMemcpyAsync(temp_csrValC, csrValC,sizeof(double)*nnzC, cudaMemcpyDeviceToDevice, stream));
+			cublasResult = cublasDsbmv(cublas, CUBLAS_FILL_MODE_LOWER,
+					nnzC, 0, &one,
+					temp_csrValC, 1,
+					temp_csrValC, 1,
+					&zero, csrValC, 1);
+			assert(CUBLAS_STATUS_SUCCESS == cublasResult);
+
+			// out = C * all_one_vector_with_size_max_index
+			CUDA_CHECK(cudaMalloc((void**)&all_one, sizeof(double)*max_index));
+			CUDA_CHECK(cudaMalloc((void**)&d_out, sizeof(double)*model->l));
+			h_all_one.resize(max_index, 1.0);
+			CUDA_CHECK(cudaMemcpyAsync(all_one, h_all_one.data(), sizeof(double)*max_index, cudaMemcpyHostToDevice, stream));
+
+			cusparseResult = cusparseCsrmvEx_bufferSize(cusparse,
+					CUSPARSE_ALG0,
+					CUSPARSE_OPERATION_NON_TRANSPOSE,
+					model->l, max_index,
+					nnzC, &one,
+					CUDA_R_64F, descrC,
+					csrValC, CUDA_R_64F,
+					csrRowPtrC, csrColIdxC,
+					all_one, CUDA_R_64F,
+					&zero, CUDA_R_64F,
+					d_out, CUDA_R_64F,
+					CUDA_R_64F, &buffer_size);
+			assert(CUSPARSE_STATUS_SUCCESS == cusparseResult);
+			CUDA_CHECK(cudaMalloc ((void**)&buffer, buffer_size));
+
+			cusparseResult = cusparseCsrmvEx(cusparse,
+					CUSPARSE_ALG0,
+					CUSPARSE_OPERATION_NON_TRANSPOSE,
+					model->l, max_index,
+					nnzC, &one,
+					CUDA_R_64F, descrC,
+					csrValC, CUDA_R_64F,
+					csrRowPtrC, csrColIdxC,
+					all_one, CUDA_R_64F,
+					&zero, CUDA_R_64F,
+					d_out, CUDA_R_64F,
+					CUDA_R_64F, buffer);
+			assert(CUSPARSE_STATUS_SUCCESS == cusparseResult);
+
+			// copy d_out back to host
+			CUDA_CHECK(cudaMemcpyAsync(out, d_out, sizeof(double)*model->l, cudaMemcpyDeviceToHost, stream));
+			CUDA_CHECK(cudaStreamSynchronize(stream));
+
+			// do out[i] = exp(-param.gamma*out[i])
+			for( int i=0; i<model->l; i++ )
+				out[i] = exp(-param.gamma*out[i]);
+			break;
+		default:
+			printf("unsupport kernel type\n");
+			exit(0);
+			break;
+	}
+
+	cudaFree(csrColIdxX);
+	cudaFree(csrValX);
+	cudaFree(csrRowPtrX);
+	cudaFree(csrRowPtrC);
+        cudaFree(buffer);
+        cudaFree(csrValC);
+	cudaFree(temp_csrValC);
+        cudaFree(csrColIdxC);
+	cudaFree(all_one);
+	cudaFree(d_out);
+	cudaFree(d_vectorX);
+	cudaFree(d_vectorY);
+	cusparseDestroyMatDescr(descrSV);
+	cusparseDestroyMatDescr(descrX);
+	cusparseDestroyMatDescr(descrC);
+	cublasDestroy(cublas);
+	cusparseDestroy(cusparse);
+	cudaStreamDestroy(stream);
+
+        // debug, compare with base class result from cpu
+	/*std::vector<double> Outbase(model->l, 0.0);
+	KernelBase::batch_k_function(x, model, Outbase.data());
+	for( int idx=0; idx<model->l; idx++ ) {
+		if( fabs(Outbase[idx]-out[idx])>0.01 )
+			printf("batch_k_function %f <-> %f %d\n", Outbase[idx], out[idx], idx);
+	}*/
+}
+
 #endif
 
 #ifdef SVM_CUDA
@@ -2580,6 +2884,9 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 		free(nz_count);
 		free(nz_start);
 	}
+#ifdef SVM_CUDA
+	model->cuda_init();
+#endif
 	return model;
 }
 
@@ -2755,8 +3062,14 @@ double svm_predict_values(const svm_model *model, const svm_node *x, double* dec
 	{
 		double *sv_coef = model->sv_coef[0];
 		double sum = 0;
+		//for(i=0;i<model->l;i++)
+		//	sum += sv_coef[i] * Kernel::k_function(x,model->SV[i],model->param);
+		double *kvalue = Malloc(double,model->l);
+		Kernel::batch_k_function(x,model,kvalue);
 		for(i=0;i<model->l;i++)
-			sum += sv_coef[i] * Kernel::k_function(x,model->SV[i],model->param);
+			sum += sv_coef[i] * kvalue[i];
+		free(kvalue);
+
 		sum -= model->rho[0];
 		*dec_values = sum;
 
@@ -2771,8 +3084,9 @@ double svm_predict_values(const svm_model *model, const svm_node *x, double* dec
 		int l = model->l;
 
 		double *kvalue = Malloc(double,l);
-		for(i=0;i<l;i++)
-			kvalue[i] = Kernel::k_function(x,model->SV[i],model->param);
+		//for(i=0;i<l;i++)
+		//	kvalue[i] = Kernel::k_function(x,model->SV[i],model->param);
+		Kernel::batch_k_function(x,model,kvalue);
 
 		int *start = Malloc(int,nr_class);
 		start[0] = 0;
@@ -3237,6 +3551,9 @@ svm_model *svm_load_model(const char *model_file_name)
 		return NULL;
 
 	model->free_sv = 1;	// XXX
+#ifdef SVM_CUDA
+	model->cuda_init();
+#endif	
 	return model;
 }
 
@@ -3273,6 +3590,10 @@ void svm_free_model_content(svm_model* model_ptr)
 
 	free(model_ptr->nSV);
 	model_ptr->nSV = NULL;
+
+#ifdef SVM_CUDA
+	model_ptr->cuda_free();
+#endif	
 }
 
 void svm_free_and_destroy_model(svm_model** model_ptr_ptr)

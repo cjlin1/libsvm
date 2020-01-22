@@ -69,6 +69,16 @@ struct svm_model
 	/* XXX */
 	int free_sv;		/* 1 if svm_model is created by svm_load_model*/
 				/* 0 if svm_model is created by svm_train */
+#ifdef SVM_CUDA
+	void cuda_init();
+	void cuda_free();
+
+	int nMaxIdxSV;		/* max index of SV */
+	int nnzSV;		/* non-zero value count of SV */
+	int* csrRowPtrSV;	/* row index of matrix SV */
+	int* csrColIdxSV;	/* column index of matrix SV */
+	double* csrValSV;	/* values of matrix SV */
+#endif
 };
 
 struct svm_model *svm_train(const struct svm_problem *prob, const struct svm_parameter *param);
