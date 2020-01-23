@@ -27,6 +27,6 @@ clean:
 svm-train.o: svm-train.c
 	$(CXX) $(CFLAGS) -c svm-train.c
 svm-cuda.o: svm.cpp
-	$(CXX) $(CFLAGS) -DSVM_CUDA -c svm.cpp -o svm-cuda.o
+	nvcc -O3 -x cu -DSVM_CUDA -c svm.cpp -o svm-cuda.o
 svm-train-cuda: svm-train.o svm-cuda.o
 	$(CXX) $(CFLAGS) svm-train.o svm-cuda.o -o svm-train-cuda -lm -lcusparse -lcublas -lcudart
