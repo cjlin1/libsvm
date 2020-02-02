@@ -78,6 +78,20 @@ struct svm_model
 	int* csrRowPtrSV;	/* row index of matrix SV */
 	int* csrColIdxSV;	/* column index of matrix SV */
 	double* csrValSV;	/* values of matrix SV */
+	double* csrValSVSquare; /* value^2 of matrix SV */
+
+	void cuda_preload_problem(const struct svm_problem *problem);  /* load problem in gpu memory, non-thread-safe, speed up training */
+	void setPreloadIdx(int nIdx); /* called before getPreloadX() */
+	int getPreloadX(int* nnz, int** csrColIdx, double** csrVal, double** csrValSquare) const; /* get vector x */
+	int nPreloadIdx;
+	const struct svm_problem *problem;
+	int* csrRowPtrProblem;  /* row index of matrix problem */
+	int nMaxIdxProblem;	/* max index of problem */
+	int nnzProblem;		/* non-zero value count of problem */
+	int* csrColIdxProblem;	/* cloumn index of matrix problem */
+	double* csrValProblem;	/* values of matrix problem */
+	double* csrValProblemSquare; /* value^2 of matrix problem */
+	double* d_out;		/* temp output */
 #endif
 };
 
