@@ -4,6 +4,14 @@ make clean; make svm-train-cuda
 How to use:
 run svm-train-cuda instead of svm-train, with same command line arguments of svm-train
 
+multithreading
+svm-train-cuda is multithreading by default(with OpenMP), If you are runing a svm classification job with more than 2 tags, it can much faster than single thread one.
+
+If you run out of memory or GPU memory, you can disable it with environment:
+export OMP_NUM_THREADS=1
+
+You can try setting OMP_NUM_THREADS to another number,  balancing the speed and GPU/CPU usage.
+
 
 ///////////////////////////////////////////////////////////////////////////////////////
 
