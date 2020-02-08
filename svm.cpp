@@ -2625,14 +2625,13 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 			probB=Malloc(double,nr_class*(nr_class-1)/2);
 		}
 
-		int t = 0;
-		for(i=0;i<nr_class;i++) {
 #ifdef SVM_CUDA
-			#pragma omp parallel for if(nr_class!=2) schedule(dynamic)
+		#pragma omp parallel for if(nr_class!=2) schedule(dynamic) collapse(2)
 #endif
+		for(i=0;i<nr_class;i++) {
 			for(int j=i+1;j<nr_class;j++)
 			{
-				int p = t + j - (i+1);
+				int p = i*(nr_class-1) - i*(i-1)/2 + j-(i+1);
 				svm_problem sub_prob;
 				int si = start[i], sj = start[j];
 				int ci = count[i], cj = count[j];
@@ -2664,7 +2663,6 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 				free(sub_prob.x);
 				free(sub_prob.y);
 			}
-			t += (nr_class-i-1);
 		}
 
 		// build output
