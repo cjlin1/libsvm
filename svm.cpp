@@ -2626,6 +2626,8 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 		}
 
 #ifdef SVM_CUDA
+		if( !getenv("OMP_NUM_THREADS") )
+			omp_set_num_threads(2);
 		#pragma omp parallel for if(nr_class!=2) schedule(dynamic) collapse(2)
 #endif
 		for(i=0;i<nr_class;i++) {
