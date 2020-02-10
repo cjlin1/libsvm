@@ -2627,13 +2627,14 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 
 #ifdef SVM_CUDA
 		if( !getenv("OMP_NUM_THREADS") )
-			omp_set_num_threads(2);
-		#pragma omp parallel for if(nr_class!=2) schedule(dynamic) collapse(2)
+			omp_set_num_threads(1);
+		#pragma omp parallel for if(nr_class!=2) schedule(dynamic) collapse(1)
 #endif
-		for(i=0;i<nr_class;i++) {
-			for(int j=i+1;j<nr_class;j++)
-			{
-				int p = i*(nr_class-1) - i*(i-1)/2 + j-(i+1);
+		for(int p=0; p<nr_class*(nr_class-1)/2; p++) {
+			for( int i=0; i<nr_class; i++ ) {
+				int j = p - i*(nr_class-1) + i*(i-1)/2 + i + 1;
+				if( j<=i || j>=nr_class )
+					continue;
 				svm_problem sub_prob;
 				int si = start[i], sj = start[j];
 				int ci = count[i], cj = count[j];
