@@ -1264,38 +1264,82 @@ int Solver::select_working_set(int &out_i, int &out_j)
 	// j: minimizes the decrease of obj value
 	//    (if quadratic coefficeint <= 0, replace it with tau)
 	//    -y_j*grad(f)_j < -y_i*grad(f)_i, j in I_low(\alpha)
-
 	double Gmax = -INF;
 	double Gmax2 = -INF;
 	int Gmax_idx = -1;
 	int Gmin_idx = -1;
 	double obj_diff_min = INF;
 
+#ifdef SVM_CUDA
+	static double tGmax = -INF;
+	static double tGmax2 = -INF;
+	static int tGmax_idx = -1;
+	static int tGmin_idx = -1;
+	static double tobj_diff_min = INF;
+#pragma omp threadprivate(tGmax, tGmax2, tGmax_idx, tGmin_idx, tobj_diff_min)
+
+	tGmax = -INF;
+	tGmax_idx = -1;
+#pragma omp parallel for copyin(tGmax, tGmax_idx)	
+#else
+	double& tGmax = Gmax;
+	double& tGmax2 = Gmax2;
+	int& tGmax_idx = Gmax_idx;
+	int& tGmin_idx = Gmin_idx;
+	double& tobj_diff_min = obj_diff_min;
+#endif
 	for(int t=0;t<active_size;t++)
 		if(y[t]==+1)
 		{
 			if(!is_upper_bound(t))
-				if(-G[t] >= Gmax)
+				if(-G[t] >= tGmax)
 				{
-					Gmax = -G[t];
-					Gmax_idx = t;
+					tGmax = -G[t];
+					tGmax_idx = t;
 				}
 		}
 		else
 		{
 			if(!is_lower_bound(t))
-				if(G[t] >= Gmax)
+				if(G[t] >= tGmax)
 				{
-					Gmax = G[t];
-					Gmax_idx = t;
+					tGmax = G[t];
+					tGmax_idx = t;
 				}
 		}
+#ifdef SVM_CUDA
+#pragma omp parallel
+	{
+		#pragma omp critical
+		{
+			if( tGmax>=Gmax )
+			{
+				if( tGmax==Gmax )
+				{
+					if( tGmax_idx>Gmax_idx )
+						Gmax_idx = tGmax_idx;
+				}
+				else
+				{
+					Gmax = tGmax;
+					Gmax_idx = tGmax_idx;
+				}
+			}
+		}
+	}
+#endif
 
 	int i = Gmax_idx;
 	const Qfloat *Q_i = NULL;
 	if(i != -1) // NULL Q_i not accessed: Gmax=-INF if i=-1
 		Q_i = Q->get_Q(i,active_size);
 
+	tGmax2 = -INF;
+	tGmin_idx = -1;
+	tobj_diff_min = INF;
+#ifdef SVM_CUDA
+#pragma omp parallel for copyin(tGmax2, tGmin_idx, tobj_diff_min)
+#endif
 	for(int j=0;j<active_size;j++)
 	{
 		if(y[j]==+1)
@@ -1303,8 +1347,8 @@ int Solver::select_working_set(int &out_i, int &out_j)
 			if (!is_lower_bound(j))
 			{
 				double grad_diff=Gmax+G[j];
-				if (G[j] >= Gmax2)
-					Gmax2 = G[j];
+				if (G[j] >= tGmax2)
+					tGmax2 = G[j];
 				if (grad_diff > 0)
 				{
 					double obj_diff;
@@ -1314,10 +1358,10 @@ int Solver::select_working_set(int &out_i, int &out_j)
 					else
 						obj_diff = -(grad_diff*grad_diff)/TAU;
 
-					if (obj_diff <= obj_diff_min)
+					if (obj_diff <= tobj_diff_min)
 					{
-						Gmin_idx=j;
-						obj_diff_min = obj_diff;
+						tGmin_idx=j;
+						tobj_diff_min = obj_diff;
 					}
 				}
 			}
@@ -1327,8 +1371,8 @@ int Solver::select_working_set(int &out_i, int &out_j)
 			if (!is_upper_bound(j))
 			{
 				double grad_diff= Gmax-G[j];
-				if (-G[j] >= Gmax2)
-					Gmax2 = -G[j];
+				if (-G[j] >= tGmax2)
+					tGmax2 = -G[j];
 				if (grad_diff > 0)
 				{
 					double obj_diff;
@@ -1338,15 +1382,37 @@ int Solver::select_working_set(int &out_i, int &out_j)
 					else
 						obj_diff = -(grad_diff*grad_diff)/TAU;
 
-					if (obj_diff <= obj_diff_min)
+					if (obj_diff <= tobj_diff_min)
 					{
-						Gmin_idx=j;
-						obj_diff_min = obj_diff;
+						tGmin_idx=j;
+						tobj_diff_min = obj_diff;
 					}
 				}
 			}
 		}
 	}
+#ifdef SVM_CUDA
+#pragma omp parallel
+	{
+		#pragma omp critical
+		{
+			if(tGmax2>Gmax2 )
+				Gmax2 = tGmax2;
+			if( tobj_diff_min <= obj_diff_min )
+			{
+				if( tobj_diff_min<obj_diff_min )
+				{
+					obj_diff_min = tobj_diff_min;
+					Gmin_idx = tGmin_idx;
+				}
+				else if( tGmin_idx > Gmin_idx )
+				{
+					Gmin_idx = tGmin_idx;
+				}
+			}
+		}
+	}
+#endif
 
 	if(Gmax+Gmax2 < eps || Gmin_idx == -1)
 		return 1;
@@ -2379,9 +2445,6 @@ static void svm_binary_svc_probability(
 		int j = i+rand()%(prob->l-i);
 		swap(perm[i],perm[j]);
 	}
-#ifdef SVM_CUDA
-	#pragma omp parallel for schedule(dynamic) num_threads(param->cuda_threads)
-#endif	
 	for(i=0;i<nr_fold;i++)
 	{
 		int begin = i*prob->l/nr_fold;
@@ -2435,6 +2498,9 @@ static void svm_binary_svc_probability(
 			subparam.weight[0]=Cp;
 			subparam.weight[1]=Cn;
 			struct svm_model *submodel = svm_train(&subprob,&subparam);
+#ifdef SVM_CUDA			
+#pragma omp parallel for private(j)
+#endif
 			for(j=begin;j<end;j++)
 			{
 				svm_predict_values(submodel,prob->x[perm[j]],&(dec_values[perm[j]]));
@@ -2665,10 +2731,6 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 			probB=Malloc(double,nr_class*(nr_class-1)/2);
 		}
 
-#ifdef SVM_CUDA
-		// Another "#pragma omp parallel for" in svm_binary_svc_probability(), if param->probability
-		#pragma omp parallel for schedule(dynamic) if(nr_class!=2 && !param->probability) num_threads(param->cuda_threads)
-#endif
 		for(int p=0; p<nr_class*(nr_class-1)/2; p++) {
 			for( int i=0; i<nr_class; i++ )
 			{
@@ -3269,7 +3331,6 @@ bool read_model_header(FILE *fp, svm_model* model)
 	param.nr_weight = 0;
 	param.weight_label = NULL;
 	param.weight = NULL;
-	param.cuda_threads = 1;
 
 	char cmd[81];
 	while(1)

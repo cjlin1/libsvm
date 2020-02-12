@@ -38,7 +38,6 @@ void exit_with_help()
 	"-wi weight : set the parameter C of class i to weight*C, for C-SVC (default 1)\n"
 	"-v n: n-fold cross validation mode\n"
 	"-q : quiet mode (no outputs)\n"
-	"-u n : cuda train threads count (default 1)\n"
 	);
 	exit(1);
 }
@@ -180,7 +179,6 @@ void parse_command_line(int argc, char **argv, char *input_file_name, char *mode
 	param.nr_weight = 0;
 	param.weight_label = NULL;
 	param.weight = NULL;
-	param.cuda_threads = 1;
 	cross_validation = 0;
 
 	// parse options
@@ -246,9 +244,6 @@ void parse_command_line(int argc, char **argv, char *input_file_name, char *mode
 				param.weight = (double *)realloc(param.weight,sizeof(double)*param.nr_weight);
 				param.weight_label[param.nr_weight-1] = atoi(&argv[i-1][2]);
 				param.weight[param.nr_weight-1] = atof(argv[i]);
-				break;
-			case 'u':
-				param.cuda_threads = atoi(argv[i]);
 				break;
 			default:
 				fprintf(stderr,"Unknown option: -%c\n", argv[i-1][1]);
