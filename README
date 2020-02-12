@@ -5,14 +5,10 @@ How to use:
 run svm-train-cuda instead of svm-train, with same command line arguments of svm-train
 
 multithreading
-svm-train-cuda is multithreading by default(with OpenMP), If you are runing a svm classification job with more than 2 tags,
-it can be faster than single thread one.
-You can define cuda thread count with command line argument -u
--u n : cuda train threads count (default 1)
-Please note: cache is base on thread, total host memory usage is cuda_thread*cache_size_per_thread
-you will have to cut down some cache memory if you are using multithreading cuda, cache is faster than GPU, 
-if the training size is small enough. 
-So you may try and get the best -u cuda_thread -m cache_size combination, base on the size of your problem.
+svm-train-cuda is multithreading by default(with OpenMP), you can change thread count with
+setenv OMP_NUM_THREADS 8 (Windows)
+or
+export OMP_NUM_THREADS=8 (Linux)
 
 tips
 try add -h 0 as arguments of svm-train-cuda, it may faster than default one(-h 1)
