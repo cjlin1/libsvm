@@ -951,6 +951,9 @@ void Solver::reconstruct_gradient()
 
 	if (nr_free*l > 2*active_size*(l-active_size))
 	{
+#ifdef SVM_CUDA
+#pragma omp parallel for private(i)
+#endif
 		for(i=active_size;i<l;i++)
 		{
 			const Qfloat *Q_i = Q->get_Q(i,active_size);
@@ -961,6 +964,9 @@ void Solver::reconstruct_gradient()
 	}
 	else
 	{
+#ifdef SVM_CUDA
+#pragma omp parallel for private(i)
+#endif
 		for(i=0;i<active_size;i++)
 			if(is_free(i))
 			{
@@ -1165,6 +1171,9 @@ void Solver::Solve(int l, const QMatrix& Q, const double *p_, const schar *y_,
 		double delta_alpha_i = alpha[i] - old_alpha_i;
 		double delta_alpha_j = alpha[j] - old_alpha_j;
 
+#ifdef SVM_CUDA
+#pragma omp parallel for
+#endif
 		for(int k=0;k<active_size;k++)
 		{
 			G[k] += Q_i[k]*delta_alpha_i + Q_j[k]*delta_alpha_j;
@@ -1182,9 +1191,15 @@ void Solver::Solve(int l, const QMatrix& Q, const double *p_, const schar *y_,
 			{
 				Q_i = Q.get_Q(i,l);
 				if(ui)
+#ifdef SVM_CUDA
+#pragma omp parallel for private(k)
+#endif					
 					for(k=0;k<l;k++)
 						G_bar[k] -= C_i * Q_i[k];
 				else
+#ifdef SVM_CUDA
+#pragma omp parallel for private(k)
+#endif
 					for(k=0;k<l;k++)
 						G_bar[k] += C_i * Q_i[k];
 			}
@@ -1193,9 +1208,15 @@ void Solver::Solve(int l, const QMatrix& Q, const double *p_, const schar *y_,
 			{
 				Q_j = Q.get_Q(j,l);
 				if(uj)
+#ifdef SVM_CUDA
+#pragma omp parallel for private(k)
+#endif
 					for(k=0;k<l;k++)
 						G_bar[k] -= C_j * Q_j[k];
 				else
+#ifdef SVM_CUDA
+#pragma omp parallel for private(k)
+#endif
 					for(k=0;k<l;k++)
 						G_bar[k] += C_j * Q_j[k];
 			}
