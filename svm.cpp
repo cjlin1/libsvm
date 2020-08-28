@@ -951,9 +951,6 @@ void Solver::reconstruct_gradient()
 
 	if (nr_free*l > 2*active_size*(l-active_size))
 	{
-#ifdef SVM_CUDA
-#pragma omp parallel for private(i)
-#endif
 		for(i=active_size;i<l;i++)
 		{
 			const Qfloat *Q_i = Q->get_Q(i,active_size);
@@ -964,9 +961,6 @@ void Solver::reconstruct_gradient()
 	}
 	else
 	{
-#ifdef SVM_CUDA
-#pragma omp parallel for private(i)
-#endif
 		for(i=0;i<active_size;i++)
 			if(is_free(i))
 			{
@@ -2519,9 +2513,6 @@ static void svm_binary_svc_probability(
 			subparam.weight[0]=Cp;
 			subparam.weight[1]=Cn;
 			struct svm_model *submodel = svm_train(&subprob,&subparam);
-#ifdef SVM_CUDA			
-#pragma omp parallel for private(j)
-#endif
 			for(j=begin;j<end;j++)
 			{
 				svm_predict_values(submodel,prob->x[perm[j]],&(dec_values[perm[j]]));
