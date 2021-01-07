@@ -4,12 +4,6 @@ make clean; make svm-train-cuda
 How to use:
 run svm-train-cuda instead of svm-train, with same command line arguments of svm-train
 
-multithreading
-svm-train-cuda is multithreading by default(with OpenMP), you can change thread count with
-setenv OMP_NUM_THREADS 8 (Windows)
-or
-export OMP_NUM_THREADS=8 (Linux)
-
 tips
 try add -h 0 as arguments of svm-train-cuda, it may faster than default one(-h 1)
 
