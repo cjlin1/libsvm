@@ -24,10 +24,11 @@ the usage and the way of specifying parameters are the same as that of LIBSVM.
 Installation
 ============
 
-On Windows systems, pre-built binary files are already in the
-directory '..\windows', so no need to conduct installation. Now we
-provide binary files only for 64bit MATLAB on Windows. If you would
-like to re-build the package, please rely on the following steps.
+On Windows systems, pre-built mex files are already in the
+directory '..\windows', so please just copy them to the matlab
+directory. Now we provide binary files only for 64bit MATLAB on
+Windows. If you would like to re-build the package, please rely on the
+following steps.
 
 We recommend using make.m on both MATLAB and OCTAVE. Just type 'make'
 to build 'libsvmread.mex', 'libsvmwrite.mex', 'svmtrain.mex', and
