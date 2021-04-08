@@ -3,6 +3,7 @@
 from ctypes import *
 from ctypes.util import find_library
 from os import path
+from glob import glob
 import sys
 
 try:
@@ -24,18 +25,23 @@ __all__ = ['libsvm', 'svm_problem', 'svm_parameter',
 
 try:
     dirname = path.dirname(path.abspath(__file__))
-    if sys.platform == 'win32':
-        libsvm = CDLL(path.join(dirname, r'..\windows\libsvm.dll'))
-    else:
-        libsvm = CDLL(path.join(dirname, '../libsvm.so.2'))
+    dynamic_lib_name = 'clib.cp*'
+    path_to_so = glob(path.join(dirname, dynamic_lib_name))[0]
+    libsvm = CDLL(path_to_so)
 except:
-# For unix the prefix 'lib' is not considered.
-    if find_library('svm'):
-        libsvm = CDLL(find_library('svm'))
-    elif find_library('libsvm'):
-        libsvm = CDLL(find_library('libsvm'))
-    else:
-        raise Exception('LIBSVM library not found.')
+    try:
+        if sys.platform == 'win32':
+            libsvm = CDLL(path.join(dirname, r'..\..\windows\libsvm.dll'))
+        else:
+            libsvm = CDLL(path.join(dirname, '../../libsvm.so.2'))
+    except:
+    # For unix the prefix 'lib' is not considered.
+        if find_library('svm'):
+            libsvm = CDLL(find_library('svm'))
+        elif find_library('libsvm'):
+            libsvm = CDLL(find_library('libsvm'))
+        else:
+            raise Exception('LIBSVM library not found.')
 
 C_SVC = 0
 NU_SVC = 1

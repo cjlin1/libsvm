@@ -2,11 +2,11 @@
 
 import os, sys
 sys.path = [os.path.dirname(os.path.abspath(__file__))] + sys.path
-from svm import *
-from svm import __all__ as svm_all
-from svm import scipy, sparse
-from commonutil import *
-from commonutil import __all__ as common_all
+from .svm import *
+from .svm import __all__ as svm_all
+from .svm import scipy, sparse
+from .commonutil import *
+from .commonutil import __all__ as common_all
 
 if sys.version_info[0] < 3:
     range = xrange
