@@ -9,7 +9,7 @@
 <a name="_TOP"><b><h1><a
 href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a>  FAQ </h1></b></a>
 <b>last modified : </b>
-Wed, 20 Feb 2019 17:53:09 GMT
+Sat, 31 Oct 2020 23:48:24 GMT
 <class="categories">
 <li><a
 href="#_TOP">All Questions</a>(84)</li>
@@ -1757,12 +1757,13 @@ Your compiler version may not be supported/compatible for MATLAB.
 Please check <a href=http://www.mathworks.com/support/compilers/current_release>this MATLAB page</a> first and then specify the version
 number. For example, if g++ X.Y is supported, replace
 <pre>
-CXX = g++
+CXX ?= g++
 </pre>
 in the Makefile with
 <pre>
 CXX = g++-X.Y
 </pre>
+Note that you should have = instead of ?= to ensure that the specified compiler is used.
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
