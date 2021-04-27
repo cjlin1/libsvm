@@ -94,10 +94,32 @@ double do_cross_validation()
 	}
 	else
 	{
+        int countp = 0;
+        int countn = 0;
+        int correctp = 0;
+        int correctn = 0;
+        
 		for(i=0;i<prob.l;i++)
+        {
 			if(target[i] == prob.y[i])
 				++total_correct;
-		mexPrintf("Cross Validation Accuracy = %g%%\n",100.0*total_correct/prob.l);
+
+            if(prob.y[i] > 0.0)
+            {
+                countp++;
+                if(target[i] == prob.y[i])
+                    correctp++;
+            }
+            else
+            {
+                countn++;
+                if(target[i] == prob.y[i])
+                    correctn++;
+            }
+        }
+        mexPrintf("Positive Cross Validation Accuracy = %g%%\n",100.0*correctp/countp);
+        mexPrintf("Negative Cross Validation Accuracy = %g%%\n",100.0*correctn/countn);
+
 		retval = 100.0*total_correct/prob.l;
 	}
 	free(target);
