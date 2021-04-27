@@ -1,3 +1,17 @@
+How to build:
+make clean; make svm-train-cuda
+
+How to use:
+run svm-train-cuda instead of svm-train, with same command line arguments of svm-train
+
+tips
+try add -h 0 as arguments of svm-train-cuda, it may faster than default one(-h 1)
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+
+
+
 Libsvm is a simple, easy-to-use, and efficient software for SVM
 classification and regression. It solves C-SVM classification, nu-SVM
 classification, one-class-SVM, epsilon-SVM regression, and nu-SVM
