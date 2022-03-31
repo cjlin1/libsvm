@@ -57,8 +57,10 @@ The format of training and testing data files is:
 .
 .
 
-Each line contains an instance and is ended by a '\n' character. For
-<label> in the training set, we have the following cases.
+Each line contains an instance and is ended by a '\n' character. 
+While there can be no feature values for a sample (i.e., a row of all zeros), 
+the <label> column must not be empty. For <label> in the training set, 
+we have the following cases.
 
 * classification: <label> is an integer indicating the class label
   (multi-class is supported).
@@ -66,12 +68,14 @@ Each line contains an instance and is ended by a '\n' character. For
 * For regression, <label> is the target value which can be any real
   number.
 
-* For one-class SVM, <label> is not used and can be any number.
+* For one-class SVM, <label> has no effect and can be any number.
 
 In the test set, <label> is used only to calculate accuracy or
 errors. If it's unknown, any number is fine. For one-class SVM, if
 non-outliers/outliers are known, their labels in the test file must be
-+1/-1 for evaluation.
++1/-1 for evaluation. The <label> column is read using strtod() provided by 
+the C standard library. Therefore, <label> values that are numerically 
+equivalent will be treated the same (e.g., +01e0 and 1 count as the same class).
 
 The pair <index>:<value> gives a feature (attribute) value: <index> is
 an integer starting from 1 and <value> is a real number. The only
