@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import os, sys
-sys.path = [os.path.dirname(os.path.abspath(__file__))] + sys.path
 from .svm import *
 from .svm import __all__ as svm_all
 from .svm import scipy, sparse
