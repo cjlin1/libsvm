@@ -160,7 +160,7 @@ def csr_scale(x, scale_param):
 
     if not n == len(coef):
         print("WARNING: The dimension of scaling parameters and feature number do not match.", file=sys.stderr)
-        coef = coef.resize(n)
+        coef = coef.resize(n) # zeros padded if n > len(coef)
         offset = offset.resize(n)
 
     # scaled_x = x * diag(coef) + ones(l, 1) * offset'
