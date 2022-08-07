@@ -5,11 +5,11 @@ from array import array
 import sys
 
 try:
+    import numpy as np
     import scipy
     from scipy import sparse
 except:
     scipy = None
-    sparse = None
 
 
 __all__ = ['svm_read_problem', 'evaluations', 'csr_find_scale_param', 'csr_scale']
@@ -58,10 +58,10 @@ def svm_read_problem(data_file_name, return_scipy=False):
                 xi[int(ind)] = float(val)
             prob_x += [xi]
     if scipy != None and return_scipy:
-        prob_y = scipy.frombuffer(prob_y, dtype='d')
-        prob_x = scipy.frombuffer(prob_x, dtype='d')
-        col_idx = scipy.frombuffer(col_idx, dtype='l')
-        row_ptr = scipy.frombuffer(row_ptr, dtype='l')
+        prob_y = np.frombuffer(prob_y, dtype='d')
+        prob_x = np.frombuffer(prob_x, dtype='d')
+        col_idx = np.frombuffer(col_idx, dtype='l')
+        row_ptr = np.frombuffer(row_ptr, dtype='l')
         prob_x = sparse.csr_matrix((prob_x, col_idx, row_ptr))
     return (prob_y, prob_x)
 
@@ -73,7 +73,7 @@ def evaluations_scipy(ty, pv):
     Calculate accuracy, mean squared error and squared correlation coefficient
     using the true values (ty) and predicted values (pv).
     """
-    if not (scipy != None and isinstance(ty, scipy.ndarray) and isinstance(pv, scipy.ndarray)):
+    if not (scipy != None and isinstance(ty, np.ndarray) and isinstance(pv, np.ndarray)):
         raise TypeError("type of ty and pv must be ndarray")
     if len(ty) != len(pv):
         raise ValueError("len(ty) must be equal to len(pv)")
@@ -85,7 +85,7 @@ def evaluations_scipy(ty, pv):
     sumvy = (pv*ty).sum()
     sumvv = (pv*pv).sum()
     sumyy = (ty*ty).sum()
-    with scipy.errstate(all = 'raise'):
+    with np.errstate(all = 'raise'):
         try:
             SCC = ((l*sumvy-sumv*sumy)*(l*sumvy-sumv*sumy))/((l*sumvv-sumv*sumv)*(l*sumyy-sumy*sumy))
         except:
@@ -102,7 +102,7 @@ def evaluations(ty, pv, useScipy = True):
     using the true values (ty) and predicted values (pv).
     """
     if scipy != None and useScipy:
-        return evaluations_scipy(scipy.asarray(ty), scipy.asarray(pv))
+        return evaluations_scipy(np.asarray(ty), np.asarray(pv))
     if len(ty) != len(pv):
         raise ValueError("len(ty) must be equal to len(pv)")
     total_correct = total_error = 0
