@@ -9,7 +9,7 @@
 <a name="_TOP"><b><h1><a
 href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a>  FAQ </h1></b></a>
 <b>last modified : </b>
-Sat, 31 Oct 2020 23:48:24 GMT
+Sat, 12 Mar 2022 22:30:54 GMT
 <class="categories">
 <li><a
 href="#_TOP">All Questions</a>(84)</li>
@@ -1226,7 +1226,8 @@ this, so <b>after version 3.17</b>, if the data set has only
 two labels +1 and -1,
 internally we ensure +1 to be before -1. Then class +1 
 is always treated as positive in the SVM problem.
-Note that this is for <b>two-class data only.</b>
+Note that this is for <b>two-class data only</b>
+(the data must include both +1 and -1 labels).
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
@@ -1374,7 +1375,7 @@ may be different.
 <a name="f503"><b>Q: On some systems CV accuracy is the same in several runs. How could I use different data partitions? In other words, how do I set random seed in LIBSVM?</b></a>
 <br/>                                                                                
 <p>
-If you use GNU C library,
+If you use GNU C library or a recent Visual C++ library,
 the default seed 1 is considered. Thus you always
 get the same result of running svm-train -v.
 To have different seeds, you can add the following code
@@ -1386,8 +1387,8 @@ and in the beginning of main(),
 <pre>
 srand(time(0));
 </pre>
-Alternatively, if you are not using GNU C library
-and would like to use a fixed seed, you can have
+Alternatively, if you
+would like to use a fixed seed, you can have
 <pre>
 srand(1);
 </pre>
