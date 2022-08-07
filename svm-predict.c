@@ -58,6 +58,12 @@ void predict(FILE *input, FILE *output)
 	{
 		if (svm_type==NU_SVR || svm_type==EPSILON_SVR)
 			info("Prob. model for test data: target value = predicted value + z,\nz: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma=%g\n",svm_get_svr_probability(model));
+		else if(svm_type==ONE_CLASS)
+		{
+			// nr_class = 2 for ONE_CLASS
+			prob_estimates = (double *) malloc(nr_class*sizeof(double));
+			fprintf(output,"label normal outlier\n");
+		}
 		else
 		{
 			int *labels=(int *) malloc(nr_class*sizeof(int));
@@ -117,7 +123,7 @@ void predict(FILE *input, FILE *output)
 		}
 		x[i].index = -1;
 
-		if (predict_probability && (svm_type==C_SVC || svm_type==NU_SVC))
+		if (predict_probability && (svm_type==C_SVC || svm_type==NU_SVC || svm_type==ONE_CLASS))
 		{
 			predict_label = svm_predict_probability(model,x,prob_estimates);
 			fprintf(output,"%g",predict_label);

@@ -104,7 +104,7 @@ Returned Model Structure
 
 The 'svmtrain' function returns a model which can be used for future
 prediction.  It is a structure and is organized as [Parameters, nr_class,
-totalSV, rho, Label, ProbA, ProbB, nSV, sv_coef, SVs]:
+totalSV, rho, Label, ProbA, ProbB, Prob_density_marks, nSV, sv_coef, SVs]:
 
         -Parameters: parameters
         -nr_class: number of classes; = 2 for regression/one-class svm
@@ -114,6 +114,7 @@ totalSV, rho, Label, ProbA, ProbB, nSV, sv_coef, SVs]:
         -sv_indices: values in [1,...,num_traning_data] to indicate SVs in the training set
         -ProbA: pairwise probability information; empty if -b 0 or in one-class SVM
         -ProbB: pairwise probability information; empty if -b 0 or in one-class SVM
+        -Prob_density_marks: probability information for one-class SVM; empty if -b 0 or not in one-class SVM
         -nSV: number of SVs for each class; empty for regression/one-class SVM
         -sv_coef: coefficients for SVs in decision functions
         -SVs: support vectors
@@ -144,6 +145,8 @@ instead of an empty vector. For probabilities, each row contains k values
 indicating the probability that the testing instance is in each class.
 Note that the order of classes here is the same as 'Label' field
 in the model structure.
+For one-class SVM, each row contains two elements for probabilities
+of normal instance/outlier.
 
 Other Utilities
 ===============

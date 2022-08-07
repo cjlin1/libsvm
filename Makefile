@@ -1,6 +1,6 @@
 CXX ?= g++
 CFLAGS = -Wall -Wconversion -O3 -fPIC
-SHVER = 2
+SHVER = 3
 OS = $(shell uname)
 
 all: svm-train svm-predict svm-scale

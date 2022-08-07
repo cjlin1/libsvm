@@ -51,6 +51,12 @@ class svm_predict {
 			{
 				svm_predict.info("Prob. model for test data: target value = predicted value + z,\nz: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma="+svm.svm_get_svr_probability(model)+"\n");
 			}
+			else if(svm_type == svm_parameter.ONE_CLASS)
+			{
+				// nr_class = 2 for ONE_CLASS
+				prob_estimates = new double[nr_class];
+				output.writeBytes("label normal outlier\n");
+			}
 			else
 			{
 				int[] labels=new int[nr_class];
@@ -80,7 +86,7 @@ class svm_predict {
 			}
 
 			double predict_label;
-			if (predict_probability==1 && (svm_type==svm_parameter.C_SVC || svm_type==svm_parameter.NU_SVC))
+			if (predict_probability==1 && (svm_type==svm_parameter.C_SVC || svm_type==svm_parameter.NU_SVC || svm_type==svm_parameter.ONE_CLASS))
 			{
 				predict_label = svm.svm_predict_probability(model,x,prob_estimates);
 				output.writeBytes(predict_label+" ");

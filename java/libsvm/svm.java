@@ -1295,7 +1295,7 @@ public class svm {
 	//
 	// construct and solve various formulations
 	//
-	public static final int LIBSVM_VERSION=325;
+	public static final int LIBSVM_VERSION=330;
 	public static final Random rand = new Random();
 
 	private static svm_print_interface svm_print_stdout = new svm_print_interface()
@@ -1681,7 +1681,7 @@ public class svm {
 			return 1.0/(1+Math.exp(fApB)) ;
 	}
 
-	// Method 2 from the multiclass_prob paper by Wu, Lin, and Weng
+	// Method 2 from the multiclass_prob paper by Wu, Lin, and Weng to predict probabilities
 	private static void multiclass_probability(int k, double[][] r, double[] p)
 	{
 		int t,j;
@@ -1741,7 +1741,7 @@ public class svm {
 			svm.info("Exceeds max_iter in multiclass_prob\n");
 	}
 
-	// Cross-validation decision values for probability estimates
+	// Using cross-validation decision values to get parameters for SVC probability estimates
 	private static void svm_binary_svc_probability(svm_problem prob, svm_parameter param, double Cp, double Cn, double[] probAB)
 	{
 		int i;
@@ -1820,6 +1820,75 @@ public class svm {
 			}
 		}
 		sigmoid_train(prob.l,dec_values,prob.y,probAB);
+	}
+
+	// Binning method from the oneclass_prob paper by Que and Lin to predict the probability as a normal instance (i.e., not an outlier)
+	private static double predict_one_class_probability(svm_model model, double dec_value)
+	{
+		double prob_estimate = 0.0;
+		int nr_marks = 10;
+
+		if(dec_value < model.prob_density_marks[0])
+			prob_estimate = 0.0001;
+		else if(dec_value > model.prob_density_marks[nr_marks-1])
+			prob_estimate = 0.999;
+		else
+		{
+			for(int i=0;i<nr_marks;i++)
+				if(dec_value < model.prob_density_marks[i])
+				{
+					prob_estimate = (double)i/nr_marks;
+					break;
+				}
+		}
+		return prob_estimate;
+	}
+
+	// Get parameters for one-class SVM probability estimates
+	private static int svm_one_class_probability(svm_problem prob, svm_model model, double[] prob_density_marks)
+	{
+		double[] dec_values = new double[prob.l];
+		double[] pred_results = new double[prob.l];
+		int ret = 0;
+		int nr_marks = 10;
+
+		for(int i=0;i<prob.l;i++)
+		{
+			double[] dec_value = new double[1];
+			pred_results[i] = svm_predict_values(model,prob.x[i],dec_value);
+			dec_values[i] = dec_value[0];
+		}
+		Arrays.sort(dec_values);
+
+		int neg_counter=0;
+		for(int i=0;i<prob.l;i++)
+			if(dec_values[i]>=0)
+			{
+				neg_counter = i;
+				break;
+			}
+
+		int pos_counter = prob.l-neg_counter;
+		if(neg_counter<nr_marks/2 || pos_counter<nr_marks/2)
+		{
+			System.err.print("WARNING: number of positive or negative decision values <"+nr_marks/2+"; too few to do a probability estimation.\n");
+			ret = -1;
+		}
+		else
+		{
+			// Binning by density
+			double[] tmp_marks = new double[nr_marks+1];
+			int mid = nr_marks/2;
+			for(int i=0;i<mid;i++)
+				tmp_marks[i] = dec_values[i*neg_counter/mid];
+			tmp_marks[mid] = 0;
+			for(int i=mid+1;i<nr_marks+1;i++)
+				tmp_marks[i] = dec_values[neg_counter-1+(i-mid)*pos_counter/mid];
+
+			for(int i=0;i<nr_marks;i++)
+				prob_density_marks[i] = (tmp_marks[i]+tmp_marks[i+1])/2;
+		}
+		return ret;
 	}
 
 	// Return parameter of a Laplace distribution
@@ -1949,15 +2018,8 @@ public class svm {
 			model.label = null;
 			model.nSV = null;
 			model.probA = null; model.probB = null;
+			model.prob_density_marks = null;
 			model.sv_coef = new double[1][];
-
-			if(param.probability == 1 &&
-			   (param.svm_type == svm_parameter.EPSILON_SVR ||
-			    param.svm_type == svm_parameter.NU_SVR))
-			{
-				model.probA = new double[1];
-				model.probA[0] = svm_svr_probability(prob,param);
-			}
 
 			decision_function f = svm_train_one(prob,param,0,0);
 			model.rho = new double[1];
@@ -1980,6 +2042,26 @@ public class svm {
 					model.sv_indices[j] = i+1;
 					++j;
 				}
+
+			if(param.probability == 1 &&
+			   (param.svm_type == svm_parameter.EPSILON_SVR ||
+			    param.svm_type == svm_parameter.NU_SVR))
+			{
+				model.probA = new double[1];
+				model.probA[0] = svm_svr_probability(prob,param);
+			}
+			else if(param.probability == 1 && param.svm_type == svm_parameter.ONE_CLASS)
+			{
+				int nr_marks = 10;
+				double[] prob_density_marks = new double[nr_marks];
+
+				if(svm_one_class_probability(prob,model,prob_density_marks) == 0)
+				{
+					model.prob_density_marks = new double[nr_marks];
+					for(i=0;i<nr_marks;i++)
+						model.prob_density_marks[i] = prob_density_marks[i];
+				}
+			}
 		}
 		else
 		{
@@ -2104,6 +2186,7 @@ public class svm {
 				model.probA=null;
 				model.probB=null;
 			}
+			model.prob_density_marks = null;	// for one-class SVM probabilistic outputs only
 
 			int total_sv = 0;
 			int[] nz_count = new int[nr_class];
@@ -2445,6 +2528,14 @@ public class svm {
 					prob_max_idx = i;
 			return model.label[prob_max_idx];
 		}
+		else if(model.param.svm_type == svm_parameter.ONE_CLASS && model.prob_density_marks!=null)
+		{
+			double[] dec_value = new double[1];
+			double pred_result = svm_predict_values(model,x,dec_value);
+			prob_estimates[0] = predict_one_class_probability(model,dec_value[0]);
+			prob_estimates[1] = 1-prob_estimates[0];
+			return pred_result;
+		}
 		else
 			return svm_predict(model, x);
 	}
@@ -2512,6 +2603,14 @@ public class svm {
 			fp.writeBytes("probB");
 			for(int i=0;i<nr_class*(nr_class-1)/2;i++)
 				fp.writeBytes(" "+model.probB[i]);
+			fp.writeBytes("\n");
+		}
+		if(model.prob_density_marks != null)
+		{
+			fp.writeBytes("prob_density_marks");
+			int nr_marks = 10;
+			for(int i=0;i<nr_marks;i++)
+				fp.writeBytes(" "+model.prob_density_marks[i]);
 			fp.writeBytes("\n");
 		}
 
@@ -2646,6 +2745,14 @@ public class svm {
 					for(int i=0;i<n;i++)
 						model.probB[i] = atof(st.nextToken());
 				}
+				else if(cmd.startsWith("prob_density_marks"))
+				{
+					int n = 10;	// nr_marks
+					model.prob_density_marks = new double[n];
+					StringTokenizer st = new StringTokenizer(arg);
+					for(int i=0;i<n;i++)
+						model.prob_density_marks[i] = atof(st.nextToken());
+				}
 				else if(cmd.startsWith("nr_sv"))
 				{
 					int n = model.nr_class;
@@ -2685,6 +2792,7 @@ public class svm {
 		model.rho = null;
 		model.probA = null;
 		model.probB = null;
+		model.prob_density_marks = null;
 		model.label = null;
 		model.nSV = null;
 
@@ -2786,10 +2894,6 @@ public class svm {
 		   param.probability != 1)
 			return "probability != 0 and probability != 1";
 
-		if(param.probability == 1 &&
-		   svm_type == svm_parameter.ONE_CLASS)
-			return "one-class SVM probability output not supported yet";
-
 		// check whether nu-svc is feasible
 
 		if(svm_type == svm_parameter.NU_SVC)
@@ -2850,6 +2954,7 @@ public class svm {
 	{
 		if (((model.param.svm_type == svm_parameter.C_SVC || model.param.svm_type == svm_parameter.NU_SVC) &&
 		model.probA!=null && model.probB!=null) ||
+		(model.param.svm_type == svm_parameter.ONE_CLASS && model.prob_density_marks!=null) ||
 		((model.param.svm_type == svm_parameter.EPSILON_SVR || model.param.svm_type == svm_parameter.NU_SVR) &&
 		 model.probA!=null))
 			return 1;

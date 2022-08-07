@@ -33,7 +33,7 @@ except:
         if sys.platform == 'win32':
             libsvm = CDLL(path.join(dirname, r'..\..\windows\libsvm.dll'))
         else:
-            libsvm = CDLL(path.join(dirname, '../../libsvm.so.2'))
+            libsvm = CDLL(path.join(dirname, '../../libsvm.so.3'))
     except:
     # For unix the prefix 'lib' is not considered.
         if find_library('svm'):
@@ -348,11 +348,12 @@ class svm_parameter(Structure):
 
 class svm_model(Structure):
     _names = ['param', 'nr_class', 'l', 'SV', 'sv_coef', 'rho',
-            'probA', 'probB', 'sv_indices', 'label', 'nSV', 'free_sv']
+            'probA', 'probB', 'prob_density_marks', 'sv_indices',
+            'label', 'nSV', 'free_sv']
     _types = [svm_parameter, c_int, c_int, POINTER(POINTER(svm_node)),
             POINTER(POINTER(c_double)), POINTER(c_double),
-            POINTER(c_double), POINTER(c_double), POINTER(c_int),
-            POINTER(c_int), POINTER(c_int), c_int]
+            POINTER(c_double), POINTER(c_double), POINTER(c_double),
+            POINTER(c_int), POINTER(c_int), POINTER(c_int), c_int]
     _fields_ = genFields(_names, _types)
 
     def __init__(self):

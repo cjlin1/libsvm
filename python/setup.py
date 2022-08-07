@@ -16,7 +16,7 @@ build_ext.get_export_symbols = lambda x, y: []
 
 PACKAGE_DIR = "libsvm"
 PACKAGE_NAME = "libsvm-official"
-VERSION = "3.25.0"
+VERSION = "3.30.0"
 cpp_dir = "cpp-source"
 # should be consistent with dynamic_lib_name in libsvm/svm.py
 dynamic_lib_name = "clib"

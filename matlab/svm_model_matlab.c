@@ -10,7 +10,7 @@ typedef int mwIndex;
 #endif
 #endif
 
-#define NUM_OF_RETURN_FIELD 11
+#define NUM_OF_RETURN_FIELD 12
 
 #define Malloc(type,n) (type *)malloc((n)*sizeof(type))
 
@@ -23,6 +23,7 @@ static const char *field_names[] = {
 	"sv_indices",
 	"ProbA",
 	"ProbB",
+	"Prob_density_marks",
 	"nSV",
 	"sv_coef",
 	"SVs"
@@ -110,6 +111,19 @@ const char *model_to_matlab_structure(mxArray *plhs[], int num_of_feature, struc
 		ptr = mxGetPr(rhs[out_id]);
 		for(i = 0; i < n; i++)
 			ptr[i] = model->probB[i];
+	}
+	else
+		rhs[out_id] = mxCreateDoubleMatrix(0, 0, mxREAL);
+	out_id++;
+
+	// prob_density_marks
+	if(model->prob_density_marks != NULL)
+	{
+		int nr_marks = 10;
+		rhs[out_id] = mxCreateDoubleMatrix(nr_marks, 1, mxREAL);
+		ptr = mxGetPr(rhs[out_id]);
+		for(i = 0; i < nr_marks; i++)
+			ptr[i] = model->prob_density_marks[i];
 	}
 	else
 		rhs[out_id] = mxCreateDoubleMatrix(0, 0, mxREAL);
@@ -232,6 +246,7 @@ struct svm_model *matlab_matrix_to_model(const mxArray *matlab_struct, const cha
 	model->rho = NULL;
 	model->probA = NULL;
 	model->probB = NULL;
+	model->prob_density_marks = NULL;
 	model->label = NULL;
 	model->sv_indices = NULL;
 	model->nSV = NULL;
@@ -298,6 +313,17 @@ struct svm_model *matlab_matrix_to_model(const mxArray *matlab_struct, const cha
 		ptr = mxGetPr(rhs[id]);
 		for(i=0;i<n;i++)
 			model->probB[i] = ptr[i];
+	}
+	id++;
+
+	// prob_density_marks
+	if(mxIsEmpty(rhs[id]) == 0)
+	{
+		int nr_marks = 10;
+		model->prob_density_marks = (double*) malloc(nr_marks*sizeof(double));
+		ptr = mxGetPr(rhs[id]);
+		for(i=0;i<nr_marks;i++)
+			model->prob_density_marks[i] = ptr[i];
 	}
 	id++;
 

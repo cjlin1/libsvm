@@ -432,6 +432,8 @@ The above command loads
             instance, instead of an empty list.
             For probabilities, each element contains k values indicating
             the probability that the testing instance is in each class.
+            For one-class SVM, the list has two elements indicating the
+            probabilities of normal instance/outlier.
             Note that the order of classes is the same as the 'model.label'
             field in the model structure.
 

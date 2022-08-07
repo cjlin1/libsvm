@@ -12,6 +12,7 @@ public class svm_model implements java.io.Serializable
 	public double[] rho;		// constants in decision functions (rho[k*(k-1)/2])
 	public double[] probA;         // pariwise probability information
 	public double[] probB;
+	public double[] prob_density_marks;	// probability information for ONE_CLASS
 	public int[] sv_indices;       // sv_indices[0,...,nSV-1] are values in [1,...,num_traning_data] to indicate SVs in the training set
 
 	// for classification only

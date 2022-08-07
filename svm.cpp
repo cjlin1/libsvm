@@ -1825,7 +1825,7 @@ static double sigmoid_predict(double decision_value, double A, double B)
 		return 1.0/(1+exp(fApB)) ;
 }
 
-// Method 2 from the multiclass_prob paper by Wu, Lin, and Weng
+// Method 2 from the multiclass_prob paper by Wu, Lin, and Weng to predict probabilities
 static void multiclass_probability(int k, double **r, double *p)
 {
 	int t,j;
@@ -1889,7 +1889,7 @@ static void multiclass_probability(int k, double **r, double *p)
 	free(Qp);
 }
 
-// Cross-validation decision values for probability estimates
+// Using cross-validation decision values to get parameters for SVC probability estimates
 static void svm_binary_svc_probability(
 	const svm_problem *prob, const svm_parameter *param,
 	double Cp, double Cn, double& probA, double& probB)
@@ -1974,6 +1974,83 @@ static void svm_binary_svc_probability(
 	sigmoid_train(prob->l,dec_values,prob->y,probA,probB);
 	free(dec_values);
 	free(perm);
+}
+
+// Binning method from the oneclass_prob paper by Que and Lin to predict the probability as a normal instance (i.e., not an outlier)
+static double predict_one_class_probability(const svm_model *model, double dec_value)
+{
+	double prob_estimate = 0.0;
+	int nr_marks = 10;
+
+	if(dec_value < model->prob_density_marks[0])
+		prob_estimate = 0.001;
+	else if(dec_value > model->prob_density_marks[nr_marks-1])
+		prob_estimate = 0.999;
+	else
+	{
+		for(int i=1;i<nr_marks;i++)
+			if(dec_value < model->prob_density_marks[i])
+			{
+				prob_estimate = (double)i/nr_marks;
+				break;
+			}
+	}
+	return prob_estimate;
+}
+
+static int compare_double(const void *a, const void *b)
+{
+	if(*(double *)a > *(double *)b)
+		return 1;
+	else if(*(double *)a < *(double *)b)
+		return -1;
+	return 0;
+}
+
+// Get parameters for one-class SVM probability estimates
+static int svm_one_class_probability(const svm_problem *prob, const svm_model *model, double *prob_density_marks)
+{
+	double *dec_values = Malloc(double,prob->l);
+	double *pred_results = Malloc(double,prob->l);
+	int ret = 0;
+	int nr_marks = 10;
+
+	for(int i=0;i<prob->l;i++)
+		pred_results[i] = svm_predict_values(model,prob->x[i],&dec_values[i]);
+	qsort(dec_values,prob->l,sizeof(double),compare_double);
+
+	int neg_counter=0;
+	for(int i=0;i<prob->l;i++)
+		if(dec_values[i]>=0)
+		{
+			neg_counter = i;
+			break;
+		}
+
+	int pos_counter = prob->l-neg_counter;
+	if(neg_counter<nr_marks/2 || pos_counter<nr_marks/2)
+	{
+		fprintf(stderr,"WARNING: number of positive or negative decision values <%d; too few to do a probability estimation.\n",nr_marks/2);
+		ret = -1;
+	}
+	else
+	{
+		// Binning by density
+		double *tmp_marks = Malloc(double,nr_marks+1);
+		int mid = nr_marks/2;
+		for(int i=0;i<mid;i++)
+			tmp_marks[i] = dec_values[i*neg_counter/mid];
+		tmp_marks[mid] = 0;
+		for(int i=mid+1;i<nr_marks+1;i++)
+			tmp_marks[i] = dec_values[neg_counter-1+(i-mid)*pos_counter/mid];
+
+		for(int i=0;i<nr_marks;i++)
+			prob_density_marks[i] = (tmp_marks[i]+tmp_marks[i+1])/2;
+		free(tmp_marks);
+	}
+	free(dec_values);
+	free(pred_results);
+	return ret;
 }
 
 // Return parameter of a Laplace distribution
@@ -2104,15 +2181,8 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 		model->label = NULL;
 		model->nSV = NULL;
 		model->probA = NULL; model->probB = NULL;
+		model->prob_density_marks = NULL;
 		model->sv_coef = Malloc(double *,1);
-
-		if(param->probability &&
-		   (param->svm_type == EPSILON_SVR ||
-		    param->svm_type == NU_SVR))
-		{
-			model->probA = Malloc(double,1);
-			model->probA[0] = svm_svr_probability(prob,param);
-		}
 
 		decision_function f = svm_train_one(prob,param,0,0);
 		model->rho = Malloc(double,1);
@@ -2135,6 +2205,26 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 				model->sv_indices[j] = i+1;
 				++j;
 			}
+
+		if(param->probability &&
+		   (param->svm_type == EPSILON_SVR ||
+		    param->svm_type == NU_SVR))
+		{
+			model->probA = Malloc(double,1);
+			model->probA[0] = svm_svr_probability(prob,param);
+		}
+		else if(param->probability && param->svm_type == ONE_CLASS)
+		{
+			int nr_marks = 10;
+			double *prob_density_marks = Malloc(double,nr_marks);
+
+			if(svm_one_class_probability(prob,model,prob_density_marks) == 0)
+			{
+				model->prob_density_marks = Malloc(double,nr_marks);
+				for(i=0;i<nr_marks;i++)
+					model->prob_density_marks[i] = prob_density_marks[i];
+			}
+		}
 
 		free(f.alpha);
 	}
@@ -2253,6 +2343,7 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 			model->probA=NULL;
 			model->probB=NULL;
 		}
+		model->prob_density_marks=NULL;	// for one-class SVM probabilistic outputs only
 
 		int total_sv = 0;
 		int *nz_count = Malloc(int,nr_class);
@@ -2630,6 +2721,14 @@ double svm_predict_probability(
 		free(pairwise_prob);
 		return model->label[prob_max_idx];
 	}
+	else if(model->param.svm_type == ONE_CLASS && model->prob_density_marks!=NULL)
+	{
+		double dec_value;
+		double pred_result = svm_predict_values(model,x,&dec_value);
+		prob_estimates[0] = predict_one_class_probability(model,dec_value);
+		prob_estimates[1] = 1-prob_estimates[0];
+		return pred_result;
+	}
 	else
 		return svm_predict(model, x);
 }
@@ -2701,6 +2800,14 @@ int svm_save_model(const char *model_file_name, const svm_model *model)
 		fprintf(fp, "probB");
 		for(int i=0;i<nr_class*(nr_class-1)/2;i++)
 			fprintf(fp," %.17g",model->probB[i]);
+		fprintf(fp, "\n");
+	}
+	if(model->prob_density_marks)
+	{
+		fprintf(fp, "prob_density_marks");
+		int nr_marks=10;
+		for(int i=0;i<nr_marks;i++)
+			fprintf(fp," %.17g",model->prob_density_marks[i]);
 		fprintf(fp, "\n");
 	}
 
@@ -2857,6 +2964,13 @@ bool read_model_header(FILE *fp, svm_model* model)
 			for(int i=0;i<n;i++)
 				FSCANF(fp,"%lf",&model->probB[i]);
 		}
+		else if(strcmp(cmd,"prob_density_marks")==0)
+		{
+			int n = 10;	// nr_marks
+			model->prob_density_marks = Malloc(double,n);
+			for(int i=0;i<n;i++)
+				FSCANF(fp,"%lf",&model->prob_density_marks[i]);
+		}
 		else if(strcmp(cmd,"nr_sv")==0)
 		{
 			int n = model->nr_class;
@@ -2901,6 +3015,7 @@ svm_model *svm_load_model(const char *model_file_name)
 	model->rho = NULL;
 	model->probA = NULL;
 	model->probB = NULL;
+	model->prob_density_marks = NULL;
 	model->sv_indices = NULL;
 	model->label = NULL;
 	model->nSV = NULL;
@@ -3012,13 +3127,16 @@ void svm_free_model_content(svm_model* model_ptr)
 	model_ptr->rho = NULL;
 
 	free(model_ptr->label);
-	model_ptr->label= NULL;
+	model_ptr->label = NULL;
 
 	free(model_ptr->probA);
 	model_ptr->probA = NULL;
 
 	free(model_ptr->probB);
-	model_ptr->probB= NULL;
+	model_ptr->probB = NULL;
+
+	free(model_ptr->prob_density_marks);
+	model_ptr->prob_density_marks = NULL;
 
 	free(model_ptr->sv_indices);
 	model_ptr->sv_indices = NULL;
@@ -3104,10 +3222,6 @@ const char *svm_check_parameter(const svm_problem *prob, const svm_parameter *pa
 	   param->probability != 1)
 		return "probability != 0 and probability != 1";
 
-	if(param->probability == 1 &&
-	   svm_type == ONE_CLASS)
-		return "one-class SVM probability output not supported yet";
-
 
 	// check whether nu-svc is feasible
 
@@ -3170,6 +3284,7 @@ int svm_check_probability_model(const svm_model *model)
 	return
 		((model->param.svm_type == C_SVC || model->param.svm_type == NU_SVC) &&
 		 model->probA!=NULL && model->probB!=NULL) ||
+		(model->param.svm_type == ONE_CLASS && model->prob_density_marks!=NULL) ||
 		((model->param.svm_type == EPSILON_SVR || model->param.svm_type == NU_SVR) &&
 		 model->probA!=NULL);
 }

@@ -78,7 +78,7 @@ def svm_train(arg1, arg2=None, arg3=None):
         -m cachesize : set cache memory size in MB (default 100)
         -e epsilon : set tolerance of termination criterion (default 0.001)
         -h shrinking : whether to use the shrinking heuristics, 0 or 1 (default 1)
-        -b probability_estimates : whether to train a SVC or SVR model for probability estimates, 0 or 1 (default 0)
+        -b probability_estimates : whether to train a model for probability estimates, 0 or 1 (default 0)
         -wi weight : set the parameter C of class i to weight*C, for C-SVC (default 1)
         -v n: n-fold cross validation mode
         -q : quiet mode (no outputs)
@@ -150,7 +150,7 @@ def svm_predict(y, x, m, options=""):
     Predict data (y, x) with the SVM model m.
     options:
         -b probability_estimates: whether to predict probability estimates,
-            0 or 1 (default 0); for one-class SVM only 0 is supported.
+            0 or 1 (default 0).
         -q : quiet mode (no outputs).
 
     The return tuple contains

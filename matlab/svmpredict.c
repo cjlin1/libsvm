@@ -130,8 +130,11 @@ void predict(int nlhs, mxArray *plhs[], const mxArray *prhs[], struct svm_model 
 	if(predict_probability)
 	{
 		// prob estimates are in plhs[2]
-		if(svm_type==C_SVC || svm_type==NU_SVC)
+		if(svm_type==C_SVC || svm_type==NU_SVC || svm_type==ONE_CLASS)
+		{
+			// nr_class = 2 for ONE_CLASS
 			tplhs[2] = mxCreateDoubleMatrix(testing_instance_number, nr_class, mxREAL);
+		}
 		else
 			tplhs[2] = mxCreateDoubleMatrix(0, 0, mxREAL);
 	}
@@ -172,7 +175,7 @@ void predict(int nlhs, mxArray *plhs[], const mxArray *prhs[], struct svm_model 
 
 		if(predict_probability)
 		{
-			if(svm_type==C_SVC || svm_type==NU_SVC)
+			if(svm_type==C_SVC || svm_type==NU_SVC || svm_type==ONE_CLASS)
 			{
 				predict_label = svm_predict_probability(model, x, prob_estimates);
 				ptr_predict_label[instance_index] = predict_label;
