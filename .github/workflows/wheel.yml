@@ -1,0 +1,40 @@
+name: Build wheels
+
+on:
+  # on new tag
+  push:
+    tags:
+      - '*'
+
+  # manually trigger
+  workflow_dispatch:
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+         os: [windows-2019]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      # Used to host cibuildwheel
+      - uses: actions/setup-python@v2
+
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel==2.3.1
+
+      - name: Build wheels
+        working-directory: ./python
+        run: python -m cibuildwheel --output-dir wheelhouse
+        env:
+          # don't build for PyPython and windows 32-bit
+          CIBW_SKIP: pp* *win32*
+
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v3.0.0
+        with:
+          path: ./python/wheelhouse
+
