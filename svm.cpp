@@ -2436,8 +2436,8 @@ void svm_cross_validation(const svm_problem *prob, const svm_parameter *param, i
 	int nr_class;
 	if (nr_fold > l)
 	{
+		fprintf(stderr,"WARNING: # folds (%d) > # data (%d). Will use # folds = # data instead (i.e., leave-one-out cross validation)\n", nr_fold, l);
 		nr_fold = l;
-		fprintf(stderr,"WARNING: # folds > # data. Will use # folds = # data instead (i.e., leave-one-out cross validation)\n");
 	}
 	fold_start = Malloc(int,nr_fold+1);
 	// stratified cv may not give leave-one-out rate
