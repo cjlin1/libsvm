@@ -8,6 +8,9 @@ CXX = cl.exe
 CFLAGS = /nologo /O2 /EHsc /I. /D _WIN64 /D _CRT_SECURE_NO_DEPRECATE
 TARGET = windows
 
+# Uncomment the following lines to enable parallelization with OpenMP
+# CFLAGS = /nologo /O2 /EHsc /I. /D _WIN64 /D _CRT_SECURE_NO_DEPRECATE /openmp
+
 all: $(TARGET)\svm-train.exe $(TARGET)\svm-predict.exe $(TARGET)\svm-scale.exe $(TARGET)\svm-toy.exe lib
 
 $(TARGET)\svm-predict.exe: svm.h svm-predict.c svm.obj

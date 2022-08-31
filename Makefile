@@ -2,17 +2,20 @@ CXX ?= g++
 CFLAGS = -Wall -Wconversion -O3 -fPIC
 SHVER = 3
 OS = $(shell uname)
+ifeq ($(OS),Darwin)
+	SHARED_LIB_FLAG = -dynamiclib -Wl,-install_name,libsvm.so.$(SHVER)
+else
+	SHARED_LIB_FLAG = -shared -Wl,-soname,libsvm.so.$(SHVER)
+endif
+
+# Uncomment the following lines to enable parallelization with OpenMP
+# CFLAGS += -fopenmp
+# SHARED_LIB_FLAG += -fopenmp
 
 all: svm-train svm-predict svm-scale
 
 lib: svm.o
-	if [ "$(OS)" = "Darwin" ]; then \
-		SHARED_LIB_FLAG="-dynamiclib -Wl,-install_name,libsvm.so.$(SHVER)"; \
-	else \
-		SHARED_LIB_FLAG="-shared -Wl,-soname,libsvm.so.$(SHVER)"; \
-	fi; \
-	$(CXX) $${SHARED_LIB_FLAG} svm.o -o libsvm.so.$(SHVER)
-
+	$(CXX) $(SHARED_LIB_FLAG) svm.o -o libsvm.so.$(SHVER)
 svm-predict: svm-predict.c svm.o
 	$(CXX) $(CFLAGS) svm-predict.c svm.o -o svm-predict -lm
 svm-train: svm-train.c svm.o
