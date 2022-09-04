@@ -43,6 +43,14 @@ if sys.platform == "win32":
         {
             "define_macros": [("_WIN64", ""), ("_CRT_SECURE_NO_DEPRECATE", "")],
             "extra_link_args": ["-DEF:{}\svm.def".format(cpp_dir)],
+            "extra_compile_args": ["/openmp"],
+        }
+    )
+else:
+    kwargs_for_extension.update(
+        {
+            "extra_compile_args": ["-fopenmp"],
+            "extra_link_args": ["-fopenmp"],
         }
     )
 
