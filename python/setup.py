@@ -37,7 +37,7 @@ kwargs_for_extension = {
     "language": "c++",
 }
 
-# see ../Makefile.win
+# see ../Makefile.win and enable openmp
 if sys.platform == "win32":
     kwargs_for_extension.update(
         {
