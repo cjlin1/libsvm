@@ -15,26 +15,21 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-         os: [windows-2019]
+         os: [windows-2019, macos-11]
 
     steps:
       - uses: actions/checkout@v2
 
-      # Used to host cibuildwheel
-      - uses: actions/setup-python@v2
-
-      - name: Install cibuildwheel
-        run: python -m pip install cibuildwheel==2.3.1
-
       - name: Build wheels
-        working-directory: ./python
-        run: python -m cibuildwheel --output-dir wheelhouse
+        uses: pypa/cibuildwheel@v2.10.2
         env:
           # don't build for PyPython and windows 32-bit
           CIBW_SKIP: pp* *win32*
+        with:
+          package-dir: ./python
+          output-dir: ./python/wheelhouse
 
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v3.0.0
         with:
           path: ./python/wheelhouse
-
