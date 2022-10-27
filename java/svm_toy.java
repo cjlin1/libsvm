@@ -1,11 +1,15 @@
 import libsvm.*;
-import java.applet.*;
 import java.awt.*;
 import java.util.*;
 import java.awt.event.*;
 import java.io.*;
 
-public class svm_toy extends Applet {
+public class svm_toy {
+    public static void main(String[] args) {
+        svm_toy_frame frame = new svm_toy_frame("svm_toy", 500, 500+50);
+	}
+}
+class svm_toy_frame extends Frame {
 
 	static final String DEFAULT_PARAM="-t 2 -c 100";
 	int XLEN;
@@ -43,10 +47,24 @@ public class svm_toy extends Applet {
 	Vector<point> point_list = new Vector<point>();
 	byte current_value = 1;
 
-	public void init()
+	svm_toy_frame(String title, int width, int height)
 	{
-		setSize(getSize());
+		super(title);
+		this.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				System.exit(0);
+			}
+		});
+		this.init();
+		this.setSize(width, height);
+		XLEN = width;
+		YLEN = height-50;
+		this.clear_all();
+		this.setVisible(true);
+	}
 
+	void init()
+	{
 		final Button button_change = new Button("Change");
 		Button button_run = new Button("Run");
 		Button button_clear = new Button("Clear");
@@ -465,38 +483,5 @@ public class svm_toy extends Applet {
 			buffer_gc.fillRect(0,0,XLEN,YLEN);
 		}
 		g.drawImage(buffer,0,0,this);
-	}
-
-	public Dimension getPreferredSize() { return new Dimension(XLEN,YLEN+50); }
-
-	public void setSize(Dimension d) { setSize(d.width,d.height); }
-	public void setSize(int w,int h) {
-		super.setSize(w,h);
-		XLEN = w;
-		YLEN = h-50;
-		clear_all();
-	}
-
-	public static void main(String[] argv)
-	{
-		new AppletFrame("svm_toy",new svm_toy(),500,500+50);
-	}
-}
-
-class AppletFrame extends Frame {
-	AppletFrame(String title, Applet applet, int width, int height)
-	{
-		super(title);
-		this.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {
-				System.exit(0);
-			}
-		});
-		applet.init();
-		applet.setSize(width,height);
-		applet.start();
-		this.add(applet);
-		this.pack();
-		this.setVisible(true);
 	}
 }
