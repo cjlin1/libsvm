@@ -471,7 +471,10 @@ to classify new data.
 
     param describes the parameters used to obtain the model.
 
-    nr_class is the number of classes. It is 2 for regression and one-class SVM.
+    nr_class is the number of classes for classification. It is a
+    non-negative integer with special cases of 0 (no training data at
+    all) and 1 (all training data in one class). For regression and
+    one-class SVM, nr_class = 2.
 
     l is the number of support vectors. SV and sv_coef are support
     vectors and the corresponding coefficients, respectively. Assume there are
