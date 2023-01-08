@@ -2229,11 +2229,9 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 			double *prob_density_marks = Malloc(double,nr_marks);
 
 			if(svm_one_class_probability(prob,model,prob_density_marks) == 0)
-			{
-				model->prob_density_marks = Malloc(double,nr_marks);
-				for(i=0;i<nr_marks;i++)
-					model->prob_density_marks[i] = prob_density_marks[i];
-			}
+				model->prob_density_marks = prob_density_marks;
+			else
+				free(prob_density_marks);
 		}
 
 		free(f.alpha);
