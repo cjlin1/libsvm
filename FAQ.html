@@ -9,7 +9,7 @@
 <a name="_TOP"><b><h1><a
 href=http://www.csie.ntu.edu.tw/~cjlin/libsvm>LIBSVM</a>  FAQ </h1></b></a>
 <b>last modified : </b>
-Sat, 12 Mar 2022 22:30:54 GMT
+Sun,  4 Sep 2022 12:32:38 GMT
 <class="categories">
 <li><a
 href="#_TOP">All Questions</a>(84)</li>
@@ -86,7 +86,7 @@ href="#/Q10:_MATLAB_OCTAVE_interface">Q10:_MATLAB_OCTAVE_interface</a>(13)</li>
 <li class="headlines_item"><a href="#f427">Why the code gives NaN (not a number) results?</a></li>
 <li class="headlines_item"><a href="#f430">Why the sign of predicted labels and decision values are sometimes reversed?</a></li>
 <li class="headlines_item"><a href="#f431">I don't know class labels of test data. What should I put in the first column of the test file?</a></li>
-<li class="headlines_item"><a href="#f432">How can I use OpenMP to parallelize LIBSVM on a multicore/shared-memory computer?</a></li>
+<li class="headlines_item"><a href="#f432">How can I use OpenMP, tbb, or other tools to parallelize LIBSVM on a multicore/shared-memory computer?</a></li>
 <li class="headlines_item"><a href="#f433">How could I know which training instances are support vectors?</a></li>
 <li class="headlines_item"><a href="#f434">Why sv_indices (indices of support vectors) are not stored in the saved model file?</a></li>
 <li class="headlines_item"><a href="#f501">After doing cross validation, why there is no model file outputted ?</a></li>
@@ -1241,14 +1241,15 @@ Note that this is for <b>two-class data only</b>
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
   <a name="/Q04:_Training_and_prediction"></a>
-<a name="f432"><b>Q: How can I use OpenMP to parallelize LIBSVM on a multicore/shared-memory computer?</b></a>
+<a name="f432"><b>Q: How can I use OpenMP, tbb, or other tools to parallelize LIBSVM on a multicore/shared-memory computer?</b></a>
 <br/>                                                                                
 
-<p>It is very easy if you are using GCC 4.2
-or after. 
+<p>It is very easy. Consider OpenMP. For GCC, version 4.2 or after is needed.
 
-<p> In Makefile, add -fopenmp  to CFLAGS.
-
+<p> In Makefile, add -fopenmp  to CFLAGS. In the beginning of svm.cpp, add
+<pre>
+#include &lt;omp.h&gt;
+</pre>
 <p> In class SVC_Q of svm.cpp, modify the for loop
 of get_Q to:
 <pre>
@@ -1267,7 +1268,7 @@ is also different because you need
 a reduction clause for the variable sum:
 <pre>
 #pragma omp parallel for private(i) reduction(+:sum) schedule(guided)
-		for(i=0;i&lt;model->l;i++)
+		for(i=0;i&lt;model-&gt;l;i++)
 			sum += sv_coef[i] * Kernel::k_function(x,model-&gt;SV[i],model-&gt;param);
 </pre>
 
@@ -1293,13 +1294,96 @@ export OMP_NUM_THREADS=8
 </pre>
 instead.
 
-<p> For Python interface, you need to add the -lgomp link option:
+<p> For Python interface, you need to add the -fopenmp link option:
 <pre>
-$(CXX) -lgomp -shared -dynamiclib svm.o -o libsvm.so.$(SHVER)
+if [ "$(OS)" = "Darwin" ]; then \
+	SHARED_LIB_FLAG="-dynamiclib -Wl,-install_name,libsvm.so.$(SHVER) -fopenmp"; \
+else \
+	SHARED_LIB_FLAG="-shared -Wl,-soname,libsvm.so.$(SHVER) -fopenmp"; \
+fi; \
 </pre>
 
 <p> For MS Windows, you need to add /openmp in CFLAGS of Makefile.win
 
+<!-- <p>To use OpenMP, check that your compiler supports it. For GCC version 4.2 or later is needed.
+
+<p>In Makefile, there are the lines
+<pre>
+# Uncomment the following lines to enable parallelization with OpenMP
+# CFLAGS += -fopenmp
+# SHARED_LIB_FLAG += -fopenmp
+</pre>
+Uncomment the latter two lines then rebuild the package to use OpenMP.
+
+<p>Kernel evaluations in training/testing will be parallelized.
+An example of running this modification on an 8-core machine using the data set
+<a href=../libsvmtools/datasets/binary/real-sim.bz2>real-sim</a>:
+
+<p> 8 cores:
+<pre>
+%setenv OMP_NUM_THREADS 8
+%time svm-train -c 8 -g 0.5 -m 1000 real-sim
+175.90sec
+</pre>
+1 core:
+<pre>
+%setenv OMP_NUM_THREADS 1
+%time svm-train -c 8 -g 0.5 -m 1000 real-sim
+588.89sec
+</pre>
+For this data, kernel evaluations take 91% of training time. In the above example, we assume you use csh. For bash, use
+<pre>
+export OMP_NUM_THREADS=8
+</pre>
+instead.
+
+<p>For Windows, in Makefile.win there are the lines
+<pre>
+# Uncomment the following lines to enable parallelization with OpenMP
+# CFLAGS = /nologo /O2 /EHsc /I. /D _WIN64 /D _CRT_SECURE_NO_DEPRECATE /openmp
+</pre>
+Uncomment the latter line and rebuild the package to use OpenMP. -->
+
+<p> Now consider tbb (thread building blocks). Thank Rob Ward for the following instructions. First the tbb package must be installed. On Ubuntu this can be done by
+<pre>
+apt-get install -y libtbb-dev
+</pre>
+In svm.cpp, add
+<pre>
+#include &lt;atomic&gt;
+#include &lt;execution&gt;
+#include &quot;tbb/iterators.h&quot;
+</pre>
+in the beginning. Then the loops mentioned earlier should be as
+follows. In class SVC_Q of svm.cpp,
+<pre>
+std::for_each(std::execution::par, tbb::counting_iterator&lt;int&gt;(start), tbb::counting_iterator&lt;int&gt;(len),
+	[this, i, data](int j){
+		data[j] = (Qfloat)(y[i] * y[j] * (this-&gt;*kernel_function)(i, j));
+	});
+</pre>
+In class SVR_Q of svm.cpp,
+<pre>
+std::for_each(std::execution::par, tbb::counting_iterator&lt;int&gt;(0), tbb::counting_iterator&lt;int&gt;(l),
+	[this, i, data, real_i](int j){
+		data[j] = (Qfloat)(this-&gt;*kernel_function)(real_i, j);
+	});
+</pre>
+In svm_predict_values() of svm.cpp, for SVR and ONE_CLASS,
+<pre>
+std::atomic&lt;double&gt; sum = 0;
+std::for_each(std::execution::par, tbb::counting_iterator&lt;int&gt;(0), tbb::counting_iterator&lt;int&gt;(model-&gt;l),
+	[&amp;sum, sv_coef, x, model](int i){
+		sum += sv_coef[i] * Kernel::k_function(x, model-&gt;SV[i], model-&gt;param);
+	});
+</pre>
+and for SVC
+<pre>
+std::for_each(std::execution::par, tbb::counting_iterator&lt;int&gt;(0), tbb::counting_iterator&lt;int&gt;(l),
+	[kvalue, x, model](int i){
+		kvalue[i] = Kernel::k_function(x, model-&gt;SV[i], model-&gt;param);
+	});
+</pre>
 <p align="right">
 <a href="#_TOP">[Go Top]</a>  
 <hr/>
