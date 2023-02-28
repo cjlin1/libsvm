@@ -199,9 +199,9 @@ void mexFunction( int nlhs, mxArray *plhs[],
 
 	mxGetString(prhs[0], filename, mxGetN(prhs[0]) + 1);
 
-	if(filename == NULL)
+	if(filename[0] == '\0')
 	{
-		mexPrintf("Error: filename is NULL\n");
+		mexPrintf("Error: filename is empty\n");
 		return;
 	}
 
