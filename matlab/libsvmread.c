@@ -188,7 +188,9 @@ void read_problem(const char *filename, int nlhs, mxArray *plhs[])
 void mexFunction( int nlhs, mxArray *plhs[],
 		int nrhs, const mxArray *prhs[] )
 {
-	char filename[256];
+	#define filename_size 256
+
+	char filename[filename_size];
 
 	if(nrhs != 1 || nlhs != 2)
 	{
@@ -197,11 +199,9 @@ void mexFunction( int nlhs, mxArray *plhs[],
 		return;
 	}
 
-	mxGetString(prhs[0], filename, mxGetN(prhs[0]) + 1);
-
-	if(filename == NULL)
-	{
-		mexPrintf("Error: filename is NULL\n");
+	if(mxGetString(prhs[0], filename, filename_size) == 1){
+		mexPrintf("Error: wrong or too long filename\n");
+		fake_answer(nlhs, plhs);
 		return;
 	}
 
