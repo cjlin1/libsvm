@@ -221,7 +221,7 @@ test data.
 
 > svm-train -s 0 -c 5 -t 2 -g 0.5 -e 0.1 data_file
 
-Train a classifier with RBF kernel exp(-0.5|u-v|^2), C=10, and
+Train a classifier with RBF kernel exp(-0.5|u-v|^2), C=5, and
 stopping tolerance 0.1.
 
 > svm-train -s 3 -p 0.1 -t 0 data_file
