@@ -1,0 +1,8 @@
+# binaries
+svm-train
+svm-predict
+svm-scale
+*.o
+*.mex
+
+octave-workspace

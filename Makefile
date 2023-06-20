@@ -1,5 +1,5 @@
 CXX ?= g++
-CFLAGS = -Wall -Wconversion -O3 -fPIC
+CFLAGS = -Wall -Wconversion -O3 -fPIC -fopenmp -D_OPENMP
 SHVER = 3
 OS = $(shell uname)
 ifeq ($(OS),Darwin)
