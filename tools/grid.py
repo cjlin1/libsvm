@@ -283,13 +283,13 @@ class Worker(Thread):
         if options.grid_with_g:
             cmdline += ' -g {0} '.format(g)
         cmdline += ' -v {0} {1} {2} '.format\
-            (options.fold,options.pass_through_string,options.dataset_pathname)
+            (options.fold,options.pass_through_string,'"' + options.dataset_pathname + '"')
         return cmdline
 
 class LocalWorker(Worker):
     def run_one(self,c,g):
         cmdline = self.get_cmd(c,g)
-        result = Popen(cmdline,shell=True,stdout=PIPE,stderr=PIPE,stdin=PIPE).stdout
+        result = Popen(cmdline,shell=True,stdout=PIPE,stdin=PIPE).stdout
         for line in result.readlines():
             if str(line).find('Cross') != -1:
                 return float(line.split()[-1][0:-1])

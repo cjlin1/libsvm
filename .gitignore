@@ -6,3 +6,4 @@ svm-scale
 *.mex
 
 octave-workspace
+.vscode
