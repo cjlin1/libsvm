@@ -23,7 +23,8 @@ jobs:
       - name: Set MacOS compiler
         if: runner.os == 'macOS'
         run: |
-          echo "CXX=/usr/local/opt/llvm/bin/clang" >> $GITHUB_ENV
+          brew install gcc@13;
+          echo "CXX=gcc-13" >> $GITHUB_ENV
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.10.2
