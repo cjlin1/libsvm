@@ -1323,9 +1323,10 @@ private:
 class ONE_CLASS_Q: public Kernel
 {
 public:
-	ONE_CLASS_Q(const svm_problem& prob, const svm_parameter& param)
+	ONE_CLASS_Q(const svm_problem& prob, const svm_parameter& param, const schar *y_)
 	:Kernel(prob.l, prob.x, param)
 	{
+		clone(y,y_,prob.l);
 		cache = new Cache(prob.l,(long int)(param.cache_size*(1<<20)));
 		QD = new double[prob.l];
 		for(int i=0;i<prob.l;i++)
@@ -1339,7 +1340,7 @@ public:
 		if((start = cache->get_data(i,&data,len)) < len)
 		{
 			for(j=start;j<len;j++)
-				data[j] = (Qfloat)(this->*kernel_function)(i,j);
+				data[j] = (Qfloat)(y[i]*y[j]*(this->*kernel_function)(i,j));
 		}
 		return data;
 	}
@@ -1358,10 +1359,12 @@ public:
 
 	~ONE_CLASS_Q()
 	{
+		delete[] y;
 		delete cache;
 		delete[] QD;
 	}
 private:
+	schar *y;
 	Cache *cache;
 	double *QD;
 };
@@ -1543,7 +1546,7 @@ static void solve_one_class(
 {
 	int l = prob->l;
 	double *zeros = new double[l];
-	schar *ones = new schar[l];
+	schar *y = new schar[l];
 	int i;
 
 	int n = (int)(param->nu*prob->l);	// # of alpha's at upper bound
@@ -1558,15 +1561,21 @@ static void solve_one_class(
 	for(i=0;i<l;i++)
 	{
 		zeros[i] = 0;
-		ones[i] = 1;
+		if(prob->y[i]>0)
+			y[i] = +1;
+		else
+			y[i] = -1;
 	}
 
 	Solver s;
-	s.Solve(l, ONE_CLASS_Q(*prob,*param), zeros, ones,
+	s.Solve(l, ONE_CLASS_Q(*prob,*param,y), zeros, y,
 		alpha, 1.0, 1.0, param->eps, si, param->shrinking);
 
+	for(i=0; i<l; i++)
+		alpha[i] *= y[i];
+
 	delete[] zeros;
-	delete[] ones;
+	delete[] y;
 }
 
 static void solve_epsilon_svr(
