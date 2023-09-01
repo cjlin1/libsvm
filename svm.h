@@ -98,6 +98,11 @@ int svm_check_probability_model(const struct svm_model *model);
 
 void svm_set_print_string_function(void (*print_func)(const char *));
 
+/* There is no strtok_r in Windows. */
+#if defined(_WIN32) || defined(_WIN64)
+#define strtok_r  strtok_s
+#endif
+
 #ifdef __cplusplus
 }
 #endif

@@ -3054,14 +3054,14 @@ svm_model *svm_load_model(const char *model_file_name)
 
 	max_line_len = 1024;
 	line = Malloc(char,max_line_len);
-	char *p,*endptr,*idx,*val;
+	char *p,*endptr,*idx,*val,*r = (char *)NULL;;
 
 	while(readline(fp)!=NULL)
 	{
-		p = strtok(line,":");
+		p = strtok_r(line,":",&r);
 		while(1)
 		{
-			p = strtok(NULL,":");
+			p = strtok_r(NULL,":",&r);
 			if(p == NULL)
 				break;
 			++elements;
@@ -3087,18 +3087,18 @@ svm_model *svm_load_model(const char *model_file_name)
 		readline(fp);
 		model->SV[i] = &x_space[j];
 
-		p = strtok(line, " \t");
+		p = strtok_r(line, " \t", &r);
 		model->sv_coef[0][i] = strtod(p,&endptr);
 		for(int k=1;k<m;k++)
 		{
-			p = strtok(NULL, " \t");
+			p = strtok_r(NULL, " \t", &r);
 			model->sv_coef[k][i] = strtod(p,&endptr);
 		}
 
 		while(1)
 		{
-			idx = strtok(NULL, ":");
-			val = strtok(NULL, " \t");
+			idx = strtok_r(NULL, ":", &r);
+			val = strtok_r(NULL, " \t", &r);
 
 			if(val == NULL)
 				break;
