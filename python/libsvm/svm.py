@@ -143,7 +143,7 @@ except:
     jit = lambda x: x
     jit_enabled = False
 
-@jit
+@jit(nopython=True)
 def csr_to_problem_jit(l, x_val, x_ind, x_rowptr, prob_val, prob_ind, prob_rowptr, indx_start):
     for i in range(l):
         b1,e1 = x_rowptr[i], x_rowptr[i+1]
