@@ -72,6 +72,31 @@ the following page:
 
 http://www.mathworks.com/support/compilers/current_release/
 
+For Mac users who use Xcode5:
+
+Since the MacOS 10.7 SDK is no longer available for Xcode5, you will see 
+the following message when you try to compile libsvm:
+  xcodebuild: error: SDK "macosx10.7" cannot be located.  
+  xcrun: error: unable to find utility "clang", not a developer tool or in PATH
+  
+You can update MEX to use 10.8 SDK by the following steps
+1. In Matlab command window, enter:
+> cd (matlabroot)
+> cd bin
+> edit mexopts.sh
+
+2. Backup your mexopts.sh first.
+3. Scroll down to Mac ("mac64") section
+4. Replce all instances of "10.7" to "10.8"
+5. save the file
+6. run "mex -setup" in command window again
+
+see the official Matlab support page for more details about this walkaround:
+http://www.mathworks.com/matlabcentral/answers/103904
+
+
+
+
 Usage
 =====
 
