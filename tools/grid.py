@@ -283,7 +283,7 @@ class Worker(Thread):
         if options.grid_with_g:
             cmdline += ' -g {0} '.format(g)
         cmdline += ' -v {0} {1} {2} '.format\
-            (options.fold,options.pass_through_string,options.dataset_pathname)
+            (options.fold,options.pass_through_string,'"' + options.dataset_pathname + '"')
         return cmdline
 
 class LocalWorker(Worker):

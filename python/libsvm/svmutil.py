@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import os, sys
 from .svm import *
 from .svm import __all__ as svm_all

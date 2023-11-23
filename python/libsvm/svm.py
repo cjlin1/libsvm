@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 from ctypes import *
 from ctypes.util import find_library
 from os import path
