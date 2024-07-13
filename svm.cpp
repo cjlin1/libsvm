@@ -71,7 +71,7 @@ static void info(const char *fmt,...) {}
 class Cache
 {
 public:
-	Cache(int l,long int size);
+	Cache(int l,long long size);
 	~Cache();
 
 	// request data [0,len)
@@ -81,7 +81,7 @@ public:
 	void swap_index(int i, int j);
 private:
 	int l;
-	long int size;
+	long long size;
 	struct head_t
 	{
 		head_t *prev, *next;	// a circular list
@@ -95,12 +95,12 @@ private:
 	void lru_insert(head_t *h);
 };
 
-Cache::Cache(int l_,long int size_):l(l_),size(size_)
+Cache::Cache(int l_,long long size_):l(l_),size(size_)
 {
 	head = (head_t *)calloc(l,sizeof(head_t));	// initialized to 0
 	size /= sizeof(Qfloat);
 	size -= l * sizeof(head_t) / sizeof(Qfloat);
-	size = max(size, 2 * (long int) l);	// cache must be large enough for two columns
+	size = max(size, 2 * (long long) l);	// cache must be large enough for two columns
 	lru_head.next = lru_head.prev = &lru_head;
 }
 
@@ -1274,7 +1274,7 @@ public:
 	:Kernel(prob.l, prob.x, param)
 	{
 		clone(y,y_,prob.l);
-		cache = new Cache(prob.l,(long int)(param.cache_size*(1<<20)));
+		cache = new Cache(prob.l,(long long)(param.cache_size*(1<<20)));
 		QD = new double[prob.l];
 		for(int i=0;i<prob.l;i++)
 			QD[i] = (this->*kernel_function)(i,i);
@@ -1326,7 +1326,7 @@ public:
 	ONE_CLASS_Q(const svm_problem& prob, const svm_parameter& param)
 	:Kernel(prob.l, prob.x, param)
 	{
-		cache = new Cache(prob.l,(long int)(param.cache_size*(1<<20)));
+		cache = new Cache(prob.l,(long long)(param.cache_size*(1<<20)));
 		QD = new double[prob.l];
 		for(int i=0;i<prob.l;i++)
 			QD[i] = (this->*kernel_function)(i,i);
@@ -1373,7 +1373,7 @@ public:
 	:Kernel(prob.l, prob.x, param)
 	{
 		l = prob.l;
-		cache = new Cache(l,(long int)(param.cache_size*(1<<20)));
+		cache = new Cache(l,(long long)(param.cache_size*(1<<20)));
 		QD = new double[2*l];
 		sign = new schar[2*l];
 		index = new int[2*l];
