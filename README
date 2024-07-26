@@ -786,3 +786,10 @@ The authors thank their group members and users
 for many helpful discussions and comments. They are listed in
 http://www.csie.ntu.edu.tw/~cjlin/libsvm/acknowledgements
 
+
+
+------------
+Derived version (by Lukáš Ondráček):
+Added support for learning from both positive and negative examples in one-class classification
+according to the "One-class classification" thesis written by door David Martinus Johannes TAX.
+Array y should now contain +1s for positive examples and -1s for negative ones.
