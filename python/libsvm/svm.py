@@ -138,7 +138,17 @@ try:
     from numba import jit
     jit_enabled = True
 except:
-    jit = lambda x: x
+    from functools import wraps
+
+    def jit(_func=None, *args, **kwargs):
+        def decorator_jit(func):
+            @wraps(func)
+            def wrapper_jit(*args, **kwargs):
+                return func(*args, **kwargs)
+            return wrapper_jit
+
+        return decorator_jit if _func is None else decorator_jit(_func)
+
     jit_enabled = False
 
 @jit(nopython=True)
