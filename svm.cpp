@@ -136,7 +136,7 @@ int Cache::get_data(const int index, Qfloat **data, int len)
 	if(more > 0)
 	{
 		// free old space
-		while(size < more)
+		while(size < (size_t)more)
 		{
 			head_t *old = lru_head.next;
 			lru_delete(old);
