@@ -1,6 +1,6 @@
 CXX ?= g++
 CFLAGS = -Wall -Wconversion -O3 -fPIC
-SHVER = 3
+SHVER = 4
 OS = $(shell uname)
 ifeq ($(OS),Darwin)
 	SHARED_LIB_FLAG = -dynamiclib -Wl,-install_name,libsvm.so.$(SHVER)
