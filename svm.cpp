@@ -99,8 +99,8 @@ Cache::Cache(int l_,size_t size_):l(l_),size(size_)
 {
 	head = (head_t *)calloc(l,sizeof(head_t));	// initialized to 0
 	size /= sizeof(Qfloat);
-	size -= l * sizeof(head_t) / sizeof(Qfloat);
-	size = max(size, 2 * (size_t) l);	// cache must be large enough for two columns
+	size_t header_size = l * sizeof(head_t) / sizeof(Qfloat);
+	size = max(size, 2 * (size_t) l + header_size) - header_size;  // cache must be large enough for two columns
 	lru_head.next = lru_head.prev = &lru_head;
 }
 
@@ -148,7 +148,7 @@ int Cache::get_data(const int index, Qfloat **data, int len)
 
 		// allocate new space
 		h->data = (Qfloat *)realloc(h->data,sizeof(Qfloat)*len);
-		size -= more;
+		size -= more;  // previous while loop guarantees size >= more and subtraction of size_t variable will not underflow
 		swap(h->len,len);
 	}
 
