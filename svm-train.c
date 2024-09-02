@@ -98,16 +98,20 @@ int main(int argc, char **argv)
 
 	if(cross_validation)
 	{
+		fprintf(stdout, "performing cross validation\n");
 		do_cross_validation();
 	}
 	else
 	{
+		fprintf(stdout, "training model\n");
 		model = svm_train(&prob,&param);
+		fprintf(stdout, "trained model, saving in file[%s]\n", model_file_name);
 		if(svm_save_model(model_file_name,model))
 		{
-			fprintf(stderr, "can't save model to file %s\n", model_file_name);
+			fprintf(stderr, "can't save model to file[%s]\n", model_file_name);
 			exit(1);
 		}
+		fprintf(stdout, "saved model with success\n");
 		svm_free_and_destroy_model(&model);
 	}
 	svm_destroy_param(&param);
