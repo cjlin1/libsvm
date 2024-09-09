@@ -208,3 +208,28 @@ line 1: feature indices must be in an ascending order, previous/current features
 Found 1 lines with error.
 
 
+csv2libsvm.py
+
+In this code, we write  a basic script to convert a csv file to libsvm format. This example done for this type of csv file:
+classs	accelX	accelY	accelZ	gyroX	gyroY	gyroZ
+1	-0.329013	1.111466	9.943973	0.064446	-0.0759	-0.095295
+1	-0.329013	1.111466	9.943973	0.064446	-0.0759	-0.095295
+
+which 'class'(label) column of the dataframe is the first column.
+
+Converted format is like:
+1 1:-0.329013 2:1.111466 3:9.943973 4:0.064446 5:-0.0759 6:-0.095295
+1 1:-0.329013 2:1.111466 3:9.943973 4:0.064446 5:-0.0759 6:-0.095295
+which makes enable to use libsvm.
+
+Also, example data('data.csv') uploaded to test script.
+
+Usage is like:
+python3 csv2libsvm.py -c path_of_input_csv -o path_of_output_folder
+
+For my enviroment I used like:
+
+python3 csv2libsvm.py -c /home/robogor/Desktop/workshop/muhur/data.csv -o /home/robogor/Desktop/
+to save file on desktop.
+
+You can change some input arguments to handle your csv data.
