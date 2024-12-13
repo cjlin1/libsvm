@@ -1969,7 +1969,7 @@ public class svm {
 		// However, for two-class sets with -1/+1 labels and -1 appears first,
 		// we swap labels to ensure that internally the binary SVM has positive data corresponding to the +1 instances.
 		//
-		if (nr_class == 2 && label[0] == -1 && label[1] == +1)
+		if (nr_class == 2 && label[0] <= 0 && label[1] > 0)
 		{
 			swap(int,label[0],label[1]);
 			swap(int,count[0],count[1]);
