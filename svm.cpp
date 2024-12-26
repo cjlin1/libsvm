@@ -198,7 +198,7 @@ void Cache::swap_index(int i, int j)
 class QMatrix {
 public:
 	virtual Qfloat *get_Q(int column, int len) const = 0;
-	virtual double *get_QD() const = 0;
+	virtual Qfloat *get_QD() const = 0;
 	virtual void swap_index(int i, int j) const = 0;
 	virtual ~QMatrix() {}
 };
@@ -211,7 +211,7 @@ public:
 	static double k_function(const svm_node *x, const svm_node *y,
 				 const svm_parameter& param);
 	virtual Qfloat *get_Q(int column, int len) const = 0;
-	virtual double *get_QD() const = 0;
+	virtual Qfloat *get_QD() const = 0;
 	virtual void swap_index(int i, int j) const	// no so const...
 	{
 		swap(x[i],x[j]);
@@ -418,7 +418,7 @@ protected:
 	char *alpha_status;	// LOWER_BOUND, UPPER_BOUND, FREE
 	double *alpha;
 	const QMatrix *Q;
-	const double *QD;
+	const Qfloat *QD;
 	double eps;
 	double Cp,Cn;
 	double *p;
@@ -1275,7 +1275,7 @@ public:
 	{
 		clone(y,y_,prob.l);
 		cache = new Cache(prob.l,(size_t)(param.cache_size*(1<<20)));
-		QD = new double[prob.l];
+		QD = new Qfloat[prob.l];
 		for(int i=0;i<prob.l;i++)
 			QD[i] = (this->*kernel_function)(i,i);
 	}
@@ -1295,7 +1295,7 @@ public:
 		return data;
 	}
 
-	double *get_QD() const
+	Qfloat *get_QD() const
 	{
 		return QD;
 	}
@@ -1317,7 +1317,7 @@ public:
 private:
 	schar *y;
 	Cache *cache;
-	double *QD;
+	Qfloat *QD;
 };
 
 class ONE_CLASS_Q: public Kernel
@@ -1327,7 +1327,7 @@ public:
 	:Kernel(prob.l, prob.x, param)
 	{
 		cache = new Cache(prob.l,(size_t)(param.cache_size*(1<<20)));
-		QD = new double[prob.l];
+		QD = new Qfloat[prob.l];
 		for(int i=0;i<prob.l;i++)
 			QD[i] = (this->*kernel_function)(i,i);
 	}
@@ -1344,7 +1344,7 @@ public:
 		return data;
 	}
 
-	double *get_QD() const
+	Qfloat *get_QD() const
 	{
 		return QD;
 	}
@@ -1363,7 +1363,7 @@ public:
 	}
 private:
 	Cache *cache;
-	double *QD;
+	Qfloat *QD;
 };
 
 class SVR_Q: public Kernel
@@ -1374,7 +1374,7 @@ public:
 	{
 		l = prob.l;
 		cache = new Cache(l,(size_t)(param.cache_size*(1<<20)));
-		QD = new double[2*l];
+		QD = new Qfloat[2*l];
 		sign = new schar[2*l];
 		index = new int[2*l];
 		for(int k=0;k<l;k++)
@@ -1420,7 +1420,7 @@ public:
 		return buf;
 	}
 
-	double *get_QD() const
+	Qfloat *get_QD() const
 	{
 		return QD;
 	}
@@ -1441,7 +1441,7 @@ private:
 	int *index;
 	mutable int next_buffer;
 	Qfloat *buffer[2];
-	double *QD;
+	Qfloat *QD;
 };
 
 //
