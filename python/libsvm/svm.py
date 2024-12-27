@@ -240,10 +240,10 @@ class svm_problem(Structure):
 class svm_parameter(Structure):
     _names = ["svm_type", "kernel_type", "degree", "gamma", "coef0",
             "cache_size", "eps", "C", "nr_weight", "weight_label", "weight",
-            "nu", "p", "shrinking", "probability"]
+            "nu", "p", "shrinking", "probability", "use_double_precision_kernel_values"]
     _types = [c_int, c_int, c_int, c_double, c_double,
             c_double, c_double, c_double, c_int, POINTER(c_int), POINTER(c_double),
-            c_double, c_double, c_int, c_int]
+            c_double, c_double, c_int, c_int, c_int]
     _fields_ = genFields(_names, _types)
 
     def __init__(self, options = None):
@@ -274,6 +274,7 @@ class svm_parameter(Structure):
         self.p = 0.1
         self.shrinking = 1
         self.probability = 0
+        self.use_double_precision_kernel_values = 0
         self.nr_weight = 0
         self.weight_label = None
         self.weight = None
@@ -331,6 +332,9 @@ class svm_parameter(Structure):
             elif argv[i] == "-b":
                 i = i + 1
                 self.probability = int(argv[i])
+            elif argv[i] == '-f':
+                i = i + 1
+                self.use_double_precision_kernel_values = int(argv[i])
             elif argv[i] == "-q":
                 self.print_func = PRINT_STRING_FUN(print_null)
             elif argv[i] == "-v":

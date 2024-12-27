@@ -13,7 +13,6 @@
 #endif
 
 int libsvm_version = LIBSVM_VERSION;
-typedef float Qfloat;
 typedef signed char schar;
 #ifndef min
 template <class T> static inline T min(T x,T y) { return (x<y)?x:y; }
@@ -68,6 +67,7 @@ static void info(const char *fmt,...) {}
 // l is the number of total data items
 // size is the cache size limit in bytes
 //
+template<typename Qfloat>
 class Cache
 {
 public:
@@ -95,7 +95,8 @@ private:
 	void lru_insert(head_t *h);
 };
 
-Cache::Cache(int l_,size_t size_):l(l_),size(size_)
+template<typename Qfloat>
+Cache<Qfloat>::Cache(int l_,size_t size_):l(l_),size(size_)
 {
 	head = (head_t *)calloc(l,sizeof(head_t));	// initialized to 0
 	size /= sizeof(Qfloat);
@@ -104,21 +105,24 @@ Cache::Cache(int l_,size_t size_):l(l_),size(size_)
 	lru_head.next = lru_head.prev = &lru_head;
 }
 
-Cache::~Cache()
+template<typename Qfloat>
+Cache<Qfloat>::~Cache()
 {
 	for(head_t *h = lru_head.next; h != &lru_head; h=h->next)
 		free(h->data);
 	free(head);
 }
 
-void Cache::lru_delete(head_t *h)
+template<typename Qfloat>
+void Cache<Qfloat>::lru_delete(head_t *h)
 {
 	// delete from current location
 	h->prev->next = h->next;
 	h->next->prev = h->prev;
 }
 
-void Cache::lru_insert(head_t *h)
+template<typename Qfloat>
+void Cache<Qfloat>::lru_insert(head_t *h)
 {
 	// insert to last position
 	h->next = &lru_head;
@@ -127,7 +131,8 @@ void Cache::lru_insert(head_t *h)
 	h->next->prev = h;
 }
 
-int Cache::get_data(const int index, Qfloat **data, int len)
+template<typename Qfloat>
+int Cache<Qfloat>::get_data(const int index, Qfloat **data, int len)
 {
 	head_t *h = &head[index];
 	if(h->len) lru_delete(h);
@@ -157,7 +162,8 @@ int Cache::get_data(const int index, Qfloat **data, int len)
 	return len;
 }
 
-void Cache::swap_index(int i, int j)
+template<typename Qfloat>
+void Cache<Qfloat>::swap_index(int i, int j)
 {
 	if(i==j) return;
 
@@ -195,6 +201,7 @@ void Cache::swap_index(int i, int j)
 // the constructor of Kernel prepares to calculate the l*l kernel matrix
 // the member function get_Q is for getting one column from the Q Matrix
 //
+template<typename Qfloat>
 class QMatrix {
 public:
 	virtual Qfloat *get_Q(int column, int len) const = 0;
@@ -203,7 +210,8 @@ public:
 	virtual ~QMatrix() {}
 };
 
-class Kernel: public QMatrix {
+template<typename Qfloat>
+class Kernel: public QMatrix<Qfloat> {
 public:
 	Kernel(int l, svm_node * const * x, const svm_parameter& param);
 	virtual ~Kernel();
@@ -254,7 +262,8 @@ private:
 	}
 };
 
-Kernel::Kernel(int l, svm_node * const * x_, const svm_parameter& param)
+template<typename Qfloat>
+Kernel<Qfloat>::Kernel(int l, svm_node * const * x_, const svm_parameter& param)
 :kernel_type(param.kernel_type), degree(param.degree),
  gamma(param.gamma), coef0(param.coef0)
 {
@@ -289,13 +298,15 @@ Kernel::Kernel(int l, svm_node * const * x_, const svm_parameter& param)
 		x_square = 0;
 }
 
-Kernel::~Kernel()
+template<typename Qfloat>
+Kernel<Qfloat>::~Kernel()
 {
 	delete[] x;
 	delete[] x_square;
 }
 
-double Kernel::dot(const svm_node *px, const svm_node *py)
+template<typename Qfloat>
+double Kernel<Qfloat>::dot(const svm_node *px, const svm_node *py)
 {
 	double sum = 0;
 	while(px->index != -1 && py->index != -1)
@@ -317,7 +328,8 @@ double Kernel::dot(const svm_node *px, const svm_node *py)
 	return sum;
 }
 
-double Kernel::k_function(const svm_node *x, const svm_node *y,
+template<typename Qfloat>
+double Kernel<Qfloat>::k_function(const svm_node *x, const svm_node *y,
 			  const svm_parameter& param)
 {
 	switch(param.kernel_type)
@@ -376,6 +388,14 @@ double Kernel::k_function(const svm_node *x, const svm_node *y,
 	}
 }
 
+struct SolutionInfo {
+   double obj;
+   double rho;
+   double upper_bound_p;
+   double upper_bound_n;
+   double r;	// for Solver_NU
+};
+
 // An SMO algorithm in Fan et al., JMLR 6(2005), p. 1889--1918
 // Solves:
 //
@@ -394,20 +414,13 @@ double Kernel::k_function(const svm_node *x, const svm_node *y,
 //
 // solution will be put in \alpha, objective value will be put in obj
 //
+template<typename Qfloat>
 class Solver {
 public:
 	Solver() {};
 	virtual ~Solver() {};
 
-	struct SolutionInfo {
-		double obj;
-		double rho;
-		double upper_bound_p;
-		double upper_bound_n;
-		double r;	// for Solver_NU
-	};
-
-	void Solve(int l, const QMatrix& Q, const double *p_, const schar *y_,
+	void Solve(int l, const QMatrix<Qfloat>& Q, const double *p_, const schar *y_,
 		   double *alpha_, double Cp, double Cn, double eps,
 		   SolutionInfo* si, int shrinking);
 protected:
@@ -417,7 +430,7 @@ protected:
 	enum { LOWER_BOUND, UPPER_BOUND, FREE };
 	char *alpha_status;	// LOWER_BOUND, UPPER_BOUND, FREE
 	double *alpha;
-	const QMatrix *Q;
+	const QMatrix<Qfloat> *Q;
 	const Qfloat *QD;
 	double eps;
 	double Cp,Cn;
@@ -451,7 +464,8 @@ private:
 	bool be_shrunk(int i, double Gmax1, double Gmax2);
 };
 
-void Solver::swap_index(int i, int j)
+template<typename Qfloat>
+void Solver<Qfloat>::swap_index(int i, int j)
 {
 	Q->swap_index(i,j);
 	swap(y[i],y[j]);
@@ -463,7 +477,8 @@ void Solver::swap_index(int i, int j)
 	swap(G_bar[i],G_bar[j]);
 }
 
-void Solver::reconstruct_gradient()
+template<typename Qfloat>
+void Solver<Qfloat>::reconstruct_gradient()
 {
 	// reconstruct inactive elements of G from G_bar and free variables
 
@@ -505,7 +520,8 @@ void Solver::reconstruct_gradient()
 	}
 }
 
-void Solver::Solve(int l, const QMatrix& Q, const double *p_, const schar *y_,
+template<typename Qfloat>
+void Solver<Qfloat>::Solve(int l, const QMatrix<Qfloat>& Q, const double *p_, const schar *y_,
 		   double *alpha_, double Cp, double Cn, double eps,
 		   SolutionInfo* si, int shrinking)
 {
@@ -787,7 +803,8 @@ void Solver::Solve(int l, const QMatrix& Q, const double *p_, const schar *y_,
 }
 
 // return 1 if already optimal, return 0 otherwise
-int Solver::select_working_set(int &out_i, int &out_j)
+template<typename Qfloat>
+int Solver<Qfloat>::select_working_set(int &out_i, int &out_j)
 {
 	// return i,j such that
 	// i: maximizes -y_i * grad(f)_i, i in I_up(\alpha)
@@ -886,7 +903,8 @@ int Solver::select_working_set(int &out_i, int &out_j)
 	return 0;
 }
 
-bool Solver::be_shrunk(int i, double Gmax1, double Gmax2)
+template<typename Qfloat>
+bool Solver<Qfloat>::be_shrunk(int i, double Gmax1, double Gmax2)
 {
 	if(is_upper_bound(i))
 	{
@@ -906,7 +924,8 @@ bool Solver::be_shrunk(int i, double Gmax1, double Gmax2)
 		return(false);
 }
 
-void Solver::do_shrinking()
+template<typename Qfloat>
+void Solver<Qfloat>::do_shrinking()
 {
 	int i;
 	double Gmax1 = -INF;		// max { -y_i * grad(f)_i | i in I_up(\alpha) }
@@ -967,7 +986,8 @@ void Solver::do_shrinking()
 		}
 }
 
-double Solver::calculate_rho()
+template<typename Qfloat>
+double Solver<Qfloat>::calculate_rho()
 {
 	double r;
 	int nr_free = 0;
@@ -1010,16 +1030,17 @@ double Solver::calculate_rho()
 //
 // additional constraint: e^T \alpha = constant
 //
-class Solver_NU: public Solver
+template<typename Qfloat>
+class Solver_NU: public Solver<Qfloat>
 {
 public:
 	Solver_NU() {}
-	void Solve(int l, const QMatrix& Q, const double *p, const schar *y,
+	void Solve(int l, const QMatrix<Qfloat>& Q, const double *p, const schar *y,
 		   double *alpha, double Cp, double Cn, double eps,
 		   SolutionInfo* si, int shrinking)
 	{
 		this->si = si;
-		Solver::Solve(l,Q,p,y,alpha,Cp,Cn,eps,si,shrinking);
+		Solver<Qfloat>::Solve(l,Q,p,y,alpha,Cp,Cn,eps,si,shrinking);
 	}
 private:
 	SolutionInfo *si;
@@ -1027,10 +1048,25 @@ private:
 	double calculate_rho();
 	bool be_shrunk(int i, double Gmax1, double Gmax2, double Gmax3, double Gmax4);
 	void do_shrinking();
+
+	using Solver<Qfloat>::active_size;
+	using Solver<Qfloat>::y;
+	using Solver<Qfloat>::G;
+	using Solver<Qfloat>::Q;
+	using Solver<Qfloat>::QD;
+	using Solver<Qfloat>::eps;
+	using Solver<Qfloat>::l;
+	using Solver<Qfloat>::unshrink;
+
+	using Solver<Qfloat>::is_upper_bound;
+	using Solver<Qfloat>::is_lower_bound;
+	using Solver<Qfloat>::swap_index;
+	using Solver<Qfloat>::reconstruct_gradient;
 };
 
 // return 1 if already optimal, return 0 otherwise
-int Solver_NU::select_working_set(int &out_i, int &out_j)
+template<typename Qfloat>
+int Solver_NU<Qfloat>::select_working_set(int &out_i, int &out_j)
 {
 	// return i,j such that y_i = y_j and
 	// i: maximizes -y_i * grad(f)_i, i in I_up(\alpha)
@@ -1142,7 +1178,8 @@ int Solver_NU::select_working_set(int &out_i, int &out_j)
 	return 0;
 }
 
-bool Solver_NU::be_shrunk(int i, double Gmax1, double Gmax2, double Gmax3, double Gmax4)
+template<typename Qfloat>
+bool Solver_NU<Qfloat>::be_shrunk(int i, double Gmax1, double Gmax2, double Gmax3, double Gmax4)
 {
 	if(is_upper_bound(i))
 	{
@@ -1162,7 +1199,8 @@ bool Solver_NU::be_shrunk(int i, double Gmax1, double Gmax2, double Gmax3, doubl
 		return(false);
 }
 
-void Solver_NU::do_shrinking()
+template<typename Qfloat>
+void Solver_NU<Qfloat>::do_shrinking()
 {
 	double Gmax1 = -INF;	// max { -y_i * grad(f)_i | y_i = +1, i in I_up(\alpha) }
 	double Gmax2 = -INF;	// max { y_i * grad(f)_i | y_i = +1, i in I_low(\alpha) }
@@ -1214,7 +1252,8 @@ void Solver_NU::do_shrinking()
 		}
 }
 
-double Solver_NU::calculate_rho()
+template<typename Qfloat>
+double Solver_NU<Qfloat>::calculate_rho()
 {
 	int nr_free1 = 0,nr_free2 = 0;
 	double ub1 = INF, ub2 = INF;
@@ -1267,14 +1306,15 @@ double Solver_NU::calculate_rho()
 //
 // Q matrices for various formulations
 //
-class SVC_Q: public Kernel
+template<typename Qfloat>
+class SVC_Q: public Kernel<Qfloat>
 {
 public:
 	SVC_Q(const svm_problem& prob, const svm_parameter& param, const schar *y_)
-	:Kernel(prob.l, prob.x, param)
+	: Kernel<Qfloat>(prob.l, prob.x, param)
 	{
 		clone(y,y_,prob.l);
-		cache = new Cache(prob.l,(size_t)(param.cache_size*(1<<20)));
+		cache = new Cache<Qfloat>(prob.l,(size_t)(param.cache_size*(1<<20)));
 		QD = new Qfloat[prob.l];
 		for(int i=0;i<prob.l;i++)
 			QD[i] = (this->*kernel_function)(i,i);
@@ -1303,7 +1343,7 @@ public:
 	void swap_index(int i, int j) const
 	{
 		cache->swap_index(i,j);
-		Kernel::swap_index(i,j);
+		Kernel<Qfloat>::swap_index(i,j);
 		swap(y[i],y[j]);
 		swap(QD[i],QD[j]);
 	}
@@ -1316,17 +1356,20 @@ public:
 	}
 private:
 	schar *y;
-	Cache *cache;
+	Cache<Qfloat> *cache;
 	Qfloat *QD;
+
+	using Kernel<Qfloat>::kernel_function;
 };
 
-class ONE_CLASS_Q: public Kernel
+template<typename Qfloat>
+class ONE_CLASS_Q: public Kernel<Qfloat>
 {
 public:
 	ONE_CLASS_Q(const svm_problem& prob, const svm_parameter& param)
-	:Kernel(prob.l, prob.x, param)
+	: Kernel<Qfloat>(prob.l, prob.x, param)
 	{
-		cache = new Cache(prob.l,(size_t)(param.cache_size*(1<<20)));
+		cache = new Cache<Qfloat>(prob.l,(size_t)(param.cache_size*(1<<20)));
 		QD = new Qfloat[prob.l];
 		for(int i=0;i<prob.l;i++)
 			QD[i] = (this->*kernel_function)(i,i);
@@ -1352,7 +1395,7 @@ public:
 	void swap_index(int i, int j) const
 	{
 		cache->swap_index(i,j);
-		Kernel::swap_index(i,j);
+		Kernel<Qfloat>::swap_index(i,j);
 		swap(QD[i],QD[j]);
 	}
 
@@ -1362,18 +1405,21 @@ public:
 		delete[] QD;
 	}
 private:
-	Cache *cache;
+	Cache<Qfloat> *cache;
 	Qfloat *QD;
+
+	using Kernel<Qfloat>::kernel_function;
 };
 
-class SVR_Q: public Kernel
+template<typename Qfloat>
+class SVR_Q: public Kernel<Qfloat>
 {
 public:
 	SVR_Q(const svm_problem& prob, const svm_parameter& param)
-	:Kernel(prob.l, prob.x, param)
+	: Kernel<Qfloat>(prob.l, prob.x, param)
 	{
 		l = prob.l;
-		cache = new Cache(l,(size_t)(param.cache_size*(1<<20)));
+		cache = new Cache<Qfloat>(l,(size_t)(param.cache_size*(1<<20)));
 		QD = new Qfloat[2*l];
 		sign = new schar[2*l];
 		index = new int[2*l];
@@ -1436,12 +1482,14 @@ public:
 	}
 private:
 	int l;
-	Cache *cache;
+	Cache<Qfloat> *cache;
 	schar *sign;
 	int *index;
 	mutable int next_buffer;
 	Qfloat *buffer[2];
 	Qfloat *QD;
+
+	using Kernel<Qfloat>::kernel_function;
 };
 
 //
@@ -1449,7 +1497,7 @@ private:
 //
 static void solve_c_svc(
 	const svm_problem *prob, const svm_parameter* param,
-	double *alpha, Solver::SolutionInfo* si, double Cp, double Cn)
+	double *alpha, SolutionInfo* si, double Cp, double Cn)
 {
 	int l = prob->l;
 	double *minus_ones = new double[l];
@@ -1464,9 +1512,15 @@ static void solve_c_svc(
 		if(prob->y[i] > 0) y[i] = +1; else y[i] = -1;
 	}
 
-	Solver s;
-	s.Solve(l, SVC_Q(*prob,*param,y), minus_ones, y,
-		alpha, Cp, Cn, param->eps, si, param->shrinking);
+   if (param->use_double_precision_kernel_values) {
+      Solver<double> s;
+      s.Solve(l, SVC_Q<double>(*prob,*param,y), minus_ones, y,
+         alpha, Cp, Cn, param->eps, si, param->shrinking);
+   } else {
+      Solver<float> s;
+      s.Solve(l, SVC_Q<float>(*prob,*param,y), minus_ones, y,
+         alpha, Cp, Cn, param->eps, si, param->shrinking);
+   }
 
 	double sum_alpha=0;
 	for(i=0;i<l;i++)
@@ -1484,7 +1538,7 @@ static void solve_c_svc(
 
 static void solve_nu_svc(
 	const svm_problem *prob, const svm_parameter *param,
-	double *alpha, Solver::SolutionInfo* si)
+	double *alpha, SolutionInfo* si)
 {
 	int i;
 	int l = prob->l;
@@ -1518,9 +1572,15 @@ static void solve_nu_svc(
 	for(i=0;i<l;i++)
 		zeros[i] = 0;
 
-	Solver_NU s;
-	s.Solve(l, SVC_Q(*prob,*param,y), zeros, y,
-		alpha, 1.0, 1.0, param->eps, si,  param->shrinking);
+   if (param->use_double_precision_kernel_values) {
+      Solver_NU<double> s;
+      s.Solve(l, SVC_Q<double>(*prob,*param,y), zeros, y,
+         alpha, 1.0, 1.0, param->eps, si,  param->shrinking);
+   } else {
+      Solver_NU<float> s;
+      s.Solve(l, SVC_Q<float>(*prob,*param,y), zeros, y,
+         alpha, 1.0, 1.0, param->eps, si,  param->shrinking);
+   }
 	double r = si->r;
 
 	info("C = %f\n",1/r);
@@ -1539,7 +1599,7 @@ static void solve_nu_svc(
 
 static void solve_one_class(
 	const svm_problem *prob, const svm_parameter *param,
-	double *alpha, Solver::SolutionInfo* si)
+	double *alpha, SolutionInfo* si)
 {
 	int l = prob->l;
 	double *zeros = new double[l];
@@ -1561,9 +1621,15 @@ static void solve_one_class(
 		ones[i] = 1;
 	}
 
-	Solver s;
-	s.Solve(l, ONE_CLASS_Q(*prob,*param), zeros, ones,
-		alpha, 1.0, 1.0, param->eps, si, param->shrinking);
+   if (param->use_double_precision_kernel_values) {
+      Solver<double> s;
+      s.Solve(l, ONE_CLASS_Q<double>(*prob,*param), zeros, ones,
+         alpha, 1.0, 1.0, param->eps, si, param->shrinking);
+   } else {
+      Solver<float> s;
+      s.Solve(l, ONE_CLASS_Q<float>(*prob,*param), zeros, ones,
+         alpha, 1.0, 1.0, param->eps, si, param->shrinking);
+   }
 
 	delete[] zeros;
 	delete[] ones;
@@ -1571,7 +1637,7 @@ static void solve_one_class(
 
 static void solve_epsilon_svr(
 	const svm_problem *prob, const svm_parameter *param,
-	double *alpha, Solver::SolutionInfo* si)
+	double *alpha, SolutionInfo* si)
 {
 	int l = prob->l;
 	double *alpha2 = new double[2*l];
@@ -1590,9 +1656,15 @@ static void solve_epsilon_svr(
 		y[i+l] = -1;
 	}
 
-	Solver s;
-	s.Solve(2*l, SVR_Q(*prob,*param), linear_term, y,
-		alpha2, param->C, param->C, param->eps, si, param->shrinking);
+   if (param->use_double_precision_kernel_values) {
+      Solver<double> s;
+      s.Solve(2*l, SVR_Q<double>(*prob,*param), linear_term, y,
+         alpha2, param->C, param->C, param->eps, si, param->shrinking);
+   } else {
+      Solver<float> s;
+      s.Solve(2*l, SVR_Q<float>(*prob,*param), linear_term, y,
+         alpha2, param->C, param->C, param->eps, si, param->shrinking);
+   }
 
 	double sum_alpha = 0;
 	for(i=0;i<l;i++)
@@ -1609,7 +1681,7 @@ static void solve_epsilon_svr(
 
 static void solve_nu_svr(
 	const svm_problem *prob, const svm_parameter *param,
-	double *alpha, Solver::SolutionInfo* si)
+	double *alpha, SolutionInfo* si)
 {
 	int l = prob->l;
 	double C = param->C;
@@ -1631,9 +1703,15 @@ static void solve_nu_svr(
 		y[i+l] = -1;
 	}
 
-	Solver_NU s;
-	s.Solve(2*l, SVR_Q(*prob,*param), linear_term, y,
-		alpha2, C, C, param->eps, si, param->shrinking);
+   if (param->use_double_precision_kernel_values) {
+      Solver_NU<double> s;
+      s.Solve(2*l, SVR_Q<double>(*prob,*param), linear_term, y,
+         alpha2, C, C, param->eps, si, param->shrinking);
+   } else {
+      Solver_NU<float> s;
+      s.Solve(2*l, SVR_Q<float>(*prob,*param), linear_term, y,
+         alpha2, C, C, param->eps, si, param->shrinking);
+   }
 
 	info("epsilon = %f\n",-si->r);
 
@@ -1659,7 +1737,7 @@ static decision_function svm_train_one(
 	double Cp, double Cn)
 {
 	double *alpha = Malloc(double,prob->l);
-	Solver::SolutionInfo si;
+	SolutionInfo si;
 	switch(param->svm_type)
 	{
 		case C_SVC:
@@ -2610,7 +2688,7 @@ double svm_predict_values(const svm_model *model, const svm_node *x, double* dec
 #pragma omp parallel for private(i) reduction(+:sum) schedule(guided)
 #endif
 		for(i=0;i<model->l;i++)
-			sum += sv_coef[i] * Kernel::k_function(x,model->SV[i],model->param);
+			sum += sv_coef[i] * Kernel<double>::k_function(x,model->SV[i],model->param);
 		sum -= model->rho[0];
 		*dec_values = sum;
 
@@ -2629,7 +2707,7 @@ double svm_predict_values(const svm_model *model, const svm_node *x, double* dec
 #pragma omp parallel for private(i) schedule(guided)
 #endif
 		for(i=0;i<l;i++)
-			kvalue[i] = Kernel::k_function(x,model->SV[i],model->param);
+			kvalue[i] = Kernel<double>::k_function(x,model->SV[i],model->param);
 
 		int *start = Malloc(int,nr_class);
 		start[0] = 0;
