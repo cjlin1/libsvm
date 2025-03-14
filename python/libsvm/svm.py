@@ -2,6 +2,7 @@ from ctypes import *
 from ctypes.util import find_library
 from os import path
 from glob import glob
+from enum import IntEnum
 import sys
 
 try:
@@ -17,10 +18,8 @@ if sys.version_info[0] < 3:
     from itertools import izip as zip
 
 __all__ = ['libsvm', 'svm_problem', 'svm_parameter',
-           'toPyModel', 'gen_svm_nodearray', 'print_null', 'svm_node', 'C_SVC',
-           'EPSILON_SVR', 'LINEAR', 'NU_SVC', 'NU_SVR', 'ONE_CLASS',
-           'POLY', 'PRECOMPUTED', 'PRINT_STRING_FUN', 'RBF',
-           'SIGMOID', 'c_double', 'svm_model']
+           'toPyModel', 'gen_svm_nodearray', 'print_null', 'svm_node', 'svm_forms',
+            'PRINT_STRING_FUN', 'kernel_names', 'c_double', 'svm_model']
 
 try:
     dirname = path.dirname(path.abspath(__file__))
@@ -42,17 +41,19 @@ except:
         else:
             raise Exception('LIBSVM library not found.')
 
-C_SVC = 0
-NU_SVC = 1
-ONE_CLASS = 2
-EPSILON_SVR = 3
-NU_SVR = 4
+class svm_forms(IntEnum):
+    C_SVC = 0
+    NU_SVC = 1
+    ONE_CLASS = 2
+    EPSILON_SVR = 3
+    NU_SVR = 4
 
-LINEAR = 0
-POLY = 1
-RBF = 2
-SIGMOID = 3
-PRECOMPUTED = 4
+class kernel_names(IntEnum):
+    LINEAR = 0
+    POLY = 1
+    RBF = 2
+    SIGMOID = 3
+    PRECOMPUTED = 4
 
 PRINT_STRING_FUN = CFUNCTYPE(None, c_char_p)
 def print_null(s):
@@ -262,8 +263,8 @@ class svm_parameter(Structure):
         return s
 
     def set_to_default_values(self):
-        self.svm_type = C_SVC;
-        self.kernel_type = RBF
+        self.svm_type = svm_forms.C_SVC;
+        self.kernel_type = kernel_names.RBF
         self.degree = 3
         self.gamma = 0
         self.coef0 = 0
@@ -297,10 +298,10 @@ class svm_parameter(Structure):
         while i < len(argv):
             if argv[i] == "-s":
                 i = i + 1
-                self.svm_type = int(argv[i])
+                self.svm_type = svm_forms(int(argv[i]))
             elif argv[i] == "-t":
                 i = i + 1
-                self.kernel_type = int(argv[i])
+                self.kernel_type = kernel_names(int(argv[i]))
             elif argv[i] == "-d":
                 i = i + 1
                 self.degree = int(argv[i])
