@@ -59,6 +59,14 @@ PRINT_STRING_FUN = CFUNCTYPE(None, c_char_p)
 def print_null(s):
     return
 
+# In multi-threading, all threads share the same memory space of
+# the dynamic library (libsvm). Thus, we use a module-level
+# variable to keep a reference to ctypes print_null, preventing
+# python from garbage collecting it in thread B while thread A
+# still needs it. Check the usage of svm_set_print_string_function()
+# in LIBSVM README for details.
+ctypes_print_null = PRINT_STRING_FUN(print_null)
+
 def genFields(names, types):
     return list(zip(names, types))
 
@@ -333,7 +341,7 @@ class svm_parameter(Structure):
                 i = i + 1
                 self.probability = int(argv[i])
             elif argv[i] == "-q":
-                self.print_func = PRINT_STRING_FUN(print_null)
+                self.print_func = ctypes_print_null
             elif argv[i] == "-v":
                 i = i + 1
                 self.cross_validation = 1
