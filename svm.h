@@ -1,7 +1,7 @@
 #ifndef _LIBSVM_H
 #define _LIBSVM_H
 
-#define LIBSVM_VERSION 335
+#define LIBSVM_VERSION 336
 
 #ifdef __cplusplus
 extern "C" {
