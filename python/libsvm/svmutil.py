@@ -84,6 +84,9 @@ def svm_train(arg1, arg2=None, arg3=None):
         -e epsilon : set tolerance of termination criterion (default 0.001)
         -h shrinking : whether to use the shrinking heuristics, 0 or 1 (default 1)
         -b probability_estimates : whether to train a model for probability estimates, 0 or 1 (default 0)
+	     -f floatprecision : set the floating-point precision of kernel values (default 0)
+	         0 -- float
+	         1 -- double
         -wi weight : set the parameter C of class i to weight*C, for C-SVC (default 1)
         -v n: n-fold cross validation mode
         -q : quiet mode (no outputs)

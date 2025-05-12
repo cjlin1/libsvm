@@ -46,6 +46,9 @@ void exit_with_help()
 	"-e epsilon : set tolerance of termination criterion (default 0.001)\n"
 	"-h shrinking : whether to use the shrinking heuristics, 0 or 1 (default 1)\n"
 	"-b probability_estimates : whether to train a SVC or SVR model for probability estimates, 0 or 1 (default 0)\n"
+	"-f floatprecision : set the floating-point precision of kernel values (default 0)\n"
+	"  0 -- float\n"
+	"  1 -- double\n"
 	"-wi weight : set the parameter C of class i to weight*C, for C-SVC (default 1)\n"
 	"-v n: n-fold cross validation mode\n"
 	"-q : quiet mode (no outputs)\n"
@@ -125,6 +128,7 @@ int parse_command_line(int nrhs, const mxArray *prhs[], char *model_file_name)
 	param.p = 0.1;
 	param.shrinking = 1;
 	param.probability = 0;
+	param.use_double_precision_kernel_values = 0;
 	param.nr_weight = 0;
 	param.weight_label = NULL;
 	param.weight = NULL;
@@ -187,6 +191,9 @@ int parse_command_line(int nrhs, const mxArray *prhs[], char *model_file_name)
 			case 'b':
 				param.probability = atoi(argv[i]);
 				break;
+			case 'f':
+			   param.use_double_precision_kernel_values = atoi(argv[i]);
+			   break;
 			case 'q':
 				print_func = &print_null;
 				i--;
