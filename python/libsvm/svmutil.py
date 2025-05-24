@@ -176,7 +176,7 @@ def svm_predict(y, x, m, options=""):
 
     if scipy and isinstance(x, np.ndarray):
         x = np.ascontiguousarray(x) # enforce row-major
-    elif sparse and isinstance(x, sparse.spmatrix):
+    elif scipy and isinstance(x, sparse.spmatrix):
         x = x.tocsr()
     elif not isinstance(x, (list, tuple)):
         raise TypeError("type of x: {0} is not supported!".format(type(x)))
