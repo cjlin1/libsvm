@@ -443,13 +443,29 @@ The above command loads
     >>> m = svm_train(y, x, '-c 5')
     >>> p_labels, p_acc, p_vals = svm_predict(y, x, m)
 
-- Functions: svm_read_problem/svm_load_model/svm_save_model
+- Function: svm_read_problem
+
+    Read the data from a LIBSVM-format file or object.
+
+    # Read the data from a file path
+    >>> y, x = svm_read_problem('data.txt')
+
+    # Read the data from an object created from an url
+    >>> import urllib.request
+    >>> import bz2
+    >>> url = 'https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary/leu.bz2'
+    >>> with urllib.request.urlopen(url) as r:
+    >>>     with bz2.open(r, 'rt') as f:
+    >>>         y, x = svm_read_problem(f)
+
+    Note that we must convert the file object to text mode before
+    passing it to svm_read_problem() as we do not support binary
+    mode.
+
+- Functions: svm_load_model/svm_save_model
 
     See the usage by examples:
 
-    >>> y, x = svm_read_problem('data.txt')
-    >>> with open('data.txt') as f:
-    >>>     y, x = svm_read_problem(f)
     >>> m = svm_load_model('model_file')
     >>> svm_save_model('model_file', m)
 
