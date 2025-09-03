@@ -95,7 +95,7 @@ interface.
 # Read data in LIBSVM format
 >>> y, x = svm_read_problem('../heart_scale')
 >>> m = svm_train(y[:200], x[:200], '-c 4')
->>> p_label, p_acc, p_val = svm_predict(y[200:], x[200:], m)
+>>> pred_labels, pred_metrics, pred_values = svm_predict(y[200:], x[200:], m)
 
 # Construct problem in python format
 # Dense data
@@ -121,8 +121,8 @@ interface.
 # Other utility functions
 >>> svm_save_model('heart_scale.model', m)
 >>> m = svm_load_model('heart_scale.model')
->>> p_label, p_acc, p_val = svm_predict(y, x, m, '-b 1')
->>> ACC, MSE, SCC = evaluations(y, p_label)
+>>> pred_labels, pred_metrics, pred_values = svm_predict(y, x, m, '-b 1')
+>>> ACC, MSE, SCC = evaluations(y, pred_labels)
 
 # Getting online help
 >>> help(svm_train)
@@ -154,7 +154,7 @@ in svmutil.py and the usage is the same as the LIBSVM MATLAB interface.
 # Read data in LIBSVM format
 >>> y, x = svm_read_problem('../heart_scale', return_scipy = True) # y: ndarray, x: csr_matrix
 >>> m = svm_train(y[:200], x[:200, :], '-c 4')
->>> p_label, p_acc, p_val = svm_predict(y[200:], x[200:, :], m)
+>>> pred_labels, pred_metrics, pred_values = svm_predict(y[200:], x[200:, :], m)
 
 # Construct problem in Scipy format
 # Dense data: numpy ndarray
@@ -184,8 +184,8 @@ in svmutil.py and the usage is the same as the LIBSVM MATLAB interface.
 # Other utility functions
 >>> svm_save_model('heart_scale.model', m)
 >>> m = svm_load_model('heart_scale.model')
->>> p_label, p_acc, p_val = svm_predict(y, x, m, '-b 1')
->>> ACC, MSE, SCC = evaluations(y, p_label)
+>>> pred_labels, pred_metrics, pred_values = svm_predict(y, x, m, '-b 1')
+>>> ACC, MSE, SCC = evaluations(y, pred_labels)
 
 # Getting online help
 >>> help(svm_train)
@@ -403,7 +403,7 @@ The above command loads
 
     To predict testing data with a model, use
 
-    >>> p_labs, p_acc, p_vals = svm_predict(y, x, model [,'predicting_options'])
+    >>> pred_labels, pred_metrics, pred_values = svm_predict(y, x, model [,'predicting_options'])
 
     y: a list/tuple/ndarray of l true labels (type must be int/double).
        It is used for calculating the accuracy. Use [] if true labels are
@@ -419,13 +419,13 @@ The above command loads
 
     model: an svm_model instance.
 
-    p_labels: a list of predicted labels
+    pred_labels: a list of predicted labels
 
-    p_acc: a tuple including accuracy (for classification), mean
+    pred_metrics: a tuple of metrics including accuracy (for classification), mean
            squared error, and squared correlation coefficient (for
            regression).
 
-    p_vals: a list of decision values or probability estimates (if '-b 1'
+    pred_values: a list of decision values or probability estimates (if '-b 1'
             is specified). If k is the number of classes in training data,
             for decision values, each element includes results of predicting
             k(k-1)/2 binary-class SVMs. For classification, k = 1 is a
@@ -441,7 +441,7 @@ The above command loads
     Example:
 
     >>> m = svm_train(y, x, '-c 5')
-    >>> p_labels, p_acc, p_vals = svm_predict(y, x, m)
+    >>> pred_labels, pred_metrics, pred_values = svm_predict(y, x, m)
 
 - Function: svm_read_problem
 

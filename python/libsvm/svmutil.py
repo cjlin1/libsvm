@@ -141,7 +141,7 @@ def svm_train(arg1, arg2=None, arg3=None):
 
 def svm_predict(y, x, m, options=""):
     """
-    svm_predict(y, x, m [, options]) -> (p_labels, p_acc, p_vals)
+    svm_predict(y, x, m [, options]) -> (pred_labels, pred_metrics, pred_values)
 
     y: a list/tuple/ndarray of l true labels (type must be int/double).
        It is used for calculating the accuracy. Use [] if true labels are
@@ -159,10 +159,10 @@ def svm_predict(y, x, m, options=""):
         -q : quiet mode (no outputs).
 
     The return tuple contains
-    p_labels: a list of predicted labels
-    p_acc: a tuple including  accuracy (for classification), mean-squared
+    pred_labels: a list of predicted labels
+    pred_metrics: a tuple of metrics including  accuracy (for classification), mean-squared
            error, and squared correlation coefficient (for regression).
-    p_vals: a list of decision values or probability estimates (if '-b 1'
+    pred_values: a list of decision values or probability estimates (if '-b 1'
             is specified). If k is the number of classes, for decision values,
             each element includes results of predicting k(k-1)/2 binary-class
             SVMs. For probabilities, each element contains k values indicating
