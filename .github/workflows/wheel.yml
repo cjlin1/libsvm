@@ -15,31 +15,36 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-2022, macos-13]
+        os: [windows-latest, windows-11-arm, macos-15-intel, macos-latest]
+        python-version: ["3.13"]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v5
+
+      # Used to host cibuildwheel
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
 
       - name: Set MacOS compiler
         if: runner.os == 'macOS'
         run: |
-          brew install gcc@13;
           echo "CXX=gcc-13" >> $GITHUB_ENV
+          echo "MACOSX_DEPLOYMENT_TARGET=15.0" >> $GITHUB_ENV
+
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel==3.3.0
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.10.2
+        run: cd python ; python -m cibuildwheel --output-dir wheelhouse
         env:
           # don't build for PyPython and windows 32-bit
           CIBW_SKIP: pp* *win32*
           # force compiler on macOS
           CXX: ${{ env.CXX }}
           CC: ${{ env.CXX }}
-        with:
-          package-dir: ./python
-          output-dir: ./python/wheelhouse
 
-      - name: Upload a Build Artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: wheels-${{ matrix.os }}
-          path: ./python/wheelhouse
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          path: ./python/wheelhouse/*.whl
